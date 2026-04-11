@@ -44,3 +44,5 @@ Se já existia MySQL na stack **ematricula** com dados:
 4. **Remover** volumes órfãos antigos só depois de confirmar que o backup está seguro.
 
 Não apagar volumes de produção sem backup explícito.
+
+Após mover uma app de MySQL/Redis “embutidos” para o shared, podem ficar **contentores órfãos** (`infra_<app>_mysql`, etc.). Remova-os com `docker rm -f <nome>` ou suba a stack da app com `docker compose up -d --remove-orphans` uma vez.
