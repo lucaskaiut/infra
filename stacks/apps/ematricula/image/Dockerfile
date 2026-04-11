@@ -33,7 +33,6 @@ RUN apk add --no-cache \
 WORKDIR /var/www/html
 COPY --from=vendor /app /var/www/html
 COPY --from=assets /app/public/build /var/www/html/public/build
-COPY image/bootstrap-app.production.php /var/www/html/bootstrap/app.php
 
 COPY image/nginx.conf /etc/nginx/http.d/default.conf
 COPY image/supervisord.conf /etc/supervisord.conf

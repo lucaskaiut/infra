@@ -1,0 +1,28 @@
+---
+description: Não alterar código das aplicações; só infra; avisar o utilizador em erros da app
+alwaysApply: true
+---
+
+# Aplicações: sem alterações pelo agente
+
+## Limite de responsabilidade
+
+Este repositório cobre **infraestrutura** (Compose, proxy, TLS, imagens de *empacotamento*, variáveis de exemplo, documentação de deploy). **Não** é responsabilidade do agente alterar **código das aplicações** (repositórios como `ematricula`, pastas `api/` dos monorepos, `bootstrap/app.php`, rotas, lógica de negócio, patches sobre ficheiros da app dentro da imagem, etc.).
+
+## Proibido
+
+- Sobrescrever, patchar ou injetar ficheiros que pertençam ao código-fonte da aplicação (ex.: copiar um `bootstrap/app.php` alternativo por cima do do projeto).
+- Fazer commit ou push em repositórios de aplicação a partir deste contexto.
+- “Corrigir” bugs de Laravel/PHP/Node da app ao editar o código da app ou equivalente na imagem.
+
+## Se a aplicação falhar (5xx, rotas, auth, jobs)
+
+1. **Informar o utilizador** com o sintoma, logs relevantes do container (ex.: `docker logs`, `storage/logs` se montado) e a hipótese de causa **no projeto da aplicação**.
+2. **Manter o foco em infra**: rede, DNS, Traefik, variáveis de ambiente do Compose, saúde de MySQL/Redis, ordem de subida, rebuild da imagem a partir do clone **inalterado** da app.
+3. **Não** implementar workarounds no código da aplicação nem substituir ficheiros da app na Docker image.
+
+## Permitido em `stacks/apps/*`
+
+- `Dockerfile` que **copia** o código clonado tal como vem do repositório upstream (sem substituir ficheiros de aplicação por versões mantidas em `infra`).
+- `docker-compose.yml`, Nginx **só** como reverse interno (PHP-FPM), entrypoints que corram `migrate` / processos de longa duração **sem** alterar fontes da app.
+- `.env.example` da stack com chaves esperadas pela app (sem segredos).

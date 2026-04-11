@@ -45,10 +45,6 @@ docker compose build --no-cache
 docker compose up -d
 ```
 
-## Patch na imagem (`bootstrap/app.php`)
-
-A imagem substitui `bootstrap/app.php` por `image/bootstrap-app.production.php`, que define `redirectGuestsTo` para rotas `api/*` e pedidos JSON **sem** redirecionar para `route('login')` (inexistente nesta API). Quando o mesmo ajuste existir no repositório [ematricula](https://github.com/lucaskaiut/ematricula), pode remover-se o `COPY` correspondente do `Dockerfile` para evitar deriva.
-
 ## Serviços
 
 | Serviço     | Função                          |
