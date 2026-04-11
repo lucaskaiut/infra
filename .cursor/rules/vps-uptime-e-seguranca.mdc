@@ -33,3 +33,123 @@ Usar o host configurado pelo utilizador (ex.: `ssh contabo`). Preferir `BatchMod
 ## Conflito entre “corrigir rápido” e uptime
 
 Preferir alterações **incrementais** e `up -d`. Se a correção exigir `down` ou downtime, **descrever o impacto** e **obter confirmação** antes de executar.
+
+## Validação antes de deploy
+
+Antes de qualquer push ou deploy, validar:
+
+- Sintaxe de arquivos alterados (YAML, JSON, Dockerfile).
+- `docker compose config` para garantir que o compose é válido.
+- Se existir build: executar build local da imagem (sem subir).
+- Verificar variáveis obrigatórias referenciadas no compose.
+
+Se qualquer validação falhar:
+- NÃO fazer commit/push
+- Reportar erro claramente ao utilizador
+
+## Princípio do menor privilégio
+
+Sempre que criar ou alterar serviços:
+
+- Não usar `privileged: true`
+- Evitar rodar como root (definir `user` quando possível)
+- Limitar capabilities (`cap_drop: all` quando possível)
+- Definir apenas portas estritamente necessárias
+
+Se uma exceção for necessária:
+- Explicar o motivo ao utilizador
+
+## Isolamento de rede
+
+- Criar redes separadas por contexto (ex: edge, apps, db)
+- Apenas serviços que precisam se comunicar devem compartilhar rede
+- Bases de dados não devem estar expostas ao host
+
+Evitar:
+- Tudo na mesma network padrão
+
+## Rollback seguro
+
+Se após deploy:
+
+- Healthcheck falhar
+- HTTP status != 200
+- Container reiniciar continuamente
+
+Então:
+
+1. Não insistir no estado atual
+2. Sugerir rollback
+3. Se existir versão anterior disponível:
+   - Reverter para a última versão funcional
+
+Nunca deixar serviço quebrado sem ação
+
+## Observabilidade mínima
+
+Após alterações:
+
+- Verificar logs dos containers críticos
+- Verificar status (`docker compose ps`)
+- Validar healthchecks definidos
+
+Se não houver healthcheck:
+- Sugerir implementação ao utilizador
+
+## Reprodutibilidade
+
+- Nunca depender de estado manual da VPS
+- Tudo deve ser reproduzível via código (compose, dockerfile, env)
+- Não usar comandos manuais como solução permanente
+
+Se algo exigir ação manual:
+- Documentar claramente
+
+## Consistência de ambientes
+
+Garantir que:
+
+- Imagens são versionadas (não usar `latest`)
+- Variáveis críticas são explícitas
+- Diferenças entre ambientes (dev/prod) são claras
+
+Evitar:
+- comportamento implícito
+
+## Limpeza controlada
+
+Permitido apenas com autorização:
+
+- Remover imagens não utilizadas (sem afetar containers ativos)
+- Limpar caches de build
+
+Nunca:
+- Remover volumes ou dados persistentes
+
+## Gestão de segredos
+
+- Nunca logar valores de variáveis sensíveis
+- Nunca expor `.env` completo
+- Sempre usar placeholders ao mostrar exemplos
+
+Se necessário:
+- Mostrar apenas nomes das variáveis
+
+## Deploy incremental
+
+- Atualizar apenas serviços afetados pela mudança
+- Evitar rebuild geral sem necessidade
+- Detectar quais stacks foram alteradas
+
+Priorizar:
+- menor impacto possível
+
+## Explicação de ações críticas
+
+Antes de ações com impacto:
+
+- Explicar o que será feito
+- Explicar o risco
+- Aguardar confirmação (se houver impacto)
+
+Nunca agir no escuro
