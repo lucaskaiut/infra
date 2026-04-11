@@ -50,6 +50,7 @@ cd .. && docker compose build && docker compose up -d
 
 ## Notas
 
+- A imagem Docker aplica um `bootstrap/app.php` com `redirectGuestsTo` adequado à API (evita erro 500 em `/api/*` sem token quando não existe rota `login`). Ver `stacks/apps/ematricula/README.md`.
 - A primeira subida do `app` corre `php artisan migrate --force`.
 - O dashboard Horizon em `/horizon` está protegido pelo gate da aplicação; o processo **horizon** processa jobs independentemente da UI.
 - Se `URL` gerada incorretamente atrás do proxy, pode ser necessário confiar em proxies no projeto Laravel (`TrustProxies` / `trustProxies` no bootstrap) numa alteração futura do repositório da app.
