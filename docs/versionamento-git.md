@@ -10,7 +10,7 @@
 ## Não versionar
 
 - `stacks/edge/secrets/dashboard.htpasswd` (credenciais do dashboard Traefik). Versiona-se apenas `dashboard.htpasswd.example`.
-- `stacks/shared/.env` (root MySQL e passwords de BDs criadas no init).
+- `stacks/shared/.env` (credenciais `MYSQL_*` e root).
 - `.env` com domínio real, e-mail ACME e segredos.
 - Arquivos de certificado ou estado do Let's Encrypt gerados em volume ou bind mount local (ex.: `acme.json` em disco, se no futuro for bind mount).
 - Chaves SSH, tokens Jenkins, credenciais de registry.

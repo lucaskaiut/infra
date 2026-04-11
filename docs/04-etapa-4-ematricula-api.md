@@ -20,7 +20,7 @@ cd ~/infra/stacks/shared
 cp .env.example .env
 ```
 
-Defina `MYSQL_ROOT_PASSWORD` e `EMATRICULA_DB_PASSWORD` (e `EMATRICULA_DB_NAME` / `EMATRICULA_DB_USER` se alterar os padrões).
+Defina `MYSQL_ROOT_PASSWORD`, `MYSQL_DATABASE`, `MYSQL_USER` e `MYSQL_PASSWORD` (valores que a app eMatricula usará como `DB_DATABASE`, `DB_USERNAME` e `DB_PASSWORD`).
 
 ```bash
 docker compose --env-file .env up -d
@@ -33,7 +33,7 @@ cp .env.example .env
 ```
 
 - `APP_KEY`, `APP_URL`, etc.
-- **`DB_PASSWORD` deve coincidir com `EMATRICULA_DB_PASSWORD`** do shared.
+- **`DB_DATABASE` / `DB_USERNAME` / `DB_PASSWORD`** iguais a **`MYSQL_DATABASE` / `MYSQL_USER` / `MYSQL_PASSWORD`** do shared.
 - `DB_HOST=mysql`, `REDIS_HOST=redis`, `REDIS_PREFIX=ematricula_` (recomendado no Redis partilhado).
 
 ## Deploy

@@ -2,6 +2,8 @@
 
 Uma única instância de **MySQL** e **Redis** para todas as aplicações que precisem deles. A rede Docker **`infra_shared`** liga estes serviços às stacks em `stacks/apps/*`.
 
+Nada nesta stack referencia uma app concreta: nomes de base, utilizador e passwords vêm só do teu `.env`.
+
 ## Ordem de subida
 
 1. `stacks/edge/` (Traefik, rede `infra_edge`)
@@ -15,9 +17,10 @@ cd ~/infra/stacks/shared
 cp .env.example .env
 ```
 
-Edite `.env`: `MYSQL_ROOT_PASSWORD` e `EMATRICULA_DB_PASSWORD` (e nome/utilizador da BD se mudar do padrão).
+Edite `.env`:
 
-**A password `EMATRICULA_DB_PASSWORD` deve ser a mesma** que `DB_PASSWORD` no `.env` da stack **ematricula** (e de qualquer outra app que use essa BD).
+- `MYSQL_ROOT_PASSWORD` — root do MySQL.
+- `MYSQL_DATABASE`, `MYSQL_USER`, `MYSQL_PASSWORD` — base e utilizador criados **na primeira inicialização** do volume (imagem oficial MySQL). Cada aplicação que use esta base deve ter no **seu** `.env` os mesmos `DB_DATABASE` / `DB_USERNAME` / `DB_PASSWORD` (ou equivalente).
 
 ## Subir
 
@@ -26,15 +29,13 @@ docker compose --env-file .env up -d
 docker compose --env-file .env ps
 ```
 
-## Novas bases de dados / aplicações
+## Mais bases ou utilizadores
 
-Os scripts em `mysql/init/` só correm na **primeira inicialização** do volume MySQL (diretório de dados vazio). Para uma segunda aplicação:
+A imagem cria **uma** base + utilizador no primeiro arranque com volume vazio. Para outras BDs:
 
-1. Adicionar novo script numerado (ex.: `02-outro-app.sh`) e variáveis no `.env` da stack shared, **ou**
-2. Criar BD e utilizador manualmente com `mysql -uroot -p` dentro do container após a primeira subida.
-
-Documente o padrão em `docs/05-servicos-compartilhados.md`.
+- `mysql -uroot -p` dentro do container, **ou**
+- montar scripts em `docker-entrypoint-initdb.d` (adicionar volume e ficheiros `.sql`/`.sh` ao `docker-compose.yml` quando precisares).
 
 ## Redis e isolamento
 
-Várias apps no mesmo Redis devem usar **prefixos ou bases diferentes** (ex.: `REDIS_PREFIX` no Laravel) para evitar colisão de chaves. A stack eMatricula define `REDIS_PREFIX=ematricula_` no `.env.example`.
+Várias apps no mesmo Redis devem usar **prefixos ou bases lógicas** na aplicação (ex.: Laravel `REDIS_PREFIX`) para evitar colisão de chaves.

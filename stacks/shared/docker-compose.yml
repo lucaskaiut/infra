@@ -7,12 +7,11 @@ services:
     restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?defina MYSQL_ROOT_PASSWORD no .env}
-      EMATRICULA_DB_NAME: ${EMATRICULA_DB_NAME:-ematricula}
-      EMATRICULA_DB_USER: ${EMATRICULA_DB_USER:-ematricula}
-      EMATRICULA_DB_PASSWORD: ${EMATRICULA_DB_PASSWORD:?defina EMATRICULA_DB_PASSWORD no .env}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:?defina MYSQL_DATABASE no .env}
+      MYSQL_USER: ${MYSQL_USER:?defina MYSQL_USER no .env}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?defina MYSQL_PASSWORD no .env}
     volumes:
       - shared_mysql_data:/var/lib/mysql
-      - ./mysql/init:/docker-entrypoint-initdb.d:ro
     networks:
       - shared_data
     healthcheck:

@@ -1,0 +1,1 @@
+Pasta reservada para scripts opcionais de inicialização do MySQL (`docker-entrypoint-initdb.d`). Por defeito o `docker-compose.yml` da stack **shared** não monta este diretório: a criação inicial da base usa apenas as variáveis `MYSQL_DATABASE`, `MYSQL_USER` e `MYSQL_PASSWORD` da imagem oficial.

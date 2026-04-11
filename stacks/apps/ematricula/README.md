@@ -30,7 +30,7 @@ cp .env.example .env
 ```
 
 - Gere `APP_KEY` (ex.: `php artisan key:generate --show` noutro ambiente ou ver doc da Etapa 4).
-- **`DB_PASSWORD` tem de ser igual a `EMATRICULA_DB_PASSWORD`** definido em `stacks/shared/.env`.
+- **`DB_DATABASE`, `DB_USERNAME` e `DB_PASSWORD`** alinhados com **`MYSQL_DATABASE`, `MYSQL_USER` e `MYSQL_PASSWORD`** em `stacks/shared/.env`.
 - `DB_HOST=mysql` e `REDIS_HOST=redis` resolvem para os serviços partilhados.
 - `REDIS_PREFIX=ematricula_` reduz colisões com outras apps no mesmo Redis.
 
