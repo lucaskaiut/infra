@@ -1,0 +1,110 @@
+name: infra-app-ematricula
+
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: infra_ematricula_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?defina MYSQL_ROOT_PASSWORD no .env}
+      MYSQL_DATABASE: ${DB_DATABASE:?}
+      MYSQL_USER: ${DB_USERNAME:?}
+      MYSQL_PASSWORD: ${DB_PASSWORD:?}
+    volumes:
+      - ematricula_mysql_data:/var/lib/mysql
+    networks:
+      - ematricula_internal
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p\"$$MYSQL_ROOT_PASSWORD\" || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 30s
+
+  redis:
+    image: redis:7-alpine
+    container_name: infra_ematricula_redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    volumes:
+      - ematricula_redis_data:/data
+    networks:
+      - ematricula_internal
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  app:
+    image: local/ematricula-app:latest
+    build:
+      context: .
+      dockerfile: image/Dockerfile
+    container_name: infra_ematricula_app
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      CONTAINER_ROLE: web
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - edge
+      - ematricula_internal
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1/up || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 120s
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.ematricula-api.rule=Host(`ematricula-api.lucaskaiut.com.br`)
+      - traefik.http.routers.ematricula-api.entrypoints=websecure
+      - traefik.http.routers.ematricula-api.tls.certresolver=letsencrypt
+      - traefik.http.services.ematricula-api.loadbalancer.server.port=80
+
+  horizon:
+    image: local/ematricula-app:latest
+    container_name: infra_ematricula_horizon
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      CONTAINER_ROLE: horizon
+    depends_on:
+      app:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - ematricula_internal
+
+  scheduler:
+    image: local/ematricula-app:latest
+    container_name: infra_ematricula_scheduler
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      CONTAINER_ROLE: scheduler
+    depends_on:
+      app:
+        condition: service_healthy
+    networks:
+      - ematricula_internal
+
+networks:
+  edge:
+    external: true
+    name: infra_edge
+  ematricula_internal:
+    driver: bridge
+
+volumes:
+  ematricula_mysql_data:
+  ematricula_redis_data:

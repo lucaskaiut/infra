@@ -1,0 +1,7 @@
+ematricula/**/node_modules
+ematricula/**/vendor
+ematricula/**/.git
+ematricula/**/storage/logs/*
+ematricula/**/storage/framework/cache/*
+ematricula/**/storage/framework/sessions/*
+ematricula/**/bootstrap/cache/*

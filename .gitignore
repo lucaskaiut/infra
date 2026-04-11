@@ -3,5 +3,7 @@
 !.env.example
 **/acme.json
 stacks/edge/secrets/dashboard.htpasswd
+stacks/apps/ematricula/.env
+stacks/apps/ematricula/ematricula/
 *.log
 .DS_Store
