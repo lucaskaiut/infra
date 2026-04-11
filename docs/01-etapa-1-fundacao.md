@@ -130,7 +130,7 @@ docker compose --env-file ../../../.env ps
 1. Navegador: `https://demo.<DOMAIN>` — deve mostrar resposta do `whoami` (hostname do container, cabeçalhos).
 2. Certificado: cadeado válido (Let's Encrypt).
 3. `http://demo.<DOMAIN>` — deve redirecionar para HTTPS.
-4. Opcional: `https://traefik.<DOMAIN>` — dashboard do Traefik (em produção restrinja por firewall ou autenticação numa etapa futura).
+4. Opcional: `https://traefik.<DOMAIN>` — dashboard do Traefik (a partir da **Etapa 2** exige Basic Auth; ver `docs/02-etapa-2-dashboard-auth.md`).
 
 Se o certificado falhar, confira: DNS apontando para esta VPS, portas 80 e 443 abertas, relógio da VPS correto (`timedatectl`), e logs do Traefik.
 

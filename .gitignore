@@ -2,5 +2,6 @@
 .env.*
 !.env.example
 **/acme.json
+stacks/edge/secrets/dashboard.htpasswd
 *.log
 .DS_Store

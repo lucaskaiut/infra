@@ -1,0 +1,20 @@
+name: infra-app-myservice
+
+services:
+  web:
+    image: traefik/whoami:v1.10
+    container_name: infra_myservice_web
+    restart: unless-stopped
+    networks:
+      - edge
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.myservice-web.rule=Host(`myservice.${DOMAIN:?defina DOMAIN no .env}`)
+      - traefik.http.routers.myservice-web.entrypoints=websecure
+      - traefik.http.routers.myservice-web.tls.certresolver=letsencrypt
+      - traefik.http.services.myservice-web.loadbalancer.server.port=80
+
+networks:
+  edge:
+    external: true
+    name: infra_edge

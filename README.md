@@ -8,14 +8,17 @@ Repositório de infraestrutura: proxy de borda, redes compartilhadas e stacks po
 |---------|--------|
 | `stacks/edge/` | Borda: Traefik, TLS, roteamento por hostname |
 | `stacks/apps/*/` | Uma pasta por aplicação (compose próprio, rede `infra_edge` externa) |
+| `stacks/apps/_template/` | Modelo para copiar ao criar uma nova app |
 | `docs/` | Passos por etapa, convenções e versionamento |
 
 ## Ordem das etapas
 
-1. **Etapa 1 — Fundação** (`docs/01-etapa-1-fundacao.md`): Traefik + app demo no navegador (HTTPS).
-2. *Próximas:* rede e políticas de deploy, **ematricula** (API do monorepo), zero downtime, Jenkins e webhooks.
+1. **Etapa 1 — Fundação** (`docs/01-etapa-1-fundacao.md`): Traefik + app demo (HTTPS).
+2. **Etapa 2 — Dashboard** (`docs/02-etapa-2-dashboard-auth.md`): Basic Auth no dashboard Traefik.
+3. **Etapa 3 — Template** (`docs/03-etapa-3-template-nova-app.md`): modelo `stacks/apps/_template/` para novas apps.
+4. *Próximas:* **ematricula** (API), serviços partilhados, zero downtime, Jenkins e webhooks GitHub.
 
-Comece pela Etapa 1 e só avance após validar o checklist do final do documento.
+Avance etapa a etapa e valide cada documento antes de seguir.
 
 ## Variáveis de ambiente
 
@@ -23,6 +26,8 @@ Copie `.env.example` para `.env` na raiz do repositório. Em cada pasta de stack
 
 ## Documentação
 
-- `docs/01-etapa-1-fundacao.md` — implementação e validação da Etapa 1
+- `docs/01-etapa-1-fundacao.md` — Etapa 1
+- `docs/02-etapa-2-dashboard-auth.md` — Etapa 2
+- `docs/03-etapa-3-template-nova-app.md` — Etapa 3
 - `docs/convencoes-e-decisoes.md` — padrões e decisões técnicas
 - `docs/versionamento-git.md` — o que versionar e o que não versionar

@@ -22,7 +22,7 @@
 ## Hostnames (padrão)
 
 - `demo.<DOMAIN>` — serviço de verificação da Etapa 1.
-- `traefik.<DOMAIN>` — dashboard API do Traefik (restrinja acesso por firewall ou autenticação nas próximas etapas).
+- `traefik.<DOMAIN>` — dashboard Traefik protegido com **Basic Auth** (Etapa 2); ficheiro `stacks/edge/secrets/dashboard.htpasswd` (não versionado).
 
 ## Segurança (Etapa 1)
 
@@ -32,6 +32,6 @@
 
 ## Evolução prevista (sem implementar agora)
 
-- Basic auth ou IP allowlist no dashboard.
-- Deploy com rolling update (nova replica + troca de label ou Compose deploy) para zero downtime.
+- IP allowlist ou VPN no dashboard (complemento ao Basic Auth).
+- Deploy com rolling update (nova réplica + troca de label ou Compose deploy) para zero downtime.
 - Jenkins no host ou em container com volume para jobs e credenciais isoladas.
