@@ -2,9 +2,9 @@ FROM composer:2 AS vendor
 WORKDIR /app
 ENV COMPOSER_ALLOW_SUPERUSER=1
 COPY ematricula/api/composer.json ematricula/api/composer.lock ./
-RUN composer install --no-dev --no-scripts --no-autoloader
+RUN composer install --no-dev --no-scripts --no-autoloader --ignore-platform-reqs
 COPY ematricula/api/ .
-RUN composer install --no-dev --optimize-autoloader --classmap-authoritative
+RUN composer install --no-dev --optimize-autoloader --classmap-authoritative --ignore-platform-reqs
 
 FROM node:22-alpine AS assets
 WORKDIR /app
