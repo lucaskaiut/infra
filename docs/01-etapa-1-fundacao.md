@@ -84,7 +84,7 @@ Confirme que a raiz tem as variáveis sem espaços à volta do `=`:
 
 `grep -E '^(DOMAIN|ACME_EMAIL)=' ~/infra/.env`
 
-O serviço Traefik também usa `env_file: ../../.env` para expor `ACME_EMAIL` ao processo (certificados Let's Encrypt).
+O e-mail do Let's Encrypt é definido no Compose com `TRAEFIK_CERTIFICATESRESOLVERS_LETSENCRYPT_ACME_EMAIL` (variável oficial do Traefik), interpolado a partir de `ACME_EMAIL` no `.env` — mais fiável do que `${ACME_EMAIL}` dentro do ficheiro `traefik.yml` montado. O `env_file` mantém o restante do `.env` disponível no container.
 
 ---
 
@@ -140,6 +140,7 @@ Se o certificado falhar, confira: DNS apontando para esta VPS, portas 80 e 443 a
 |--------|----------------|-------------|
 | `required variable DOMAIN is missing` ao usar `docker compose ps` | `ps` sem `--env-file` (ou sem `.env` na pasta do projeto) | Usar `docker compose --env-file ../../.env ps` ou o link simbólico `.env` descrito na secção 4. |
 | *client version 1.24 is too old. Minimum supported API version is 1.40* (ou 1.44) nos logs do Traefik | Imagem Traefik antiga com cliente Docker API fixo em 1.24 vs Docker Engine 29+ | `docker compose --env-file ../../.env pull` e `up -d` com o `docker-compose.yml` atual (**Traefik v3.6**). |
+| *invalidContact* / *unable to parse email address* (ACME) | E-mail vazio no pedido ao Let's Encrypt (expansão de `${ACME_EMAIL}` no YAML falhou) ou `.env` com aspas/CRLF/BOM | Usar o `docker-compose.yml` atual (e-mail via `TRAEFIK_…_ACME_EMAIL`). Confirme com `docker compose --env-file ../../.env exec traefik env \| grep TRAEFIK_CERT`. Linha no `.env` sem aspas: `ACME_EMAIL=mail@dominio.com`. Se editou no Windows: `sed -i 's/\r$//' ~/infra/.env`. |
 
 ---
 
