@@ -1,0 +1,35 @@
+---
+description: Prioridade de uptime na VPS e limites de comandos destrutivos
+alwaysApply: true
+---
+
+# Uptime e segurança na VPS
+
+## Prioridade
+
+Manter os serviços **no ar de forma contínua**. Evitar interrupções. Só parar, remover ou reiniciar de forma disruptiva quando for **estritamente necessário** para cumprir o pedido **e** o utilizador tiver **autorizado explicitamente** (palavras como: pode derrubar, autorizo parar, faz `down`, janela de manutenção, etc.).
+
+Na dúvida, **não** executar ações destrutivas: perguntar ao utilizador antes.
+
+## Proibido sem autorização explícita do utilizador
+
+- `docker compose down`, `docker stop` / `kill` em serviços de produção, `docker rm -f` em containers da stack.
+- `docker volume rm`, `docker system prune`, `docker network rm` em recursos em uso.
+- Apagar dados em volumes (Let's Encrypt, bases de dados, uploads).
+- `git reset --hard`, `git push --force` em branches partilhadas, alterações destrutivas no remoto.
+- Desligar firewall, abrir portas além do necessário, expor dashboards sem contexto de hardening.
+- Colar ou pedir **credenciais, chaves privadas ou conteúdo de `.env`** no chat; não as incluir em commits.
+
+## Permitido para deploy e verificação (padrão)
+
+- `git pull` em `~/infra` na VPS.
+- `docker compose … pull` e `up -d` (recria só o que mudou quando a imagem/compose alterou).
+- Leitura: `docker compose ps`, `docker logs`, `curl` de health/HTTPS, `grep` em configs versionadas.
+
+## SSH
+
+Usar o host configurado pelo utilizador (ex.: `ssh contabo`). Preferir `BatchMode` em scripts quando não houver TTY interativo. Não assumir passwords; falhas de chave são reportadas ao utilizador.
+
+## Conflito entre “corrigir rápido” e uptime
+
+Preferir alterações **incrementais** e `up -d`. Se a correção exigir `down` ou downtime, **descrever o impacto** e **obter confirmação** antes de executar.
