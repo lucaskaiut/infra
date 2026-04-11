@@ -54,4 +54,4 @@ cd .. && docker compose build && docker compose up -d
 - Comportamento incorreto da API (ex.: erro 500 em `/api/*` sem token por configuração de `redirectGuestsTo` / rota `login`) deve ser corrigido **na aplicação**; não se patcha código da app a partir deste repo.
 - A primeira subida do `app` corre `php artisan migrate --force`.
 - O dashboard Horizon em `/horizon` está protegido pelo gate da aplicação; o processo **horizon** processa jobs independentemente da UI.
-- Se `URL` gerada incorretamente atrás do proxy, pode ser necessário confiar em proxies no projeto Laravel (`TrustProxies` / `trustProxies` no bootstrap) numa alteração futura do repositório da app.
+- **HTTPS e assets (Vite):** o TLS termina no Traefik; a ligação Traefik → container é HTTP. O Nginx da stack define `fastcgi_param HTTPS on` e `HTTP_X_FORWARDED_PROTO https` para o PHP gerar URLs `https://` (evita *mixed content* em CSS/JS) sem alterar código Laravel.
