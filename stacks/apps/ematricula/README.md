@@ -4,7 +4,8 @@ Publica apenas a pasta `api` do repositório [ematricula](https://github.com/luc
 
 ## Pré-requisitos na VPS
 
-- Stack `edge` (Traefik) a correr com rede `infra_edge`.
+- Stack **edge** (Traefik) com rede `infra_edge`.
+- Stack **shared** (`stacks/shared/`) com MySQL e Redis na rede `infra_shared`. Ver `docs/05-servicos-compartilhados.md`.
 - DNS `A` para `ematricula-api.lucaskaiut.com.br` → IP da VPS.
 - Docker com build habilitado.
 
@@ -28,31 +29,26 @@ cd ematricula && git pull && cd ..
 cp .env.example .env
 ```
 
-Gere `APP_KEY` (pode ser no host com PHP ou noutro container Laravel):
-
-```bash
-openssl rand -base64 32
-```
-
-Coloque o resultado em `.env` como `APP_KEY=base64:...` (o Laravel espera o prefixo `base64:` quando aplicável — use `php artisan key:generate --show` num ambiente com o projeto se preferir).
-
-Altere `DB_PASSWORD`, `MYSQL_ROOT_PASSWORD` e quaisquer segredos reais.
+- Gere `APP_KEY` (ex.: `php artisan key:generate --show` noutro ambiente ou ver doc da Etapa 4).
+- **`DB_PASSWORD` tem de ser igual a `EMATRICULA_DB_PASSWORD`** definido em `stacks/shared/.env`.
+- `DB_HOST=mysql` e `REDIS_HOST=redis` resolvem para os serviços partilhados.
+- `REDIS_PREFIX=ematricula_` reduz colisões com outras apps no mesmo Redis.
 
 ## Subir
 
 ```bash
-docker compose build --no-cache
+docker compose build
 docker compose up -d
 ```
 
-## Serviços
+## Serviços **nesta** stack
 
 | Serviço     | Função                          |
 |------------|----------------------------------|
 | `app`      | Nginx + PHP-FPM, API + TLS       |
-| `mysql`    | MySQL 8.4                        |
-| `redis`    | Redis 7 (cache, filas, Horizon)  |
 | `horizon`  | Worker de filas (Laravel Horizon)|
 | `scheduler`| `schedule:run` a cada 60 s      |
+
+MySQL e Redis estão em **`stacks/shared/`**, não aqui.
 
 Documentação detalhada: `docs/04-etapa-4-ematricula-api.md`.

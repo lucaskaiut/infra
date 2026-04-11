@@ -2,7 +2,10 @@
 
 ## Nomenclatura
 
-- Rede Docker compartilhada: `infra_edge` (nome fixo, declarada na stack `edge`, referenciada como `external` nas apps).
+- Redes Docker partilhadas:
+  - **`infra_edge`** — Traefik e apps com HTTP público (declarada em `stacks/edge/`).
+  - **`infra_shared`** — MySQL e Redis em `stacks/shared/`; apps que precisam de BD/cache referenciam-na como rede `external`.
+- MySQL e Redis **não** são por aplicação: um par de serviços em `stacks/shared/`, várias apps na mesma rede `infra_shared`. Isolamento em Redis: prefixos (`REDIS_PREFIX`, etc.) por app.
 - Projetos Compose: `name` explícito — `infra-edge` (borda) e `infra-app-<slug>` (cada aplicação).
 - Containers: prefixo `infra_` + papel (`infra_traefik`, `infra_demo_whoami`, etc.) para identificação rápida em `docker ps`.
 

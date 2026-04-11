@@ -9,6 +9,7 @@ Repositório de infraestrutura: proxy de borda, redes compartilhadas e stacks po
 | `stacks/edge/` | Borda: Traefik, TLS, roteamento por hostname |
 | `stacks/apps/*/` | Uma pasta por aplicação (compose próprio, rede `infra_edge` externa) |
 | `stacks/apps/_template/` | Modelo para copiar ao criar uma nova app |
+| `stacks/shared/` | MySQL + Redis partilhados (rede `infra_shared`) |
 | `docs/` | Passos por etapa, convenções e versionamento |
 
 ## Ordem das etapas
@@ -16,8 +17,9 @@ Repositório de infraestrutura: proxy de borda, redes compartilhadas e stacks po
 1. **Etapa 1 — Fundação** (`docs/01-etapa-1-fundacao.md`): Traefik + app demo (HTTPS).
 2. **Etapa 2 — Dashboard** (`docs/02-etapa-2-dashboard-auth.md`): Basic Auth no dashboard Traefik.
 3. **Etapa 3 — Template** (`docs/03-etapa-3-template-nova-app.md`): modelo `stacks/apps/_template/` para novas apps.
-4. **Etapa 4 — eMatricula API** (`docs/04-etapa-4-ematricula-api.md`, `stacks/apps/ematricula/`): Laravel 13, MySQL, Redis, Horizon, scheduler.
-5. *Próximas:* zero downtime, Jenkins e webhooks GitHub.
+4. **Serviços partilhados** (`docs/05-servicos-compartilhados.md`, `stacks/shared/`): MySQL + Redis para todas as apps.
+5. **Etapa 4 — eMatricula API** (`docs/04-etapa-4-ematricula-api.md`, `stacks/apps/ematricula/`): Laravel 13, Horizon, scheduler (usa shared).
+6. *Próximas:* zero downtime, Jenkins e webhooks GitHub.
 
 Avance etapa a etapa e valide cada documento antes de seguir.
 
@@ -31,5 +33,6 @@ Copie `.env.example` para `.env` na raiz do repositório. Em cada pasta de stack
 - `docs/02-etapa-2-dashboard-auth.md` — Etapa 2
 - `docs/03-etapa-3-template-nova-app.md` — Etapa 3
 - `docs/04-etapa-4-ematricula-api.md` — Etapa 4 (API eMatricula)
+- `docs/05-servicos-compartilhados.md` — MySQL/Redis partilhados
 - `docs/convencoes-e-decisoes.md` — padrões e decisões técnicas
 - `docs/versionamento-git.md` — o que versionar e o que não versionar

@@ -13,5 +13,6 @@ Este diretório não é deployado diretamente: serve de modelo para criar `stack
 ## Convenções
 
 - Rede externa obrigatória: `infra_edge` (criada pela stack `stacks/edge`).
+- Se a app precisar de MySQL ou Redis, ligue também a rede **`infra_shared`** (stack `stacks/shared/`) e use `DB_HOST=mysql`, `REDIS_HOST=redis`, com prefixos Redis por app. Ver `docs/05-servicos-compartilhados.md`.
 - Nomes de router Traefik únicos em todo o host (prefixe com o slug da app).
 - `exposedByDefault: false` no Traefik: mantenha `traefik.enable=true` nos serviços que devem ser públicos.

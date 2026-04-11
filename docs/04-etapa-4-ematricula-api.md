@@ -2,25 +2,39 @@
 
 ## Objetivo
 
-Executar a API em `https://ematricula-api.lucaskaiut.com.br` com MySQL, Redis, filas via **Horizon** e **scheduler** Laravel.
+Executar a API em `https://ematricula-api.lucaskaiut.com.br` com **MySQL e Redis partilhados** (`stacks/shared/`), filas via **Horizon** e **scheduler** Laravel.
 
 ## Requisitos
 
 - Traefik + rede `infra_edge`.
+- **Stack `stacks/shared/`** a correr (MySQL + Redis, rede `infra_shared`). Ver `docs/05-servicos-compartilhados.md`.
 - DNS `ematricula-api.lucaskaiut.com.br` → VPS.
 - Clone do monorepo em `stacks/apps/ematricula/ematricula/` (a imagem Docker usa `ematricula/api`).
 
 ## Configuração
 
-1. `cp stacks/apps/ematricula/.env.example stacks/apps/ematricula/.env`
-2. Definir `APP_KEY` (ex.: `php artisan key:generate --show` com o código local, ou gerar bytes aleatórios conforme README da stack).
-3. Definir `DB_PASSWORD` e `MYSQL_ROOT_PASSWORD` fortes e coerentes com `DB_USERNAME` / `DB_DATABASE`.
+### 1. Shared (`stacks/shared/`)
 
-Variáveis críticas já previstas no `.env.example`:
+```bash
+cd ~/infra/stacks/shared
+cp .env.example .env
+```
 
-- `DB_HOST=mysql`, `REDIS_HOST=redis`
-- `QUEUE_CONNECTION=redis`, `CACHE_STORE=redis`
-- `TELESCOPE_ENABLED=false` em produção
+Defina `MYSQL_ROOT_PASSWORD` e `EMATRICULA_DB_PASSWORD` (e `EMATRICULA_DB_NAME` / `EMATRICULA_DB_USER` se alterar os padrões).
+
+```bash
+docker compose --env-file .env up -d
+```
+
+### 2. eMatricula (`stacks/apps/ematricula/`)
+
+```bash
+cp .env.example .env
+```
+
+- `APP_KEY`, `APP_URL`, etc.
+- **`DB_PASSWORD` deve coincidir com `EMATRICULA_DB_PASSWORD`** do shared.
+- `DB_HOST=mysql`, `REDIS_HOST=redis`, `REDIS_PREFIX=ematricula_` (recomendado no Redis partilhado).
 
 ## Deploy
 
@@ -28,7 +42,7 @@ Variáveis críticas já previstas no `.env.example`:
 cd ~/infra/stacks/apps/ematricula
 git clone https://github.com/lucaskaiut/ematricula.git ematricula
 cp .env.example .env
-# editar .env
+# editar .env (alinhado ao shared)
 docker compose build
 docker compose up -d
 ```
@@ -36,10 +50,10 @@ docker compose up -d
 ## Validação
 
 - `curl -sS -o /dev/null -w '%{http_code}' https://ematricula-api.lucaskaiut.com.br/` → **200**
-- `curl -sS https://ematricula-api.lucaskaiut.com.br/up` → resposta de health
-- `docker compose ps` → `mysql`, `redis`, `app`, `horizon`, `scheduler` **running**
-- OpenAPI em `/docs` (rota web da aplicação)
-- Endpoints `/api/*` conforme `public/openapi.yaml` (muitos exigem autenticação Sanctum)
+- `curl -sS https://ematricula-api.lucaskaiut.com.br/up` → health
+- `docker compose -f ~/infra/stacks/shared/docker-compose.yml --project-directory ~/infra/stacks/shared ps` → MySQL e Redis **running**
+- `docker compose ps` na pasta ematricula → `app`, `horizon`, `scheduler` **running**
+- OpenAPI em `/docs`; endpoints `/api/*` conforme `public/openapi.yaml`
 
 ## Atualizar a API
 
@@ -50,8 +64,8 @@ cd .. && docker compose build && docker compose up -d
 
 ## Notas
 
-- A imagem apenas **constrói e executa** o código em `ematricula/api` tal como está no repositório da aplicação. **Correções de código Laravel** (rotas, middleware, autenticação, etc.) são feitas no repositório **ematricula**, não neste repositório de infra.
-- Comportamento incorreto da API (ex.: erro 500 em `/api/*` sem token por configuração de `redirectGuestsTo` / rota `login`) deve ser corrigido **na aplicação**; não se patcha código da app a partir deste repo.
-- A primeira subida do `app` corre `php artisan migrate --force`.
+- A imagem apenas **constrói e executa** o código em `ematricula/api` tal como está no repositório da aplicação. **Correções de código Laravel** são feitas no repositório **ematricula**, não na infra.
+- Comportamento incorreto da API deve ser corrigido **na aplicação**.
+- A primeira subida do `app` corre `php artisan migrate --force` contra o MySQL em `mysql` (shared).
+- **HTTPS e assets (Vite):** o Nginx da imagem da app define `fastcgi_param HTTPS on` e `HTTP_X_FORWARDED_PROTO https` (TLS no Traefik).
 - O dashboard Horizon em `/horizon` está protegido pelo gate da aplicação; o processo **horizon** processa jobs independentemente da UI.
-- **HTTPS e assets (Vite):** o TLS termina no Traefik; a ligação Traefik → container é HTTP. O Nginx da stack define `fastcgi_param HTTPS on` e `HTTP_X_FORWARDED_PROTO https` para o PHP gerar URLs `https://` (evita *mixed content* em CSS/JS) sem alterar código Laravel.

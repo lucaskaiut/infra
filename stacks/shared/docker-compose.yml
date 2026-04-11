@@ -1,0 +1,47 @@
+name: infra-shared
+
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: infra_shared_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?defina MYSQL_ROOT_PASSWORD no .env}
+      EMATRICULA_DB_NAME: ${EMATRICULA_DB_NAME:-ematricula}
+      EMATRICULA_DB_USER: ${EMATRICULA_DB_USER:-ematricula}
+      EMATRICULA_DB_PASSWORD: ${EMATRICULA_DB_PASSWORD:?defina EMATRICULA_DB_PASSWORD no .env}
+    volumes:
+      - shared_mysql_data:/var/lib/mysql
+      - ./mysql/init:/docker-entrypoint-initdb.d:ro
+    networks:
+      - shared_data
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p\"$$MYSQL_ROOT_PASSWORD\" || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 30s
+
+  redis:
+    image: redis:7-alpine
+    container_name: infra_shared_redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    volumes:
+      - shared_redis_data:/data
+    networks:
+      - shared_data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+networks:
+  shared_data:
+    name: infra_shared
+    driver: bridge
+
+volumes:
+  shared_mysql_data:
+  shared_redis_data:
