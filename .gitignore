@@ -1,0 +1,6 @@
+.env
+.env.*
+!.env.example
+**/acme.json
+*.log
+.DS_Store
