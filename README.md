@@ -19,7 +19,7 @@ Comece pela Etapa 1 e só avance após validar o checklist do final do documento
 
 ## Variáveis de ambiente
 
-Copie `.env.example` para `.env` na raiz do repositório. Ao subir cada stack, use `docker compose --env-file ../../.env` (borda) ou `--env-file ../../../.env` (apps), conforme `docs/01-etapa-1-fundacao.md`.
+Copie `.env.example` para `.env` na raiz do repositório. Em cada pasta de stack, use `docker compose --env-file …` em **todos** os subcomandos que leem o Compose (`up`, `ps`, `down`, …), ou um link simbólico `.env` → raiz, conforme `docs/01-etapa-1-fundacao.md`.
 
 ## Documentação
 

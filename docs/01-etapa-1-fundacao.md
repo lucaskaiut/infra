@@ -70,9 +70,21 @@ Edite `.env`:
 - `DOMAIN` — domínio raiz usado nos registros DNS (sem `https://`).
 - `ACME_EMAIL` — e-mail válido para Let's Encrypt.
 
-Os `docker-compose.yml` usam `${DOMAIN}` nos **labels** do Traefik. Essa substituição é feita pelo Compose na hora do `up`; use sempre `--env-file` apontando para o `.env` na raiz, como nos comandos das secções 5 e 6.
+Os `docker-compose.yml` usam `${DOMAIN}` nos **labels** do Traefik. O Compose só carrega esse ficheiro para **interpolação** quando você passa `--env-file` na linha de comando (o `env_file` dentro do YAML alimenta o **container**, não resolve `${DOMAIN}` no próprio YAML).
 
-O serviço Traefik também carrega o mesmo ficheiro via `env_file` para expor `ACME_EMAIL` ao processo (certificados Let's Encrypt).
+Por isso, **em `stacks/edge`**, use sempre o mesmo ficheiro em **qualquer** subcomando: `up`, `ps`, `logs`, `down`, `pull`, etc.:
+
+`docker compose --env-file ../../.env <subcomando>`
+
+Em `stacks/apps/demo`, o equivalente é `--env-file ../../../.env`.
+
+**Atalho opcional:** a partir de `~/infra/stacks/edge`, criar um link simbólico `ln -sf ../../.env .env` (o `.env` na raiz continua fora do Git). Com isso, o Compose encontra `.env` no diretório do projeto e `docker compose ps` funciona sem repetir `--env-file`.
+
+Confirme que a raiz tem as variáveis sem espaços à volta do `=`:
+
+`grep -E '^(DOMAIN|ACME_EMAIL)=' ~/infra/.env`
+
+O serviço Traefik também usa `env_file: ../../.env` para expor `ACME_EMAIL` ao processo (certificados Let's Encrypt).
 
 ---
 
@@ -86,9 +98,18 @@ docker compose --env-file ../../.env up -d
 Verifique:
 
 ```bash
-docker compose ps
+docker compose --env-file ../../.env ps
 docker logs infra_traefik 2>&1 | tail -n 50
 ```
+
+Se você acabou de atualizar o repositório (por exemplo passando de Traefik **v3.3** para **v3.6**) ou ainda vê *client version 1.24 is too old* nos logs, force a nova imagem e recrie o container:
+
+```bash
+docker compose --env-file ../../.env pull
+docker compose --env-file ../../.env up -d
+```
+
+Versões antigas do Traefik usam API Docker 1.24 e deixam de funcionar com Docker Engine 29+; **v3.6** negocia a API com o daemon.
 
 ---
 
@@ -99,7 +120,7 @@ A rede `infra_edge` deve existir (criada pelo passo anterior).
 ```bash
 cd ~/infra/stacks/apps/demo
 docker compose --env-file ../../../.env up -d
-docker compose ps
+docker compose --env-file ../../../.env ps
 ```
 
 ---
@@ -112,6 +133,13 @@ docker compose ps
 4. Opcional: `https://traefik.<DOMAIN>` — dashboard do Traefik (em produção restrinja por firewall ou autenticação numa etapa futura).
 
 Se o certificado falhar, confira: DNS apontando para esta VPS, portas 80 e 443 abertas, relógio da VPS correto (`timedatectl`), e logs do Traefik.
+
+### Problemas comuns
+
+| Sintoma | Causa provável | O que fazer |
+|--------|----------------|-------------|
+| `required variable DOMAIN is missing` ao usar `docker compose ps` | `ps` sem `--env-file` (ou sem `.env` na pasta do projeto) | Usar `docker compose --env-file ../../.env ps` ou o link simbólico `.env` descrito na secção 4. |
+| *client version 1.24 is too old. Minimum supported API version is 1.40* (ou 1.44) nos logs do Traefik | Imagem Traefik antiga com cliente Docker API fixo em 1.24 vs Docker Engine 29+ | `docker compose --env-file ../../.env pull` e `up -d` com o `docker-compose.yml` atual (**Traefik v3.6**). |
 
 ---
 

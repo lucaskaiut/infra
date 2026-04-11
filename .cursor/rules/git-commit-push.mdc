@@ -1,0 +1,18 @@
+---
+description: Após alterações concluídas, versionar com commit e push no remoto
+alwaysApply: true
+---
+
+# Git: commit e push após mudanças
+
+Quando uma tarefa deixar ficheiros alterados no repositório e o utilizador não tiver pedido explicitamente para **não** versionar:
+
+1. **Rever o que mudou:** `git status` e, se útil, `git diff`.
+2. **Adicionar só o relevante:** `git add` com caminhos explícitos (evitar `git add .` se houver lixo ou segredos). Nunca fazer commit de `.env`, chaves ou `acme.json` (já cobertos pelo `.gitignore`).
+3. **Mensagem de commit:** uma linha em português ou inglês, no imperativo ou descrição curta do que mudou (ex.: `Traefik 3.6 e doc do --env-file para Compose`). Opcional: corpo curto só se várias alterações independentes precisarem de contexto.
+4. **Commit:** `git commit -m "mensagem"`.
+5. **Push:** `git push origin` (ou o branch atual, ex.: `git push -u origin main` na primeira vez).
+
+Se `git push` falhar (rede, permissões, branch desatualizada), tentar `git pull --rebase` e repetir o push, ou reportar o erro ao utilizador sem assumir force push.
+
+Se não existir `remote` configurado, fazer apenas o commit e indicar que é preciso adicionar `origin` antes do push.

@@ -15,7 +15,7 @@
 
 | Área | Escolha | Motivo |
 |------|---------|--------|
-| Proxy / TLS | Traefik v3 | Descoberta via labels Docker, TLS ACME, extensível a muitos hostnames sem editar o proxy a cada app |
+| Proxy / TLS | Traefik v3.6+ (imagem `traefik:v3.6`) | Labels Docker, TLS ACME; **v3.6+** evita falha com Docker Engine 29+ (*client API 1.24 too old*). |
 | Orquestração inicial | Docker Compose em stacks separadas | Simples na VPS única, alinhado a “uma pasta por app”, preparado para evoluir |
 | Desafio ACME | `tlsChallenge` | Evita conflito típico entre redirecionamento HTTP→HTTPS e HTTP-01 na porta 80 |
 
