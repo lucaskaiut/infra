@@ -16,6 +16,7 @@ Padronizar a criação de stacks em `stacks/apps/<slug>/` com a rede `infra_edge
 3. Trocar imagem, portas e labels conforme o serviço real.
 4. DNS para `<slug>.<DOMAIN>`.
 5. `docker compose --env-file ../../../.env up -d` na pasta da app.
+6. Para deploy automatizado com o mesmo padrão da eMatricula: ficheiro `ci/apps/<slug>.sh` e `docs/07-deploy-aplicacoes.md`.
 
 ## Validação
 
