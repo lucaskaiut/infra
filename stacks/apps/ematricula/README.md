@@ -44,7 +44,7 @@ cd ~/infra && ./ci/deploy-app.sh ematricula
 
 Isto faz **build** da imagem com `docker-compose.yml` e **deploy** com `docker-stack.yml` (**2 réplicas** do `app`, rolling `start-first`). Com `DOMAIN` no `.env` da stack, o script regista estatísticas de `GET /up` durante o deploy.
 
-Desenvolvimento local sem Swarm: `docker compose build && docker compose up -d` nesta pasta (ajustar/remover `APP_USE_SWARM` em `ci/apps/ematricula.sh` se usares o script a partir da raiz).
+Enquanto a VPS ainda não tiver Swarm: exportar **`APP_USE_SWARM=0`** antes de `./ci/deploy-app.sh ematricula` (mantém Compose com 2 réplicas). Localmente sem Swarm: `docker compose build && docker compose up -d` nesta pasta.
 
 Ver `docs/arquitetura.md` (secções *CI* e *Jenkins*).
 
