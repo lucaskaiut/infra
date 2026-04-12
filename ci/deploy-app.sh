@@ -51,5 +51,9 @@ if [[ -n "${APP_GIT_SUBDIR:-}" && -n "${APP_GIT_REMOTE:-}" ]]; then
 fi
 
 docker compose build
-docker compose up -d
+if docker compose up -d --help 2>&1 | grep -q '[[:space:]]--wait[[:space:]]'; then
+  docker compose up -d --wait || docker compose up -d
+else
+  docker compose up -d
+fi
 docker compose ps

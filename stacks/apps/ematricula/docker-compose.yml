@@ -15,6 +15,7 @@ services:
     networks:
       - edge
       - shared_data
+    stop_grace_period: 45s
     healthcheck:
       test: ["CMD-SHELL", "wget -qO- http://127.0.0.1/up || exit 1"]
       interval: 15s

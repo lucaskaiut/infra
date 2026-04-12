@@ -70,6 +70,10 @@ O script do job **ci-smoke** fica guardado no Jenkins; alterações em `init.gro
 
 O deploy usa `ci/jenkins/DeployApp.Jenkinsfile`: `git pull` e `./ci/deploy-app.sh` em **`/infra-deploy`** (mount do clone **infra** no host) e socket Docker do host. No `.env` da stack Jenkins: **`INFRA_HOST_PATH`** e **`DOCKER_GID`**. Detalhes: `docs/07-deploy-aplicacoes.md`.
 
+## Job **deploy-ematricula-webhook** (push GitHub)
+
+Pipeline em `ci/jenkins/DeployEmatriculaWebhook.Jenkinsfile`: **Generic Webhook Trigger** com credencial **`ematricula-webhook-token`**, filtro **`main`** + alterações em **`api/`** no repositório **ematricula**. Configuração passo a passo (credencial, webhook URL, seed): `docs/07-deploy-aplicacoes.md` (secção “Deploy automático”).
+
 ## Segurança
 
 - Não commits o `.env` (contém password e opcionalmente PAT).

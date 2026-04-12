@@ -22,7 +22,7 @@ Repositório de infraestrutura: proxy de borda, redes compartilhadas e stacks po
 4. **Serviços partilhados** (`docs/05-servicos-compartilhados.md`, `stacks/shared/`): MySQL + Redis para todas as apps.
 5. **Etapa 4 — eMatricula API** (`docs/04-etapa-4-ematricula-api.md`, `stacks/apps/ematricula/`): Laravel 13, Horizon, scheduler (usa shared).
 6. **Etapa 6 — Jenkins** (`docs/06-etapa-6-jenkins.md`, `stacks/jenkins/`): CI manual (checkout + echo), credencial GitHub opcional.
-7. **Deploy de apps** (`docs/07-deploy-aplicacoes.md`, `ci/`): script `deploy-app.sh`, job Jenkins **deploy-app** (na mesma VPS: mount do repo + Docker socket).
+7. **Deploy de apps** (`docs/07-deploy-aplicacoes.md`, `ci/`): script `deploy-app.sh`, jobs Jenkins **deploy-app** e **deploy-ematricula-webhook** (push em `api/` no repo ematricula).
 8. *Próximas:* zero downtime, webhooks GitHub, CD mais fino.
 
 Avance etapa a etapa e valide cada documento antes de seguir.
