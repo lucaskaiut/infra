@@ -108,7 +108,10 @@ docker compose --env-file ../../.env ps
 
 ```bash
 cd ~/infra/stacks/edge
-docker compose -f docker-stack.yml --env-file ../../.env config | sed '/^name:/d' > /tmp/infra-edge.stack.yml
+docker compose -f docker-stack.yml --env-file ../../.env config \
+  | sed '/^name:/d' \
+  | sed -E 's/^([[:space:]]*published: )"([0-9]+)"/\1\2/' \
+  > /tmp/infra-edge.stack.yml
 docker stack deploy -c /tmp/infra-edge.stack.yml infra-edge
 ```
 
@@ -140,7 +143,10 @@ docker stack deploy -c /tmp/infra-edge.stack.yml infra-edge
 ```bash
 cd ~/infra/stacks/shared
 cp .env.example .env
-docker compose -f docker-stack.yml --env-file .env config | sed '/^name:/d' > /tmp/infra-shared.stack.yml
+docker compose -f docker-stack.yml --env-file .env config \
+  | sed '/^name:/d' \
+  | sed -E 's/^([[:space:]]*published: )"([0-9]+)"/\1\2/' \
+  > /tmp/infra-shared.stack.yml
 docker stack deploy -c /tmp/infra-shared.stack.yml infra-shared
 ```
 
