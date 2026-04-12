@@ -100,23 +100,30 @@ else
 fi
 
 SWARM_DONE=0
-if [[ "${APP_USE_SWARM:-0}" == 1 ]]; then
+SWARM_ACTIVE=false
+if docker info --format '{{.Swarm.ControlAvailable}}' 2>/dev/null | grep -q true; then
+  SWARM_ACTIVE=true
+fi
+
+if [[ "${APP_USE_SWARM:-0}" == 1 && "$SWARM_ACTIVE" == true ]]; then
   SWARM_FILE="${APP_SWARM_COMPOSE_FILE:-docker-stack.yml}"
   STACK_NAME="${APP_SWARM_STACK_NAME:?defina APP_SWARM_STACK_NAME em ci/apps/<slug>.sh quando APP_USE_SWARM=1}"
   [[ -f "$SWARM_FILE" ]] || {
     echo "Ficheiro Swarm inexistente: ${STACK}/$SWARM_FILE" >&2
     exit 1
   }
-  if ! docker info --format '{{.Swarm.ControlAvailable}}' 2>/dev/null | grep -q true; then
-    echo "Docker Swarm inativo. Na VPS: SWARM_ADVERTISE_ADDR=<IP> ${ROOT}/ci/swarm-bootstrap.sh" >&2
-    exit 1
-  fi
   RENDERED=$(mktemp)
   docker compose -f "$SWARM_FILE" --env-file .env config >"$RENDERED"
   docker stack deploy -c "$RENDERED" "$STACK_NAME"
   rm -f "$RENDERED"
   SWARM_DONE=1
 else
+  if [[ "${APP_USE_SWARM:-0}" == 1 && "$SWARM_ACTIVE" != true ]]; then
+    echo "AVISO: APP_USE_SWARM=1 mas este daemon não é manager Swarm ativo — deploy via Compose." >&2
+    echo "        Após migração: ${ROOT}/ci/swarm-bootstrap.sh (ver docs/arquitetura.md)." >&2
+    : "${APP_COMPOSE_SCALES:=app=2}"
+  fi
+
   compose_scale_args=()
   if [[ -n "${APP_COMPOSE_SCALES:-}" ]]; then
     IFS=',' read -ra _scale_pairs <<<"${APP_COMPOSE_SCALES// /}"
