@@ -64,6 +64,10 @@ Os ficheiros em `init.groovy.d` só correm quando o `jenkins_home` é populado p
 
 O script do job **ci-smoke** fica guardado no Jenkins; alterações em `init.groovy.d` no Git **não** reaplicam sozinhas. Para alinhar com a versão atual do repositório: **ci-smoke → Configure**, edita o *Pipeline script* (remove blocos inválidos, por exemplo `options { timestamps() }` se não tiveres o plugin Timestamper) ou cola o conteúdo atualizado do ficheiro `stacks/jenkins/image/init.groovy.d/02-ci-smoke-job.groovy` (só a parte `pipeline { ... }`).
 
+## Job **deploy-app** (CD por SSH)
+
+O deploy para a VPS usa o ficheiro `ci/jenkins/DeployApp.Jenkinsfile` no repositório **infra**. Requer plugin **SSH Agent**, credencial **`vps-deploy-ssh`**, e variáveis **`DEPLOY_SSH_USER`** / **`DEPLOY_SSH_HOST`** no `.env` da stack Jenkins. Passo a passo: `docs/07-deploy-aplicacoes.md`.
+
 ## Segurança
 
 - Não commits o `.env` (contém password e opcionalmente PAT).
@@ -76,3 +80,4 @@ O script do job **ci-smoke** fica guardado no Jenkins; alterações em `init.gro
 2. HTTPS em `JENKINS_URL` sem erro de certificado.
 3. Login como admin.
 4. Job **ci-smoke** → **Build Now** → build verde.
+5. (Opcional) Job **deploy-app** → **Build with Parameters** após configurar SSH conforme `docs/07-deploy-aplicacoes.md`.

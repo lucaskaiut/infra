@@ -6,7 +6,7 @@ Publica apenas a pasta `api` do repositório [ematricula](https://github.com/luc
 
 - Stack **edge** (Traefik) com rede `infra_edge`.
 - Stack **shared** (`stacks/shared/`) com MySQL e Redis na rede `infra_shared`. Ver `docs/05-servicos-compartilhados.md`.
-- DNS `A` para `ematricula-api.lucaskaiut.com.br` → IP da VPS.
+- DNS `A` para `ematricula-api.<DOMAIN>` → IP da VPS (o mesmo `DOMAIN` que definires no `.env` desta stack, alinhado à raiz do infra).
 - Docker com build habilitado.
 
 ## Primeira vez: clonar o código da API
@@ -40,6 +40,14 @@ cp .env.example .env
 docker compose build
 docker compose up -d
 ```
+
+Deploy ou atualização a partir da raiz do repo **infra** (recomendado):
+
+```bash
+cd ~/infra && ./ci/deploy-app.sh ematricula
+```
+
+Ver `docs/07-deploy-aplicacoes.md`.
 
 ## Serviços **nesta** stack
 

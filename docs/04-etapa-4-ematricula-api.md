@@ -38,14 +38,25 @@ cp .env.example .env
 
 ## Deploy
 
+Primeira vez (clone do código + `.env`):
+
 ```bash
 cd ~/infra/stacks/apps/ematricula
 git clone https://github.com/lucaskaiut/ematricula.git ematricula
 cp .env.example .env
-# editar .env (alinhado ao shared)
+# editar .env (alinhado ao shared); incluir DOMAIN para as labels Traefik
 docker compose build
 docker compose up -d
 ```
+
+Atualizações e automação (a partir da raiz do repo **infra**):
+
+```bash
+cd ~/infra
+./ci/deploy-app.sh ematricula
+```
+
+Detalhes, Jenkins e novas apps: `docs/07-deploy-aplicacoes.md`.
 
 ## Validação
 
@@ -58,9 +69,10 @@ docker compose up -d
 ## Atualizar a API
 
 ```bash
-cd ~/infra/stacks/apps/ematricula/ematricula && git pull
-cd .. && docker compose build && docker compose up -d
+cd ~/infra && ./ci/deploy-app.sh ematricula
 ```
+
+Ou manualmente: `git pull` dentro de `ematricula/` e `docker compose build && docker compose up -d` na pasta da stack.
 
 ## Notas
 

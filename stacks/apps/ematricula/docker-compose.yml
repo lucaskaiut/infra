@@ -23,7 +23,7 @@ services:
       start_period: 120s
     labels:
       - traefik.enable=true
-      - traefik.http.routers.ematricula-api.rule=Host(`ematricula-api.lucaskaiut.com.br`)
+      - traefik.http.routers.ematricula-api.rule=Host(`ematricula-api.${DOMAIN:?defina DOMAIN no .env da stack}`)
       - traefik.http.routers.ematricula-api.entrypoints=websecure
       - traefik.http.routers.ematricula-api.tls.certresolver=letsencrypt
       - traefik.http.services.ematricula-api.loadbalancer.server.port=80

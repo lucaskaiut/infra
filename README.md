@@ -11,6 +11,7 @@ Repositório de infraestrutura: proxy de borda, redes compartilhadas e stacks po
 | `stacks/apps/_template/` | Modelo para copiar ao criar uma nova app |
 | `stacks/shared/` | MySQL + Redis partilhados (rede `infra_shared`) |
 | `stacks/jenkins/` | Jenkins (CI manual, job `ci-smoke`, sem CD) |
+| `ci/` | Deploy por app (`deploy-app.sh`, configs em `ci/apps/`, Jenkinsfile em `ci/jenkins/`) |
 | `docs/` | Passos por etapa, convenções e versionamento |
 
 ## Ordem das etapas
@@ -21,7 +22,8 @@ Repositório de infraestrutura: proxy de borda, redes compartilhadas e stacks po
 4. **Serviços partilhados** (`docs/05-servicos-compartilhados.md`, `stacks/shared/`): MySQL + Redis para todas as apps.
 5. **Etapa 4 — eMatricula API** (`docs/04-etapa-4-ematricula-api.md`, `stacks/apps/ematricula/`): Laravel 13, Horizon, scheduler (usa shared).
 6. **Etapa 6 — Jenkins** (`docs/06-etapa-6-jenkins.md`, `stacks/jenkins/`): CI manual (checkout + echo), credencial GitHub opcional.
-7. *Próximas:* zero downtime, webhooks GitHub, CD controlado.
+7. **Deploy de apps** (`docs/07-deploy-aplicacoes.md`, `ci/`): script `deploy-app.sh`, job Jenkins **deploy-app** (SSH para a VPS).
+8. *Próximas:* zero downtime, webhooks GitHub, CD mais fino.
 
 Avance etapa a etapa e valide cada documento antes de seguir.
 
@@ -37,5 +39,6 @@ Copie `.env.example` para `.env` na raiz do repositório. Em cada pasta de stack
 - `docs/04-etapa-4-ematricula-api.md` — Etapa 4 (API eMatricula)
 - `docs/05-servicos-compartilhados.md` — MySQL/Redis partilhados
 - `docs/06-etapa-6-jenkins.md` — Jenkins (job manual)
+- `docs/07-deploy-aplicacoes.md` — deploy eMatricula e novas apps (script + Jenkins)
 - `docs/convencoes-e-decisoes.md` — padrões e decisões técnicas
 - `docs/versionamento-git.md` — o que versionar e o que não versionar

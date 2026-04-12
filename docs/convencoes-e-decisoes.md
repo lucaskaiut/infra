@@ -20,6 +20,7 @@
 |------|---------|--------|
 | Proxy / TLS | Traefik v3.6+ (imagem `traefik:v3.6`) | Labels Docker, TLS ACME; **v3.6+** evita falha com Docker Engine 29+ (*client API 1.24 too old*). |
 | Orquestração inicial | Docker Compose em stacks separadas | Simples na VPS única, alinhado a “uma pasta por app”, preparado para evoluir |
+| Deploy por app | `ci/deploy-app.sh <slug>` + `ci/apps/<slug>.sh` | Um ficheiro de configuração por aplicação; Jenkins chama o mesmo script por SSH |
 | Desafio ACME | `tlsChallenge` | Evita conflito típico entre redirecionamento HTTP→HTTPS e HTTP-01 na porta 80 |
 
 ## Hostnames (padrão)

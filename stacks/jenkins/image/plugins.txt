@@ -3,3 +3,4 @@ git
 workflow-aggregator
 credentials-binding
 ssh-credentials
+ssh-agent

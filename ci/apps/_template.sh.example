@@ -1,0 +1,4 @@
+APP_COMPOSE_DIR="stacks/apps/meu-slug"
+APP_GIT_SUBDIR=""
+APP_GIT_REMOTE=""
+APP_GIT_BRANCH="main"
