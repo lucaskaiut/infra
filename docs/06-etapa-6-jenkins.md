@@ -21,6 +21,8 @@ Jenkins a correr atrás do Traefik, com um job **ci-smoke** que faz `checkout` d
 | `GITHUB_REPO_URL` | Repo a clonar no job (predefinição: infra). |
 | `GITHUB_TOKEN` | PAT read-only (recomendado se o repo for privado). |
 | `GITHUB_USERNAME` | Com PAT GitHub costuma funcionar `git` ou o teu username. |
+| `INFRA_HOST_PATH` | Caminho absoluto no **host** do clone `infra` (mount em `/infra-deploy` no container); obrigatório para o job **deploy-app**. |
+| `DOCKER_GID` | GID do grupo `docker` no host (`getent group docker`); o utilizador `jenkins` no container entra nesse grupo para usar o socket. |
 
 Se **não** definires `GITHUB_TOKEN`, o job usa clone HTTPS **sem** credencial (adequado só para repositório **público**).
 
@@ -37,7 +39,7 @@ Na VPS (ou localmente com Traefik e DNS):
 ```bash
 cd stacks/jenkins
 cp .env.example .env
-# editar .env (password admin, JENKINS_URL, DOMAIN, opcional GITHUB_*)
+# editar .env (password admin, JENKINS_URL, DOMAIN, INFRA_HOST_PATH, DOCKER_GID, opcional GITHUB_*)
 docker compose build --no-cache
 docker compose up -d
 ```
