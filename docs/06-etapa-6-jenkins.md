@@ -59,6 +59,10 @@ Os ficheiros em `init.groovy.d` só correm quando o `jenkins_home` é populado p
 - opção A: apagar o volume `infra-jenkins_jenkins_home` e voltar a subir (perde configuração Jenkins); ou  
 - opção B: criar manualmente um pipeline com o mesmo script (copiar do ficheiro `stacks/jenkins/image/init.groovy.d/02-ci-smoke-job.groovy`).
 
+### Atualizar o pipeline depois de mudar o repositório
+
+O script do job **ci-smoke** fica guardado no Jenkins; alterações em `init.groovy.d` no Git **não** reaplicam sozinhas. Para alinhar com a versão atual do repositório: **ci-smoke → Configure**, edita o *Pipeline script* (remove blocos inválidos, por exemplo `options { timestamps() }` se não tiveres o plugin Timestamper) ou cola o conteúdo atualizado do ficheiro `stacks/jenkins/image/init.groovy.d/02-ci-smoke-job.groovy` (só a parte `pipeline { ... }`).
+
 ## Segurança
 
 - Não commits o `.env` (contém password e opcionalmente PAT).
