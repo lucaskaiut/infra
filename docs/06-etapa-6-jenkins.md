@@ -9,6 +9,7 @@ Jenkins a correr atrás do Traefik, com um job **ci-smoke** que faz `checkout` d
 - Stack `edge` (Traefik) ativa e rede `infra_edge`.
 - DNS: registo `jenkins.<DOMAIN>` apontando para a VPS (mesmo padrão das outras apps).
 - Ficheiro `stacks/jenkins/.env` a partir de `.env.example`.
+- A imagem customizada usa **`jenkins/jenkins:lts-jdk21`** (Java 21). O Java 17 deixou de ser suportado pelo Jenkins LTS; após mudar o `Dockerfile`, faz `docker compose build` e `up -d` na stack para aplicar.
 
 ## Variáveis
 
