@@ -31,28 +31,39 @@ O script:
    - Se for só imagem/compose sem clone: deixa `APP_GIT_SUBDIR` e `APP_GIT_REMOTE` vazios.
 3. Commit no repositório **infra**; na VPS, `git pull` e `./ci/deploy-app.sh <slug>`.
 
-## Jenkins (job **deploy-app**)
+## Jenkins (job **deploy-app**, mesma VPS)
 
-O ficheiro `ci/jenkins/DeployApp.Jenkinsfile` faz SSH para a VPS, corre `git pull` em `~/infra` e `./ci/deploy-app.sh` com o parâmetro **APP_SLUG**.
+O Jenkins corre **no mesmo host** que as aplicações. O pipeline **não** usa SSH: executa `git pull` e `./ci/deploy-app.sh` dentro do diretório **`/infra-deploy`**, que é o clone de **infra** no host montado em modo leitura-escrita no container.
 
-### 1. Plugin e variáveis
+### 1. Imagem e Docker
 
-- Imagem Jenkins: inclui o plugin **SSH Agent** (`ssh-agent` no `plugins.txt`). Após alteração, `docker compose build` e `up -d` em `stacks/jenkins/`.
-- No `stacks/jenkins/.env`, define **`DEPLOY_SSH_USER`** e **`DEPLOY_SSH_HOST`** (ex.: utilizador Linux da VPS e hostname ou IP acessível a partir do container Jenkins).
+A imagem customizada (`stacks/jenkins/image/Dockerfile`) inclui o binário **`docker`** e o plugin **`docker compose`** (v2), para o job invocar `docker compose build` / `up` no daemon do host.
 
-### 2. Credencial SSH
+### 2. Compose da stack Jenkins (`stacks/jenkins/docker-compose.yml`)
 
-Em **Manage Jenkins → Credentials**, cria uma credencial do tipo **SSH Username with private key** com ID **`vps-deploy-ssh`** (a chave privada tem de permitir login na VPS como `DEPLOY_SSH_USER`).
+- **`INFRA_HOST_PATH`** — caminho **absoluto** no host para o repositório **infra** (o mesmo que usas em `~/infra` na VPS). Ex.: `/home/deploy/infra`.
+- **`DOCKER_GID`** — GID numérico do grupo **`docker`** no host (o utilizador que corre os containers precisa de poder falar com o socket). Obténs com: `getent group docker | cut -d: -f3`.
+- **Volume** `/var/run/docker.sock` — o Jenkins usa o Docker do host para os builds/deploys.
 
-### 3. Criar o job (uma vez)
+**Implicação de segurança:** quem controla o Jenkins (ou um job malicioso) pode, via socket, pedir ao Docker do host ações equivalentes a elevado privilégio. Adequado em VPS dedicada a esta infra; evita expor o Jenkins publicamente sem autenticação forte.
+
+### 3. Autenticação `git pull` no mount
+
+O `git pull` corre **dentro** do container sobre os ficheiros montados. Repositório **público** em HTTPS costuma funcionar sem credenciais extra. Se **infra** for **privado**, configura credenciais (PAT no remoto só no host, ou credencial Git no Jenkins e ajusta o job para usar `withCredentials` / checkout em alternativa ao pull no mount — ver notas da equipa).
+
+Garante que o UID do utilizador **`jenkins`** no container (normalmente `1000`) consegue escrever em `.git` e no working tree do mount, ou alinha dono dos ficheiros no host com esse UID.
+
+### 4. Criar o job (uma vez)
 
 **Opção A — Script Console** (como admin): cola o conteúdo de `ci/jenkins/seed-deploy-app-job.groovy` e executa. Ajusta o URL do Git se o remoto não for o público `lucaskaiut/infra`.
 
 **Opção B — Manual:** **New Item** → *Pipeline* → **Pipeline script from SCM** → Git → branch `main` → *Script Path* `ci/jenkins/DeployApp.Jenkinsfile`.
 
-### 4. Executar
+### 5. Executar
 
 **Build with Parameters** → `APP_SLUG` = `ematricula` (ou outro slug com `ci/apps/<slug>.sh`).
+
+Após alterar `Dockerfile`, `docker-compose.yml` ou `plugins.txt` do Jenkins: `docker compose build` e `up -d` em `stacks/jenkins/`.
 
 ## Traefik e `DOMAIN`
 
