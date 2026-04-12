@@ -36,16 +36,15 @@ cp .env.example .env
 
 ## Subir
 
-```bash
-docker compose build
-docker compose up -d
-```
-
-Deploy ou atualização a partir da raiz do repo **infra** (recomendado): sobe **duas réplicas** do serviço `app` (Traefik reparte tráfego) e, se existir `DOMAIN` no `.env` da stack, regista estatísticas de `GET /up` durante o deploy.
+Em produção com **Docker Swarm** (recomendado): a partir da raiz do repo **infra**, após `ci/swarm-bootstrap.sh` e stacks **infra-shared** + **infra-edge** (ver `docs/arquitetura.md`).
 
 ```bash
 cd ~/infra && ./ci/deploy-app.sh ematricula
 ```
+
+Isto faz **build** da imagem com `docker-compose.yml` e **deploy** com `docker-stack.yml` (**2 réplicas** do `app`, rolling `start-first`). Com `DOMAIN` no `.env` da stack, o script regista estatísticas de `GET /up` durante o deploy.
+
+Desenvolvimento local sem Swarm: `docker compose build && docker compose up -d` nesta pasta (ajustar/remover `APP_USE_SWARM` em `ci/apps/ematricula.sh` se usares o script a partir da raiz).
 
 Ver `docs/arquitetura.md` (secções *CI* e *Jenkins*).
 

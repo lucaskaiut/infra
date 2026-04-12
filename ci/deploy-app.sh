@@ -88,31 +88,63 @@ if [[ -n "${APP_GIT_SUBDIR:-}" && -n "${APP_GIT_REMOTE:-}" ]]; then
   fi
 fi
 
-docker compose build
-
-compose_scale_args=()
-if [[ -n "${APP_COMPOSE_SCALES:-}" ]]; then
-  IFS=',' read -ra _scale_pairs <<<"${APP_COMPOSE_SCALES// /}"
-  for _sp in "${_scale_pairs[@]}"; do
-    [[ -n "$_sp" ]] && compose_scale_args+=(--scale "$_sp")
-  done
+COMPOSE_LOCAL=()
+if [[ -f docker-compose.yml ]]; then
+  COMPOSE_LOCAL=(-f docker-compose.yml)
 fi
 
-if [[ ${#compose_scale_args[@]} -gt 0 ]]; then
-  if docker compose up -d --help 2>&1 | grep -q '[[:space:]]--wait[[:space:]]'; then
-    docker compose up -d "${compose_scale_args[@]}" --wait || docker compose up -d "${compose_scale_args[@]}"
-  else
-    docker compose up -d "${compose_scale_args[@]}"
-  fi
+if [[ ${#COMPOSE_LOCAL[@]} -gt 0 ]]; then
+  docker compose "${COMPOSE_LOCAL[@]}" build
 else
-  if docker compose up -d --help 2>&1 | grep -q '[[:space:]]--wait[[:space:]]'; then
-    docker compose up -d --wait || docker compose up -d
+  docker compose build
+fi
+
+SWARM_DONE=0
+if [[ "${APP_USE_SWARM:-0}" == 1 ]]; then
+  SWARM_FILE="${APP_SWARM_COMPOSE_FILE:-docker-stack.yml}"
+  STACK_NAME="${APP_SWARM_STACK_NAME:?defina APP_SWARM_STACK_NAME em ci/apps/<slug>.sh quando APP_USE_SWARM=1}"
+  [[ -f "$SWARM_FILE" ]] || {
+    echo "Ficheiro Swarm inexistente: ${STACK}/$SWARM_FILE" >&2
+    exit 1
+  }
+  if ! docker info --format '{{.Swarm.ControlAvailable}}' 2>/dev/null | grep -q true; then
+    echo "Docker Swarm inativo. Na VPS: SWARM_ADVERTISE_ADDR=<IP> ${ROOT}/ci/swarm-bootstrap.sh" >&2
+    exit 1
+  fi
+  RENDERED=$(mktemp)
+  docker compose -f "$SWARM_FILE" --env-file .env config >"$RENDERED"
+  docker stack deploy -c "$RENDERED" "$STACK_NAME"
+  rm -f "$RENDERED"
+  SWARM_DONE=1
+else
+  compose_scale_args=()
+  if [[ -n "${APP_COMPOSE_SCALES:-}" ]]; then
+    IFS=',' read -ra _scale_pairs <<<"${APP_COMPOSE_SCALES// /}"
+    for _sp in "${_scale_pairs[@]}"; do
+      [[ -n "$_sp" ]] && compose_scale_args+=(--scale "$_sp")
+    done
+  fi
+
+  if [[ ${#compose_scale_args[@]} -gt 0 ]]; then
+    if docker compose "${COMPOSE_LOCAL[@]}" up -d --help 2>&1 | grep -q '[[:space:]]--wait[[:space:]]'; then
+      docker compose "${COMPOSE_LOCAL[@]}" up -d "${compose_scale_args[@]}" --wait || docker compose "${COMPOSE_LOCAL[@]}" up -d "${compose_scale_args[@]}"
+    else
+      docker compose "${COMPOSE_LOCAL[@]}" up -d "${compose_scale_args[@]}"
+    fi
   else
-    docker compose up -d
+    if docker compose "${COMPOSE_LOCAL[@]}" up -d --help 2>&1 | grep -q '[[:space:]]--wait[[:space:]]'; then
+      docker compose "${COMPOSE_LOCAL[@]}" up -d --wait || docker compose "${COMPOSE_LOCAL[@]}" up -d
+    else
+      docker compose "${COMPOSE_LOCAL[@]}" up -d
+    fi
   fi
 fi
 
 finalize_probe_report
 trap - EXIT
 
-docker compose ps
+if [[ "$SWARM_DONE" == 1 ]]; then
+  docker stack ps "${APP_SWARM_STACK_NAME}" --no-trunc 2>/dev/null || true
+else
+  docker compose "${COMPOSE_LOCAL[@]}" ps
+fi

@@ -1,0 +1,19 @@
+services:
+  whoami:
+    image: traefik/whoami:v1.10
+    networks:
+      - edge
+    deploy:
+      mode: replicated
+      replicas: 1
+      labels:
+        - traefik.enable=true
+        - "traefik.http.routers.demo-whoami.rule=Host(`demo.${DOMAIN:?defina DOMAIN no .env}`)"
+        - traefik.http.routers.demo-whoami.entrypoints=websecure
+        - traefik.http.routers.demo-whoami.tls.certresolver=letsencrypt
+        - traefik.http.services.demo-whoami.loadbalancer.server.port=80
+
+networks:
+  edge:
+    external: true
+    name: infra_edge
