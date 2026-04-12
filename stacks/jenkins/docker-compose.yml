@@ -1,0 +1,32 @@
+name: infra-jenkins
+
+services:
+  jenkins:
+    build:
+      context: ./image
+    image: infra-jenkins:lts
+    container_name: infra_jenkins
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      JAVA_OPTS: -Djenkins.install.runSetupWizard=false -Djava.awt.headless=true
+      CASC_JENKINS_CONFIG: /var/jenkins_home/casc
+    volumes:
+      - jenkins_home:/var/jenkins_home
+    networks:
+      - edge
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.jenkins.rule=Host(`jenkins.${DOMAIN:?defina DOMAIN no .env}`)
+      - traefik.http.routers.jenkins.entrypoints=websecure
+      - traefik.http.routers.jenkins.tls.certresolver=letsencrypt
+      - traefik.http.services.jenkins.loadbalancer.server.port=8080
+
+networks:
+  edge:
+    external: true
+    name: infra_edge
+
+volumes:
+  jenkins_home:

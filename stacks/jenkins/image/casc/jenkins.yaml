@@ -1,0 +1,16 @@
+jenkins:
+  systemMessage: "CI (Etapa 6) — sem deploy automático."
+  securityRealm:
+    local:
+      allowsSignup: false
+      users:
+        - id: "admin"
+          password: "${JENKINS_ADMIN_PASSWORD}"
+  authorizationStrategy:
+    loggedInUsersCanDoAnything:
+      allowAnonymousRead: false
+
+unclassified:
+  location:
+    url: "${JENKINS_URL}"
+    adminAddress: "admin@localhost"

@@ -6,5 +6,6 @@ stacks/edge/secrets/dashboard.htpasswd
 stacks/apps/ematricula/.env
 stacks/apps/ematricula/ematricula/
 stacks/shared/.env
+stacks/jenkins/.env
 *.log
 .DS_Store
