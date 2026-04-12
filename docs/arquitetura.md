@@ -255,8 +255,8 @@ docker compose build && docker compose up -d
 ## 13. CI — `ci/deploy-app.sh` e novas apps
 
 - **`ci/apps/<slug>.sh`:** define `APP_COMPOSE_DIR`, e opcionalmente `APP_GIT_SUBDIR`, `APP_GIT_REMOTE`, `APP_GIT_BRANCH`.
-- **Swarm (ex.: eMatricula):** `APP_USE_SWARM=1`, `APP_SWARM_STACK_NAME`, `APP_SWARM_COMPOSE_FILE=docker-stack.yml`. O script faz build com `docker-compose.yml`, valida Swarm ativo, renderiza o stack file e executa **`docker stack deploy`**.
-- **Compose clássico:** sem `APP_USE_SWARM`, mantém `docker compose up -d` e opcionalmente `APP_COMPOSE_SCALES` (ex.: `--scale app=2`).
+- **Swarm (ex.: eMatricula):** por omissão `APP_USE_SWARM=1` em `ci/apps/ematricula.sh` (definível antes do script com `export APP_USE_SWARM=0` enquanto a VPS ainda não migrar). `APP_SWARM_STACK_NAME`, `APP_SWARM_COMPOSE_FILE=docker-stack.yml`. O script faz build com `docker-compose.yml`, valida Swarm ativo, renderiza o stack file e executa **`docker stack deploy`**.
+- **Compose clássico:** `APP_USE_SWARM=0` — mantém `docker compose up -d` e opcionalmente `APP_COMPOSE_SCALES` (ex.: `--scale app=2`).
 - **`ci/swarm-bootstrap.sh`:** inicialização do Swarm e criação das redes overlay (ver secção 3.1).
 - Modelo vazio: `ci/apps/_template.sh.example`.
 
