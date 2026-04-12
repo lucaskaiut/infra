@@ -11,6 +11,7 @@ services:
       - traefik.enable=true
       - traefik.http.routers.demo-whoami.rule=Host(`demo.${DOMAIN:?defina DOMAIN no .env}`)
       - traefik.http.routers.demo-whoami.entrypoints=websecure
+      - traefik.http.routers.demo-whoami.tls=true
       - traefik.http.routers.demo-whoami.tls.certresolver=letsencrypt
       - traefik.http.services.demo-whoami.loadbalancer.server.port=80
 

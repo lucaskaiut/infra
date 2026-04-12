@@ -99,6 +99,10 @@ pipeline {
       steps {
         sh """
           set -euo pipefail
+          if [ -n "\${JENKINS_URL:-}" ] && ! echo "\$JENKINS_URL" | grep -q '^https://'; then
+            echo "ERRO: JENKINS_URL deve começar por https:// (evita aviso 'não seguro' e links HTTP no Jenkins)." >&2
+            exit 1
+          fi
           cd /infra-deploy
           git pull origin main
           ./ci/deploy-app.sh ematricula

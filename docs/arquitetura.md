@@ -134,6 +134,7 @@ docker stack deploy -c /tmp/infra-edge.stack.yml infra-edge
 | API Docker 1.24 too old (Traefik) | Imagem Traefik antiga vs Docker 29+ | Atualizar para Traefik v3.6+ |
 | Erro ACME / e-mail inválido | `ACME_EMAIL` vazio ou `.env` com CRLF/BOM | Corrigir `.env`; confirmar vars no container Traefik |
 | Dashboard `traefik.*` inacessível após **Swarm**; logs `port is missing` no provider **swarm** | No Swarm o Traefik exige label explícita `traefik.http.services.<nome>.loadbalancer.server.port` em cada serviço com `traefik.enable` (incluindo o próprio Traefik) | Em `stacks/edge/docker-stack.yml` está definido `traefik.http.services.traefik.loadbalancer.server.port=80` junto do router `api@internal` |
+| Navegador mostra **“Não seguro”** com HTTPS | Mistura HTTP/HTTPS, HSTS em falta, ou cadeia LE pouco compatível com clientes antigos | O Traefik aplica middleware **security-headers** (HSTS) em `websecure`; ACME usa `preferredChain: ISRG Root X1`. **Jenkins:** `JENKINS_URL` no `.env` tem de ser `https://jenkins.<DOMAIN>` (sem `http://`). |
 
 ---
 

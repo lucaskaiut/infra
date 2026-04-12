@@ -25,6 +25,7 @@ services:
       - traefik.enable=true
       - traefik.http.routers.ematricula-api.rule=Host(`ematricula-api.${DOMAIN:?defina DOMAIN no .env da stack}`)
       - traefik.http.routers.ematricula-api.entrypoints=websecure
+      - traefik.http.routers.ematricula-api.tls=true
       - traefik.http.routers.ematricula-api.tls.certresolver=letsencrypt
       - traefik.http.services.ematricula-api.loadbalancer.server.port=80
       - traefik.http.services.ematricula-api.loadbalancer.healthcheck.path=/up

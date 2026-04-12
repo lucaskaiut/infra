@@ -12,6 +12,9 @@ entryPoints:
           scheme: https
   websecure:
     address: ":443"
+    http:
+      middlewares:
+        - security-headers@file
 
 providers:
   docker:
@@ -32,6 +35,7 @@ certificatesResolvers:
     acme:
       storage: /letsencrypt/acme.json
       tlsChallenge: {}
+      preferredChain: ISRG Root X1
 
 log:
   level: INFO
