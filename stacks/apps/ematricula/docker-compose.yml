@@ -6,7 +6,6 @@ services:
     build:
       context: .
       dockerfile: image/Dockerfile
-    container_name: infra_ematricula_app
     restart: unless-stopped
     env_file:
       - .env

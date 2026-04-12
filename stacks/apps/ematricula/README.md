@@ -41,7 +41,7 @@ docker compose build
 docker compose up -d
 ```
 
-Deploy ou atualização a partir da raiz do repo **infra** (recomendado):
+Deploy ou atualização a partir da raiz do repo **infra** (recomendado): sobe **duas réplicas** do serviço `app` (Traefik reparte tráfego) e, se existir `DOMAIN` no `.env` da stack, regista estatísticas de `GET /up` durante o deploy.
 
 ```bash
 cd ~/infra && ./ci/deploy-app.sh ematricula

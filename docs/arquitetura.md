@@ -31,7 +31,7 @@ Documento único: visão da plataforma Docker na VPS, decisões técnicas, como 
 - **`infra_edge`** — Criada pela stack `edge`. Traefik e qualquer serviço com HTTP público ligam-se aqui.
 - **`infra_shared`** — Criada pela stack `shared`. Apps que precisam de BD/cache ligam-se como rede **external**; resolvem **`mysql`** e **`redis`** pelos nomes dos serviços no Compose do shared.
 - **Compose:** `name` explícito por projeto (`infra-edge`, `infra-app-<slug>`, `infra-shared`, `infra-jenkins`).
-- **Containers:** prefixo `infra_` + papel (`infra_traefik`, `infra_ematricula_app`, …) para `docker ps`.
+- **Containers:** Traefik e workers com nome fixo quando definido no Compose; a API eMatricula em produção usa **2 réplicas** do serviço `app` (nomes gerados, ex. `infra-app-ematricula-app-1`, `…-app-2`) atrás do mesmo balanceador Traefik.
 
 **Regra:** um par MySQL + Redis para todas as apps; isolamento em Redis com **prefixos** (ex. Laravel `REDIS_PREFIX`).
 
