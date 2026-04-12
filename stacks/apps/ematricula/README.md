@@ -5,7 +5,7 @@ Publica apenas a pasta `api` do repositório [ematricula](https://github.com/luc
 ## Pré-requisitos na VPS
 
 - Stack **edge** (Traefik) com rede `infra_edge`.
-- Stack **shared** (`stacks/shared/`) com MySQL e Redis na rede `infra_shared`. Ver `docs/05-servicos-compartilhados.md`.
+- Stack **shared** (`stacks/shared/`) com MySQL e Redis na rede `infra_shared`. Ver `docs/arquitetura.md` (secção *Stack shared*).
 - DNS `A` para `ematricula-api.<DOMAIN>` → IP da VPS (o mesmo `DOMAIN` que definires no `.env` desta stack, alinhado à raiz do infra).
 - Docker com build habilitado.
 
@@ -47,7 +47,7 @@ Deploy ou atualização a partir da raiz do repo **infra** (recomendado):
 cd ~/infra && ./ci/deploy-app.sh ematricula
 ```
 
-Ver `docs/07-deploy-aplicacoes.md`.
+Ver `docs/arquitetura.md` (secções *CI* e *Jenkins*).
 
 ## Serviços **nesta** stack
 
@@ -59,4 +59,4 @@ Ver `docs/07-deploy-aplicacoes.md`.
 
 MySQL e Redis estão em **`stacks/shared/`**, não aqui.
 
-Documentação detalhada: `docs/04-etapa-4-ematricula-api.md`.
+Documentação detalhada: `docs/arquitetura.md` (secção *Stack eMatricula*).
