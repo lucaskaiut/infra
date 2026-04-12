@@ -115,6 +115,8 @@ docker compose -f docker-stack.yml --env-file ../../.env config \
 docker stack deploy -c /tmp/infra-edge.stack.yml infra-edge
 ```
 
+Se alterares **só** ficheiros montados em volume (`traefik/static/`, `traefik/dynamic/`) sem mudar o YAML da stack, o Swarm pode **não** recriar a tarefa. Nesse caso: `docker service update --force infra-edge_traefik`.
+
 **Legado (Compose só):** `docker compose --env-file ../../.env up -d` com `docker-compose.yml` — útil em ambientes sem Swarm; em produção com Swarm, prefira o ficheiro **`docker-stack.yml`**.
 
 - Certificados Let's Encrypt; e-mail ACME via variável oficial do Traefik no Compose (fiável vs expandir `${ACME_EMAIL}` dentro de YAML estático montado).
