@@ -9,3 +9,4 @@ if [[ "$APP_USE_SWARM" == "0" ]]; then
   : "${APP_COMPOSE_SCALES:=app=2}"
 fi
 APP_HTTP_PROBE_SERVICE_HOST="ematricula-api"
+APP_DEPLOY_SUBPATH_GUARD="api"

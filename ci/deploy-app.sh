@@ -86,6 +86,12 @@ if [[ -n "${APP_GIT_SUBDIR:-}" && -n "${APP_GIT_REMOTE:-}" ]]; then
     git -C "$SUB" fetch origin "$BR"
     git -C "$SUB" pull --ff-only origin "$BR"
   fi
+  if [[ -n "${APP_DEPLOY_SUBPATH_GUARD:-}" && -n "${DEPLOY_SUBPATH_GIT_RANGE:-}" ]]; then
+    if ! git -C "$SUB" diff --name-only "$DEPLOY_SUBPATH_GIT_RANGE" | grep -qE "^${APP_DEPLOY_SUBPATH_GUARD}(/|$)"; then
+      echo "Deploy interrompido: o intervalo Git ${DEPLOY_SUBPATH_GIT_RANGE} não inclui alterações em ${APP_DEPLOY_SUBPATH_GUARD}/." >&2
+      exit 1
+    fi
+  fi
 fi
 
 COMPOSE_LOCAL=()
