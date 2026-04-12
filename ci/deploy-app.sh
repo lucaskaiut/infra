@@ -113,7 +113,7 @@ if [[ "${APP_USE_SWARM:-0}" == 1 && "$SWARM_ACTIVE" == true ]]; then
     exit 1
   }
   RENDERED=$(mktemp)
-  docker compose -f "$SWARM_FILE" --env-file .env config >"$RENDERED"
+  docker compose -f "$SWARM_FILE" --env-file .env config | sed '/^name:/d' >"$RENDERED"
   docker stack deploy -c "$RENDERED" "$STACK_NAME"
   rm -f "$RENDERED"
   SWARM_DONE=1
