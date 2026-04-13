@@ -34,7 +34,8 @@ certificatesResolvers:
   letsencrypt:
     acme:
       storage: /letsencrypt/acme.json
-      tlsChallenge: {}
+      httpChallenge:
+        entryPoint: web
       preferredChain: ISRG Root X1
 
 log:
