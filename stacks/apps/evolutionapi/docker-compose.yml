@@ -15,8 +15,11 @@ services:
       DATABASE_ENABLED: "true"
       DATABASE_PROVIDER: postgresql
       DATABASE_CONNECTION_URI: postgresql://${POSTGRES_USERNAME:?defina POSTGRES_USERNAME no .env}:${POSTGRES_PASSWORD:?defina POSTGRES_PASSWORD no .env}@evolutionapi_postgres:5432/${POSTGRES_DATABASE:?defina POSTGRES_DATABASE no .env}?schema=public
-      CACHE_REDIS_ENABLED: "true"
-      CACHE_REDIS_URI: redis://evolutionapi_redis:6379/6
+      CACHE_REDIS_ENABLED: ${CACHE_REDIS_ENABLED:-true}
+      CACHE_REDIS_URI: ${CACHE_REDIS_URI:-redis://evolutionapi_redis:6379/6}
+      CACHE_REDIS_PREFIX_KEY: ${CACHE_REDIS_PREFIX_KEY:-evolution}
+      CACHE_REDIS_SAVE_INSTANCES: ${CACHE_REDIS_SAVE_INSTANCES:-false}
+      CACHE_LOCAL_ENABLED: ${CACHE_LOCAL_ENABLED:-false}
       CORS_ORIGIN: ${CORS_ORIGIN:-*}
       TELEMETRY: ${TELEMETRY:-false}
       LOG_LEVEL: ${LOG_LEVEL:-ERROR,WARN,INFO}
