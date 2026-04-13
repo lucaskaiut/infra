@@ -7,7 +7,7 @@ services:
       SERVER_TYPE: http
       SERVER_PORT: "8080"
       SERVER_URL: https://evolution.${DOMAIN:?defina DOMAIN no .env da stack}
-      CONFIG_SESSION_PHONE_VERSION: "2.3000.1023204200"
+      CONFIG_SESSION_PHONE_VERSION: "2.3000.1037199011"
       DATABASE_ENABLED: "true"
       DATABASE_PROVIDER: postgresql
       DATABASE_CONNECTION_URI: postgresql://${POSTGRES_USERNAME:?defina POSTGRES_USERNAME no .env}:${POSTGRES_PASSWORD:?defina POSTGRES_PASSWORD no .env}@evolutionapi_postgres:5432/${POSTGRES_DATABASE:?defina POSTGRES_DATABASE no .env}?schema=public
