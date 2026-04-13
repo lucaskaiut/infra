@@ -1,6 +1,6 @@
 services:
   evolutionapi:
-    image: evoapicloud/evolution-api:v2.3.7
+    image: atendai/evolution-api:v2.2.3
     env_file:
       - .env
     environment:
