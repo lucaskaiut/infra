@@ -1,0 +1,47 @@
+{
+  "name": "CI — Jenkins deploy notify (recebimento)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "jenkins-deploy-notify",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "a1e8f0c2-7b4d-4a9e-8c1d-webhook0001",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [0, 0],
+      "webhookId": "f47ac10b-58cc-4372-a567-0e02b2c3d479"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{\n  \"ok\": true,\n  \"received\": true\n}",
+        "options": {}
+      },
+      "id": "b2f9e1d3-8c5e-4baf-9d2e-respond001",
+      "name": "Responder vazio",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [220, 0]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Responder vazio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

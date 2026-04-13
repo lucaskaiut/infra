@@ -1,0 +1,15 @@
+{
+  "source": "jenkins",
+  "event": "deploy_finished",
+  "jobName": "deploy-ematricula-webhook",
+  "buildNumber": 42,
+  "buildUrl": "https://jenkins.exemplo.com/job/deploy-ematricula-webhook/42/",
+  "result": "SUCCESS",
+  "timestamp": "2026-04-13T12:00:00.000Z",
+  "git": {
+    "branch": "refs/heads/main",
+    "commit": "abc123def456",
+    "repo": "lucaskaiut/ematricula"
+  },
+  "message": "Deploy concluído com sucesso."
+}

@@ -177,6 +177,7 @@ docker stack deploy -c /tmp/infra-shared.stack.yml infra-shared
 - Persistência: SQLite em volume Docker **`n8n_data`**. **Uma réplica** no Swarm; não aumentar réplicas sem migrar para PostgreSQL.
 - **Primeira subida:** `cp stacks/apps/n8n/.env.example stacks/apps/n8n/.env` e preencher **`DOMAIN`** (o mesmo domínio base que em `~/infra/.env` para ACME/Traefik), **`N8N_ENCRYPTION_KEY`** (ex.: `openssl rand -base64 32`), **`N8N_BASIC_AUTH_PASSWORD`**. DNS **`n8n.<DOMAIN>`** → IP da VPS.
 - **Deploy:** `cd ~/infra && ./ci/deploy-app.sh n8n` (faz `docker compose pull` e, com Swarm ativo, `docker stack deploy` na stack **`infra-app-n8n`**).
+- **Notificações Jenkins → n8n:** fluxo stub em `ci/n8n/workflows/jenkins-deploy-notify.json`; criar/publicar com `./ci/n8n/deploy-jenkins-deploy-notify-workflow.sh` a partir da raiz (usa `N8N_API_URL` / `N8N_API_KEY` no `.env` raiz). Webhook de produção (n8n 2.x): `https://n8n.<DOMAIN>/webhook/jenkins-deploy-notify`. Payload exemplo: `ci/n8n/examples/jenkins-deploy-notify.payload.json`.
 
 ---
 

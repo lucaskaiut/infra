@@ -43,7 +43,7 @@ Prefixo: **`${N8N_API_URL}/api/v1`**
 | Criar workflow | POST | `/workflows` |
 | Obter um | GET | `/workflows/{id}` |
 | Atualizar | PUT ou PATCH | `/workflows/{id}` (confirmar no OpenAPI da instância) |
-| Ativar / desativar | PATCH | `/workflows/{id}` com `{ "active": true \| false }` quando suportado |
+| Publicar (ativar) | POST | `/workflows/{id}/activate` — corpo JSON opcional (`versionId`, etc.); desativar: `POST /workflows/{id}/deactivate` |
 
 Parâmetros de listagem (paginação, filtros): ver [Pagination](https://docs.n8n.io/api/pagination/) na doc n8n.
 
@@ -105,3 +105,5 @@ Import por ficheiro ou URL na UI: [Export and import workflows](https://docs.n8n
 ## Ligação com a infra deste repo
 
 A stack **n8n** vive em `stacks/apps/n8n/` (Traefik, TLS). `WEBHOOK_URL` e `N8N_HOST` na stack devem coincidir com a URL usada em `N8N_API_URL` para evitar URLs de webhook incorretas.
+
+Em **n8n 2.x**, o URL de produção do Webhook costuma ser `{WEBHOOK_URL}webhook/{path}` (só o **path** configurado no nó), **sem** o `webhookId` no segmento do URL. Confirmar na UI do nó (“Production URL”) se o teu patch difere.
