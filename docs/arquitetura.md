@@ -173,7 +173,7 @@ docker stack deploy -c /tmp/infra-shared.stack.yml infra-shared
 
 ### Stack n8n (workflows)
 
-- Pasta **`stacks/apps/n8n/`**, hostname **`n8n.${DOMAIN}`**, TLS no Traefik (Let’s Encrypt). Imagem **`n8nio/n8n`** com **tag fixa** no YAML (atualizar a tag quando quiseres uma versão mais recente e voltar a fazer deploy).
+- Pasta **`stacks/apps/n8n/`**, hostname **`n8n.${DOMAIN}`**, TLS no Traefik (Let’s Encrypt). Imagem **`n8nio/n8n`** com **tag fixa** no YAML (tag atual em repo: **2.15.1**; alterar no YAML e voltar a fazer deploy para atualizar).
 - Persistência: SQLite em volume Docker **`n8n_data`**. **Uma réplica** no Swarm; não aumentar réplicas sem migrar para PostgreSQL.
 - **Primeira subida:** `cp stacks/apps/n8n/.env.example stacks/apps/n8n/.env` e preencher **`DOMAIN`** (o mesmo domínio base que em `~/infra/.env` para ACME/Traefik), **`N8N_ENCRYPTION_KEY`** (ex.: `openssl rand -base64 32`), **`N8N_BASIC_AUTH_PASSWORD`**. DNS **`n8n.<DOMAIN>`** → IP da VPS.
 - **Deploy:** `cd ~/infra && ./ci/deploy-app.sh n8n` (faz `docker compose pull` e, com Swarm ativo, `docker stack deploy` na stack **`infra-app-n8n`**).
