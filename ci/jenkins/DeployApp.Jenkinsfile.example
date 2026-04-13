@@ -1,7 +1,12 @@
+// Modelo para job "deploy-app" (Pipeline from SCM ou copiar para o Jenkins).
+// Inclui notificação opcional ao n8n após o deploy (sucesso ou falha).
+// Requisitos: N8N_DEPLOY_WEBHOOK_URL ou N8N_API_URL no .env do Jenkins / infra montado;
+// imagem Jenkins com python3 (ver stacks/jenkins/image/Dockerfile).
+
 pipeline {
   agent any
   parameters {
-    string(name: 'APP_SLUG', defaultValue: 'ematricula', description: 'Slug com ficheiro ci/apps/<slug>.sh')
+    string(name: 'APP_SLUG', defaultValue: 'meu-slug', description: 'Slug com ficheiro ci/apps/<slug>.sh')
   }
   stages {
     stage('Deploy') {
@@ -9,10 +14,6 @@ pipeline {
         writeFile file: "${env.WORKSPACE}/.jenkins-notify-commits.json", text: '[]'
         sh """
           set -euo pipefail
-          if [ -n "\${JENKINS_URL:-}" ] && ! echo "\$JENKINS_URL" | grep -q '^https://'; then
-            echo "ERRO: JENKINS_URL deve começar por https:// (ver stacks/jenkins/.env.example)." >&2
-            exit 1
-          fi
           cd /infra-deploy
           INFRA_BEFORE=\$(git rev-parse HEAD)
           git pull origin main

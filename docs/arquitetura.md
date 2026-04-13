@@ -240,6 +240,9 @@ O Jenkins **não** é deployado com `docker stack deploy`: o Swarm **não** supo
 | `GITHUB_*` | PAT opcional → credencial `github-readonly` no primeiro boot |
 | `INFRA_HOST_PATH` | Caminho absoluto no host para o repo infra |
 | `DOCKER_GID` | GID do grupo docker no host |
+| `N8N_DEPLOY_WEBHOOK_URL` | Opcional: URL `POST` do webhook n8n (ex.: `https://n8n.<DOMAIN>/webhook/jenkins-deploy-notify`). Se vazio, o script `ci/notify-n8n-deploy.sh` tenta `N8N_API_URL` do `.env` montado em `/infra-deploy`. |
+
+Após alterar a **imagem** Jenkins (ex.: `python3-minimal` para notificações), na VPS: `docker compose build && docker compose up -d` em `stacks/jenkins/`.
 
 ```bash
 cd ~/infra/stacks/jenkins
@@ -252,8 +255,8 @@ docker compose build && docker compose up -d
 | Job | Origem | Função |
 |-----|--------|--------|
 | **ci-smoke** | Init Groovy (só volume novo) | Checkout do repo infra + echo (smoke CI) |
-| **deploy-app** | Criar via `ci/jenkins/seed-deploy-app-job.groovy` ou Pipeline from SCM → `ci/jenkins/DeployApp.Jenkinsfile` | Parâmetro `APP_SLUG`; `git pull` + `./ci/deploy-app.sh` em `/infra-deploy` |
-| **deploy-ematricula-webhook** | Seed `ci/jenkins/seed-deploy-ematricula-webhook-job.groovy` ou SCM → `DeployEmatriculaWebhook.Jenkinsfile` | Webhook GitHub: push em `main` no repo **ematricula** com alterações em **`api/`** |
+| **deploy-app** | Criar via `ci/jenkins/seed-deploy-app-job.groovy` ou Pipeline from SCM → `ci/jenkins/DeployApp.Jenkinsfile` | Parâmetro `APP_SLUG`; `git pull` + `./ci/deploy-app.sh`; no fim chama `ci/notify-n8n-deploy.sh` (payload com Jenkins + alterações no clone **infra**). Modelo genérico: `ci/jenkins/DeployApp.Jenkinsfile.example`. |
+| **deploy-ematricula-webhook** | Seed `ci/jenkins/seed-deploy-ematricula-webhook-job.groovy` ou SCM → `DeployEmatriculaWebhook.Jenkinsfile` | Webhook GitHub: push em `main` no repo **ematricula** com alterações em **`api/`**; notificação n8n inclui `commits` do payload GitHub, intervalo Git e ficheiros alterados em `api/`. |
 
 **Manutenção:** alterações em `init.groovy.d` **não** atualizam jobs já criados — editar o job no Jenkins ou recriar o volume (perde estado).
 

@@ -127,6 +127,7 @@ pipeline {
         environment name: 'RUN_DEPLOY', value: '1'
       }
       steps {
+        writeFile file: "${env.WORKSPACE}/.jenkins-notify-commits.json", text: env.COMMITS_PAYLOAD ?: '[]'
         sh """
           set -euo pipefail
           if [ -n "\${JENKINS_URL:-}" ] && ! echo "\$JENKINS_URL" | grep -q '^https://'; then
@@ -134,10 +135,40 @@ pipeline {
             exit 1
           fi
           cd /infra-deploy
+          INFRA_BEFORE=\$(git rev-parse HEAD)
           git pull origin main
+          INFRA_AFTER=\$(git rev-parse HEAD)
+          echo "\${INFRA_BEFORE}..\${INFRA_AFTER}" > "${env.WORKSPACE}/.jenkins-notify-infra-range.txt"
           export DEPLOY_SUBPATH_GIT_RANGE="\${DEPLOY_SUBPATH_GIT_RANGE:-}"
+          export COMMITS_PAYLOAD_FILE="${env.WORKSPACE}/.jenkins-notify-commits.json"
+          export NOTIFY_APP_SLUG=ematricula
           ./ci/deploy-app.sh ematricula
         """
+      }
+      post {
+        always {
+          script {
+            env.NOTIFY_BUILD_RESULT = currentBuild.currentResult ?: 'FAILURE'
+          }
+          sh """
+            set -eu
+            export INFRA_ROOT=/infra-deploy
+            export APP_SLUG=ematricula
+            export NOTIFY_APP_SLUG=ematricula
+            export NOTIFY_BUILD_RESULT='${env.NOTIFY_BUILD_RESULT}'
+            export COMMITS_PAYLOAD_FILE='${env.WORKSPACE}/.jenkins-notify-commits.json'
+            export NOTIFY_GIT_BEFORE='${env.GIT_BEFORE ?: ""}'
+            export NOTIFY_GIT_AFTER='${env.GIT_AFTER ?: ""}'
+            export NOTIFY_GIT_REF='${env.GIT_REF ?: ""}'
+            export NOTIFY_REPO_FULL='${env.REPO_FULL ?: ""}'
+            export DEPLOY_SUBPATH_GIT_RANGE='${env.DEPLOY_SUBPATH_GIT_RANGE ?: ""}'
+            RFILE='${env.WORKSPACE}/.jenkins-notify-infra-range.txt'
+            if [ -f "\$RFILE" ]; then
+              export NOTIFY_INFRA_GIT_RANGE="\$(cat "\$RFILE")"
+            fi
+            /infra-deploy/ci/notify-n8n-deploy.sh || true
+          """
+        }
       }
     }
   }

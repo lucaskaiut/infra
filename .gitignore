@@ -8,5 +8,7 @@ stacks/apps/n8n/.env
 stacks/apps/ematricula/ematricula/
 stacks/shared/.env
 stacks/jenkins/.env
+__pycache__/
+*.pyc
 *.log
 .DS_Store

@@ -3,7 +3,7 @@ FROM jenkins/jenkins:lts-jdk21
 USER root
 ARG COMPOSE_VERSION=2.32.4
 RUN apt-get update \
-  && apt-get install -y --no-install-recommends ca-certificates curl \
+  && apt-get install -y --no-install-recommends ca-certificates curl python3-minimal \
   && ARCH=$(dpkg --print-architecture) \
   && case "$ARCH" in amd64) DC_ARCH=x86_64 ;; arm64) DC_ARCH=aarch64 ;; *) echo "unsupported arch: $ARCH"; exit 1 ;; esac \
   && mkdir -p /usr/local/lib/docker/cli-plugins \
