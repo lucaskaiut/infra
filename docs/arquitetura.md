@@ -69,7 +69,7 @@ O script ativa o Swarm se necessário e cria **`infra_edge`** e **`infra_shared`
 1. **`ci/swarm-bootstrap.sh`** — Swarm + redes overlay `infra_edge` e `infra_shared` (uma vez, ou após migração).
 2. **shared (Swarm)** — `docker stack deploy` com `stacks/shared/docker-stack.yml` → stack **`infra-shared`** (MySQL e Redis).
 3. **edge (Swarm)** — `docker stack deploy` com `stacks/edge/docker-stack.yml` → **`infra-edge`** (Traefik).
-4. **apps (Swarm)** — ex.: eMatricula via `./ci/deploy-app.sh ematricula` (build Compose + deploy stack **`infra-app-ematricula`**).
+4. **apps (Swarm)** — ex.: eMatricula via `./ci/deploy-app.sh ematricula` (build Compose + deploy stack **`infra-app-ematricula`**); **n8n** via `./ci/deploy-app.sh n8n` (imagem upstream, stack **`infra-app-n8n`**).
 5. **jenkins (Compose)** — `docker compose up -d` em `stacks/jenkins/` (liga à rede **`infra_edge`** já existente).
 
 Sem **shared** a correr, apps que dependem de MySQL/Redis falham ou ficam à espera.
@@ -78,7 +78,7 @@ Sem **shared** a correr, apps que dependem de MySQL/Redis falham ou ficam à esp
 
 ## 6. DNS e firewall
 
-- Registos **`A`** (ou wildcard) para: `traefik.<DOMAIN>`, `demo.<DOMAIN>`, `ematricula-api.<DOMAIN>`, `jenkins.<DOMAIN>`, etc., conforme as stacks ativas.
+- Registos **`A`** (ou wildcard) para: `traefik.<DOMAIN>`, `demo.<DOMAIN>`, `ematricula-api.<DOMAIN>`, `n8n.<DOMAIN>`, `jenkins.<DOMAIN>`, etc., conforme as stacks ativas.
 - **UFW (exemplo):** `OpenSSH`, `80/tcp`, `443/tcp` permitidos.
 
 ---
@@ -170,6 +170,13 @@ docker stack deploy -c /tmp/infra-shared.stack.yml infra-shared
 4. `docker compose --env-file ../../../.env up -d` na pasta da app (se usar só edge).
 5. Se precisar de MySQL/Redis: rede **`infra_shared`**, `DB_HOST=mysql`, `REDIS_HOST=redis`, prefixos Redis por app.
 6. Deploy automatizado: ficheiro `ci/apps/<slug>.sh` (ver secção 13).
+
+### Stack n8n (workflows)
+
+- Pasta **`stacks/apps/n8n/`**, hostname **`n8n.${DOMAIN}`**, TLS no Traefik (Let’s Encrypt). Imagem **`n8nio/n8n`** com **tag fixa** no YAML (atualizar a tag quando quiseres uma versão mais recente e voltar a fazer deploy).
+- Persistência: SQLite em volume Docker **`n8n_data`**. **Uma réplica** no Swarm; não aumentar réplicas sem migrar para PostgreSQL.
+- **Primeira subida:** `cp stacks/apps/n8n/.env.example stacks/apps/n8n/.env` e preencher **`DOMAIN`**, **`N8N_ENCRYPTION_KEY`** (ex.: `openssl rand -base64 32`), **`N8N_BASIC_AUTH_PASSWORD`** (e utilizador se alterares o predefinido). DNS **`n8n.<DOMAIN>`** → IP da VPS.
+- **Deploy:** `cd ~/infra && ./ci/deploy-app.sh n8n` (faz `docker compose pull` e, com Swarm ativo, `docker stack deploy` na stack **`infra-app-n8n`**).
 
 ---
 

@@ -4,6 +4,7 @@
 **/acme.json
 stacks/edge/secrets/dashboard.htpasswd
 stacks/apps/ematricula/.env
+stacks/apps/n8n/.env
 stacks/apps/ematricula/ematricula/
 stacks/shared/.env
 stacks/jenkins/.env

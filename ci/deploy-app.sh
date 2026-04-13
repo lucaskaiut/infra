@@ -99,10 +99,16 @@ if [[ -f docker-compose.yml ]]; then
   COMPOSE_LOCAL=(-f docker-compose.yml)
 fi
 
-if [[ ${#COMPOSE_LOCAL[@]} -gt 0 ]]; then
-  docker compose "${COMPOSE_LOCAL[@]}" build
+if [[ "${APP_COMPOSE_PULL_ONLY:-0}" == 1 ]]; then
+  if [[ ${#COMPOSE_LOCAL[@]} -gt 0 ]]; then
+    docker compose "${COMPOSE_LOCAL[@]}" pull
+  fi
 else
-  docker compose build
+  if [[ ${#COMPOSE_LOCAL[@]} -gt 0 ]]; then
+    docker compose "${COMPOSE_LOCAL[@]}" build
+  else
+    docker compose build
+  fi
 fi
 
 SWARM_DONE=0
