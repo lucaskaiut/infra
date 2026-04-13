@@ -1,0 +1,97 @@
+services:
+  evolutionapi:
+    image: atendai/evolution-api:v1.8.7
+    env_file:
+      - .env
+    environment:
+      SERVER_TYPE: http
+      SERVER_PORT: "8080"
+      SERVER_URL: https://evolution.${DOMAIN:?defina DOMAIN no .env da stack}
+      DATABASE_ENABLED: "true"
+      DATABASE_PROVIDER: postgresql
+      DATABASE_CONNECTION_URI: postgresql://${POSTGRES_USERNAME:?defina POSTGRES_USERNAME no .env}:${POSTGRES_PASSWORD:?defina POSTGRES_PASSWORD no .env}@evolutionapi_postgres:5432/${POSTGRES_DATABASE:?defina POSTGRES_DATABASE no .env}?schema=public
+      CACHE_REDIS_ENABLED: "true"
+      CACHE_REDIS_URI: redis://evolutionapi_redis:6379/6
+      CORS_ORIGIN: ${CORS_ORIGIN:-*}
+      TELEMETRY: ${TELEMETRY:-false}
+      LOG_LEVEL: ${LOG_LEVEL:-ERROR,WARN,INFO}
+    volumes:
+      - evolutionapi_instances:/evolution/instances
+    networks:
+      - edge
+      - evolutionapi_internal
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:8080/ >/dev/null || exit 1"]
+      interval: 20s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+      labels:
+        - traefik.enable=true
+        - "traefik.http.routers.evolutionapi.rule=Host(`evolution.${DOMAIN}`)"
+        - traefik.http.routers.evolutionapi.entrypoints=websecure
+        - traefik.http.routers.evolutionapi.tls=true
+        - traefik.http.routers.evolutionapi.tls.certresolver=letsencrypt
+        - traefik.http.services.evolutionapi.loadbalancer.server.port=8080
+        - traefik.http.services.evolutionapi.loadbalancer.healthcheck.path=/
+        - traefik.http.services.evolutionapi.loadbalancer.healthcheck.interval=15s
+        - traefik.http.services.evolutionapi.loadbalancer.healthcheck.timeout=5s
+
+  evolutionapi_redis:
+    image: redis:7.4-alpine
+    command: redis-server --appendonly yes --save 60 1 --loglevel warning
+    volumes:
+      - evolutionapi_redis:/data
+    networks:
+      - evolutionapi_internal
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping | grep -q PONG"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+
+  evolutionapi_postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: ${POSTGRES_DATABASE:?defina POSTGRES_DATABASE no .env}
+      POSTGRES_USER: ${POSTGRES_USERNAME:?defina POSTGRES_USERNAME no .env}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?defina POSTGRES_PASSWORD no .env}
+    volumes:
+      - evolutionapi_postgres:/var/lib/postgresql/data
+    networks:
+      - evolutionapi_internal
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USERNAME} -d ${POSTGRES_DATABASE} -h 127.0.0.1 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+
+networks:
+  edge:
+    external: true
+    name: infra_edge
+  evolutionapi_internal:
+    name: infra_evolutionapi_internal
+
+volumes:
+  evolutionapi_instances:
+  evolutionapi_redis:
+  evolutionapi_postgres:
