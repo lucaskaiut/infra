@@ -1,0 +1,31 @@
+---
+description: Diagnóstico de incidentes de infra na VPS por camadas, sem saltar direto para mudanças destrutivas
+alwaysApply: true
+---
+
+# Diagnóstico por camadas
+
+Quando o utilizador reportar erro em domínio, app, webhook, TLS, 502, 504, container em loop, ou falha de deploy:
+
+## Ordem obrigatória
+
+1. Identificar hostname, stack e sintoma exato.
+2. Verificar estado dos serviços e logs recentes.
+3. Verificar camada pública:
+   - DNS
+   - Traefik
+   - TLS
+   - HTTP status
+4. Verificar camada interna:
+   - healthcheck
+   - restart loop
+   - redes `infra_edge` e `infra_shared`
+   - dependências MySQL e Redis
+5. Verificar interpolação de `.env` e `docker compose config`.
+
+## Regra prática
+
+- Não assumir que o problema está na aplicação antes de fechar as verificações de proxy, rede, variáveis e dependências.
+- Se a aplicação aparentar falhar internamente, reportar o sintoma e logs relevantes, mas manter as correções no lado infra.
+- Antes de qualquer ação com impacto, preferir checks de leitura e validação.
+

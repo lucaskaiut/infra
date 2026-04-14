@@ -1,0 +1,33 @@
+---
+description: Validar Compose, env e impacto antes de commit, push ou deploy neste repositório de infra
+alwaysApply: true
+---
+
+# Validação de Compose e Stack
+
+Sempre que alterar YAML, JSON, Dockerfile, labels Traefik, redes, volumes, imagens ou variáveis referenciadas por stacks:
+
+## Fazer antes de commit, push ou deploy
+
+1. Rever `git status` e os caminhos alterados.
+2. Validar a sintaxe dos arquivos alterados.
+3. Executar `docker compose config` na stack afetada.
+4. Confirmar que as variáveis referenciadas no Compose existem no `.env.example` ou na documentação esperada.
+5. Confirmar que não houve mudança acidental em:
+   - portas expostas
+   - volumes persistentes
+   - networks externas
+   - tags de imagem
+
+## Se produção usar Swarm
+
+- Garantir que labels de roteamento estejam em `deploy.labels`.
+- Garantir que a estratégia escolhida continua incremental e compatível com rolling update.
+
+## Se a validação falhar
+
+- Não fazer commit
+- Não fazer push
+- Não fazer deploy
+- Reportar claramente o erro e o ficheiro afetado
+
