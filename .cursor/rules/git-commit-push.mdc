@@ -13,6 +13,7 @@ Quando uma tarefa deixar ficheiros alterados no repositório e o utilizador não
 2. **Adicionar:** `git add` com caminhos explícitos (nunca `.env`, chaves, `acme.json`).
 3. **Commit:** mensagem curta (imperativo ou descrição clara do que mudou).
 4. **Push:** `git push origin` (branch atual). Sem `force push` sem instrução explícita do utilizador.
+5. **Sincronizar a VPS:** após push bem-sucedido, fazer `git pull` no checkout da VPS sempre que houver acesso SSH disponível para o ambiente deste projeto.
 
 Se o push falhar, `git pull --rebase` e repetir, ou reportar. Sem `origin`, só commit e aviso.
 
@@ -27,4 +28,6 @@ Quando existir deploy neste projeto e **SSH estiver disponível** no ambiente (e
    - `curl -sS -o /dev/null -w '%{http_code}' --max-time 15 https://demo.<DOMAIN>/` quando o domínio estiver definido no projeto (ou o hostname público conhecido); opcionalmente o mesmo para `traefik.<DOMAIN>/dashboard/`.
    - `docker logs <container> 2>&1 | tail -n 30` se houver dúvida sobre ACME ou erros.
 
-Se SSH falhar ou o utilizador não tiver pedido deploy, reportar o push como concluído e indicar os comandos para correr na VPS manualmente.
+Esta sincronização na VPS é o comportamento padrão esperado neste repositório. Só deixar de a fazer se o utilizador disser explicitamente para não sincronizar, se não existir acesso SSH utilizável, ou se a validação falhar antes do push.
+
+Se SSH falhar, reportar o push como concluído e indicar os comandos para correr na VPS manualmente.

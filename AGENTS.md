@@ -96,8 +96,9 @@ When the task leaves tracked files changed and the user did not explicitly say n
 3. Never stage secrets, `.env`, private keys, or files like `acme.json`.
 4. Create a short, clear commit message.
 5. Push the current branch with `git push origin`.
+6. After a successful push, pull the updated branch on the VPS infra checkout whenever SSH access is available for this project.
 
-Treat this as the default behavior for this repository, including infra docs, `.cursor/rules`, and `.agents/skills`: do not stop after editing files if the changes are valid and safe to version.
+Treat this as the default behavior for this repository, including infra docs, `.cursor/rules`, and `.agents/skills`: do not stop after editing files if the changes are valid and safe to version, and do not stop after push if the VPS checkout can be synchronized safely.
 
 If push fails, prefer `git pull --rebase` and retry, or report the issue. Do not force-push unless the user explicitly requested it.
 
@@ -109,7 +110,7 @@ If this project has a deployment flow and SSH access is available, a successful 
 2. Reload only the affected stacks.
 3. Validate container status, logs, and relevant HTTPS endpoints.
 
-If SSH is unavailable or the user did not ask for deploy, report the push as done and provide the VPS commands the user can run manually.
+If SSH is unavailable, report the push as done and provide the VPS commands the user can run manually.
 
 ## n8n Skill
 
