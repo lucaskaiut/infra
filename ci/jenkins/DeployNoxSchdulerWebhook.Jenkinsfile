@@ -38,7 +38,7 @@ pipeline {
             echo 'Sem ref Git: ignorado (ex.: ping do webhook).'
             return
           }
-          if (env.GIT_REF != 'refs/heads/main') {
+          if (env.GIT_REF != 'refs/heads/master') {
             currentBuild.result = 'NOT_BUILT'
             echo "Branch ignorada: ${env.GIT_REF}"
             return
