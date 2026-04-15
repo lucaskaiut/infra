@@ -4,10 +4,37 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 SLUG="${1:-}"
 
+if [[ -f "${ROOT}/.env" ]]; then
+  # shellcheck source=/dev/null
+  source "${ROOT}/.env"
+fi
+
 usage() {
   echo "Uso: $0 <app-slug>" >&2
   echo "Configurações em ${ROOT}/ci/apps/<slug>.sh (ex.: ematricula)." >&2
   exit 1
+}
+
+build_git_remote_with_auth() {
+  local remote="${1:-}"
+  if [[ -z "$remote" ]]; then
+    return 0
+  fi
+  if [[ -z "${GITHUB_TOKEN:-}" ]]; then
+    printf '%s\n' "$remote"
+    return 0
+  fi
+  if [[ ! "$remote" =~ ^https://github\.com/ ]]; then
+    printf '%s\n' "$remote"
+    return 0
+  fi
+
+  local username="${GITHUB_USERNAME:-git}"
+  local encoded_user encoded_token path
+  encoded_user=$(printf '%s' "$username" | sed 's/%/%25/g; s/:/%3A/g; s/@/%40/g')
+  encoded_token=$(printf '%s' "$GITHUB_TOKEN" | sed 's/%/%25/g; s/:/%3A/g; s/@/%40/g')
+  path="${remote#https://}"
+  printf 'https://%s:%s@%s\n' "$encoded_user" "$encoded_token" "$path"
 }
 
 [[ -n "$SLUG" ]] || usage
@@ -80,11 +107,21 @@ fi
 if [[ -n "${APP_GIT_SUBDIR:-}" && -n "${APP_GIT_REMOTE:-}" ]]; then
   SUB="${STACK}/${APP_GIT_SUBDIR}"
   BR="${APP_GIT_BRANCH:-main}"
+  APP_GIT_REMOTE_EFFECTIVE="$(build_git_remote_with_auth "${APP_GIT_REMOTE}")"
   if [[ ! -d "$SUB/.git" ]]; then
-    git clone --branch "$BR" --single-branch --depth 1 "$APP_GIT_REMOTE" "$SUB"
+    git clone --branch "$BR" --single-branch --depth 1 "$APP_GIT_REMOTE_EFFECTIVE" "$SUB"
+    if [[ "$APP_GIT_REMOTE_EFFECTIVE" != "${APP_GIT_REMOTE}" ]]; then
+      git -C "$SUB" remote set-url origin "${APP_GIT_REMOTE}"
+    fi
   else
+    if [[ "$APP_GIT_REMOTE_EFFECTIVE" != "${APP_GIT_REMOTE}" ]]; then
+      git -C "$SUB" remote set-url origin "$APP_GIT_REMOTE_EFFECTIVE"
+    fi
     git -C "$SUB" fetch origin "$BR"
     git -C "$SUB" pull --ff-only origin "$BR"
+    if [[ "$APP_GIT_REMOTE_EFFECTIVE" != "${APP_GIT_REMOTE}" ]]; then
+      git -C "$SUB" remote set-url origin "${APP_GIT_REMOTE}"
+    fi
   fi
   if [[ -n "${APP_DEPLOY_SUBPATH_GUARD:-}" && -n "${DEPLOY_SUBPATH_GIT_RANGE:-}" ]]; then
     if ! git -C "$SUB" diff --name-only "$DEPLOY_SUBPATH_GIT_RANGE" | grep -qE "^${APP_DEPLOY_SUBPATH_GUARD}(/|$)"; then

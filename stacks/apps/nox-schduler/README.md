@@ -15,6 +15,8 @@ Na pasta desta stack (`stacks/apps/nox-schduler`):
 
 ```bash
 git clone https://github.com/lucaskaiut/nox-schduler.git nox-schduler
+
+Se o repositório estiver privado, defina `GITHUB_USERNAME` e `GITHUB_TOKEN` no `.env` da raiz do `infra`; o `./ci/deploy-app.sh nox-schduler` e o webhook do Jenkins passam a usar essa credencial automaticamente.
 ```
 
 ## Variáveis de ambiente

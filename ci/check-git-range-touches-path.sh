@@ -1,10 +1,40 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+if [[ -f "${ROOT}/.env" ]]; then
+  # shellcheck source=/dev/null
+  source "${ROOT}/.env"
+fi
+
 REMOTE="${1:?uso: $0 <git-remote-url> <before-sha> <after-sha> [path-prefix]}"
 BEFORE="${2:?}"
 AFTER="${3:?}"
 PREFIX="${4:-api}"
+
+build_git_remote_with_auth() {
+  local remote="${1:-}"
+  if [[ -z "$remote" ]]; then
+    return 0
+  fi
+  if [[ -z "${GITHUB_TOKEN:-}" ]]; then
+    printf '%s\n' "$remote"
+    return 0
+  fi
+  if [[ ! "$remote" =~ ^https://github\.com/ ]]; then
+    printf '%s\n' "$remote"
+    return 0
+  fi
+
+  local username="${GITHUB_USERNAME:-git}"
+  local encoded_user encoded_token path
+  encoded_user=$(printf '%s' "$username" | sed 's/%/%25/g; s/:/%3A/g; s/@/%40/g')
+  encoded_token=$(printf '%s' "$GITHUB_TOKEN" | sed 's/%/%25/g; s/:/%3A/g; s/@/%40/g')
+  path="${remote#https://}"
+  printf 'https://%s:%s@%s\n' "$encoded_user" "$encoded_token" "$path"
+}
+
+REMOTE="$(build_git_remote_with_auth "$REMOTE")"
 
 if [[ "$AFTER" =~ ^0+$ ]]; then
   echo "After é zero (branch apagada ou evento sem novo HEAD); sem deploy." >&2
