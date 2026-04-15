@@ -1,0 +1,31 @@
+services:
+  uptime-kuma:
+    image: louislam/uptime-kuma:2.2.1
+    volumes:
+      - uptime_kuma_data:/app/data
+    networks:
+      - edge
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+      labels:
+        - traefik.enable=true
+        - "traefik.http.routers.uptime-kuma.rule=Host(`uptime.${DOMAIN:?defina DOMAIN no .env da stack}`)"
+        - traefik.http.routers.uptime-kuma.entrypoints=websecure
+        - traefik.http.routers.uptime-kuma.tls=true
+        - traefik.http.routers.uptime-kuma.tls.certresolver=letsencrypt
+        - traefik.http.services.uptime-kuma.loadbalancer.server.port=3001
+        - traefik.http.services.uptime-kuma.loadbalancer.healthcheck.path=/
+        - traefik.http.services.uptime-kuma.loadbalancer.healthcheck.interval=15s
+        - traefik.http.services.uptime-kuma.loadbalancer.healthcheck.timeout=5s
+
+networks:
+  edge:
+    external: true
+    name: infra_edge
+
+volumes:
+  uptime_kuma_data:
