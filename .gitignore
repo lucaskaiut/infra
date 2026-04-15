@@ -6,6 +6,8 @@ stacks/edge/secrets/dashboard.htpasswd
 stacks/apps/ematricula/.env
 stacks/apps/n8n/.env
 stacks/apps/ematricula/ematricula/
+stacks/apps/nox-schduler/.env
+stacks/apps/nox-schduler/nox-schduler/
 stacks/shared/.env
 stacks/jenkins/.env
 __pycache__/

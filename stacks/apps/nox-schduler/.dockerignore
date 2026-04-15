@@ -1,0 +1,8 @@
+.env
+.git
+nox-schduler/.git
+nox-schduler/node_modules
+nox-schduler/api/node_modules
+nox-schduler/api/vendor
+nox-schduler/api/storage/logs
+docker-stack.rendered.yml
