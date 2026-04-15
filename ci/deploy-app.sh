@@ -96,7 +96,7 @@ cd "$STACK"
 if [[ -n "${APP_HTTP_PROBE_SERVICE_HOST:-}" && -f .env ]]; then
   DOMAIN_VAL=$(grep -E '^DOMAIN=' .env | head -1 | cut -d= -f2- | tr -d '\r' | sed 's/^["'\'']//;s/["'\'']$//')
   if [[ -n "$DOMAIN_VAL" ]]; then
-    APP_HTTP_PROBE_URL="https://${APP_HTTP_PROBE_SERVICE_HOST}.${DOMAIN_VAL}/up"
+    APP_HTTP_PROBE_URL="https://${APP_HTTP_PROBE_SERVICE_HOST}.${DOMAIN_VAL}${APP_HTTP_PROBE_PATH:-/up}"
     PROBE_LOG=$(mktemp)
     "${ROOT}/ci/http-probe-loop.sh" "$APP_HTTP_PROBE_URL" "$PROBE_LOG" &
     PROBE_PID=$!

@@ -16,7 +16,7 @@ services:
       - shared_data
     stop_grace_period: 45s
     healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1/up || exit 1"]
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1/api/health || exit 1"]
       interval: 15s
       timeout: 5s
       retries: 10
@@ -28,7 +28,7 @@ services:
       - traefik.http.routers.nox-schduler-api.tls=true
       - traefik.http.routers.nox-schduler-api.tls.certresolver=letsencrypt
       - traefik.http.services.nox-schduler-api.loadbalancer.server.port=80
-      - traefik.http.services.nox-schduler-api.loadbalancer.healthcheck.path=/up
+      - traefik.http.services.nox-schduler-api.loadbalancer.healthcheck.path=/api/health
       - traefik.http.services.nox-schduler-api.loadbalancer.healthcheck.interval=5s
       - traefik.http.services.nox-schduler-api.loadbalancer.healthcheck.timeout=4s
 
