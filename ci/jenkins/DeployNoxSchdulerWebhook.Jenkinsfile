@@ -50,13 +50,15 @@ pipeline {
           }
           def before = env.GIT_BEFORE?.trim()
           def after = env.GIT_AFTER?.trim()
+          def sourceRepo = env.APP_GIT_REMOTE?.trim() ?: 'https://github.com/lucaskaiut/nox-schduler.git'
           if (before && after) {
             def status = sh(
               script: """
                 set +e
                 cd /infra-deploy
                 git pull origin main
-                ./ci/check-git-range-touches-path.sh 'https://github.com/lucaskaiut/nox-schduler.git' '${before}' '${after}' api
+                export APP_GIT_REMOTE='${sourceRepo}'
+                ./ci/check-git-range-touches-path.sh '${sourceRepo}' '${before}' '${after}' api
                 exit \$?
               """,
               returnStatus: true
@@ -139,6 +141,7 @@ pipeline {
           git pull origin main
           INFRA_AFTER=\$(git rev-parse HEAD)
           echo "\${INFRA_BEFORE}..\${INFRA_AFTER}" > "${env.WORKSPACE}/.jenkins-notify-infra-range.txt"
+          export APP_GIT_REMOTE="\${APP_GIT_REMOTE:-https://github.com/lucaskaiut/nox-schduler.git}"
           export DEPLOY_SUBPATH_GIT_RANGE="\${DEPLOY_SUBPATH_GIT_RANGE:-}"
           export COMMITS_PAYLOAD_FILE="${env.WORKSPACE}/.jenkins-notify-commits.json"
           export NOTIFY_APP_SLUG=nox-schduler

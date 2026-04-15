@@ -1,6 +1,6 @@
 APP_COMPOSE_DIR="stacks/apps/nox-schduler"
 APP_GIT_SUBDIR="nox-schduler"
-APP_GIT_REMOTE="https://github.com/lucaskaiut/nox-schduler.git"
+APP_GIT_REMOTE="${APP_GIT_REMOTE:-https://github.com/lucaskaiut/nox-schduler.git}"
 APP_GIT_BRANCH="${APP_GIT_BRANCH:-main}"
 : "${APP_USE_SWARM:=1}"
 : "${APP_SWARM_STACK_NAME:=infra-app-nox-schduler}"
