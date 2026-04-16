@@ -22,6 +22,7 @@ services:
       CMD_DB_URL: postgres://hedgedoc:${HEDGEDOC_DB_PASSWORD:?defina HEDGEDOC_DB_PASSWORD no .env da stack}@database:5432/hedgedoc
       CMD_DOMAIN: docs.${DOMAIN:?defina DOMAIN no .env da stack}
       CMD_URL_ADDPORT: "false"
+      CMD_SESSION_SECRET: ${HEDGEDOC_SESSION_SECRET:?defina HEDGEDOC_SESSION_SECRET no .env da stack}
       UPLOADS_MODE: "0750"
     volumes:
       - hedgedoc_uploads:/hedgedoc/public/uploads

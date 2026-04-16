@@ -13,6 +13,7 @@ Copie `.env.example` para `.env` nesta pasta e ajuste:
 
 - `DOMAIN`: domínio-base do host, resultando em `docs.<DOMAIN>`
 - `HEDGEDOC_DB_PASSWORD`: senha do utilizador `hedgedoc` no Postgres
+- `HEDGEDOC_SESSION_SECRET`: segredo de sessão (cookie signing). Se não definido, o HedgeDoc gera um novo a cada start e derruba sessões ativas.
 
 ## Deploy manual
 
