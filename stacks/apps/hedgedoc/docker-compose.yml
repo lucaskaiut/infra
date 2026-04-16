@@ -1,0 +1,51 @@
+name: infra-app-hedgedoc
+
+services:
+  database:
+    image: postgres:17.7-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: hedgedoc
+      POSTGRES_PASSWORD: ${HEDGEDOC_DB_PASSWORD:?defina HEDGEDOC_DB_PASSWORD no .env da stack}
+      POSTGRES_DB: hedgedoc
+    volumes:
+      - hedgedoc_db:/var/lib/postgresql/data
+    networks:
+      - hedgedoc
+
+  hedgedoc:
+    image: quay.io/hedgedoc/hedgedoc:1.10.7
+    restart: unless-stopped
+    depends_on:
+      - database
+    environment:
+      CMD_DB_URL: postgres://hedgedoc:${HEDGEDOC_DB_PASSWORD:?defina HEDGEDOC_DB_PASSWORD no .env da stack}@database:5432/hedgedoc
+      CMD_DOMAIN: docs.${DOMAIN:?defina DOMAIN no .env da stack}
+      CMD_URL_ADDPORT: "false"
+      UPLOADS_MODE: "0750"
+    volumes:
+      - hedgedoc_uploads:/hedgedoc/public/uploads
+    networks:
+      - edge
+      - hedgedoc
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.hedgedoc.rule=Host(`docs.${DOMAIN:?defina DOMAIN no .env da stack}`)
+      - traefik.http.routers.hedgedoc.entrypoints=websecure
+      - traefik.http.routers.hedgedoc.tls=true
+      - traefik.http.routers.hedgedoc.tls.certresolver=letsencrypt
+      - traefik.http.services.hedgedoc.loadbalancer.server.port=3000
+      - traefik.http.services.hedgedoc.loadbalancer.healthcheck.path=/
+      - traefik.http.services.hedgedoc.loadbalancer.healthcheck.interval=15s
+      - traefik.http.services.hedgedoc.loadbalancer.healthcheck.timeout=5s
+
+networks:
+  edge:
+    external: true
+    name: infra_edge
+  hedgedoc:
+    driver: bridge
+
+volumes:
+  hedgedoc_db:
+  hedgedoc_uploads:
