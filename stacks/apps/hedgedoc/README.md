@@ -15,6 +15,11 @@ Copie `.env.example` para `.env` nesta pasta e ajuste:
 - `HEDGEDOC_DB_PASSWORD`: senha do utilizador `hedgedoc` no Postgres
 - `HEDGEDOC_SESSION_SECRET`: segredo de sessão (cookie signing). Se não definido, o HedgeDoc gera um novo a cada start e derruba sessões ativas.
 
+## Política de acesso (deste deploy)
+
+- `allowEmailRegister`: desativado (criação de contas via UI)
+- `allowAnonymous`: desativado (uso anónimo)
+
 ## Deploy manual
 
 Na raiz do `infra`, faça o deploy da stack:
