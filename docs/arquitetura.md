@@ -262,6 +262,8 @@ docker compose build && docker compose up -d
 
 **API Jenkins / CLI:** com `JENKINS_URL` em HTTPS (Traefik), usar essa URL para `jenkins-cli` e REST. Chamadas a `http://127.0.0.1:8080` a partir do contentor podem receber **403** (*Unexpected request origin*); na VPS preferir `https://jenkins.<DOMAIN>/...`.
 
+**Generic Webhook Trigger e `copy-job`:** ao duplicar um job (`jenkins copy-job`), o Jenkins **copia o XML** do trigger, incluindo **`tokenCredentialId`**. Se só se alterar o `scriptPath` para outro Jenkinsfile, o job pode continuar a usar o token da app de origem; o webhook devolve `Did not find any jobs with GenericTrigger configured! A token was supplied.` Corrigir com `get-job | sed` em `tokenCredentialId` (e opcionalmente `causeString`) + `update-job`, ou `./ci/jenkins/create-webhook-job-from-template.sh` com o ID da credencial correta.
+
 **Manutenção:** alterações em `init.groovy.d` **não** atualizam jobs já criados — editar o job no Jenkins ou recriar o volume (perde estado).
 
 **ci-smoke:** não usar `options { timestamps() }` sem o plugin Timestamper.

@@ -19,8 +19,8 @@ Além de `ci/apps/<slug>.sh`, Jenkinsfile e (se aplicável) `seed-*.groovy` vers
 ## Criar o job na VPS (Jenkins já a correr)
 
 1. **`JENKINS_URL`** em `stacks/jenkins/.env` tem de ser HTTPS público (ex.: `https://jenkins.<DOMAIN>`), alinhado ao Traefik. Chamadas à API ou `jenkins-cli` contra `http://127.0.0.1:8080` falham com **403** (*Unexpected request origin*) — usar sempre a URL pública.
-2. Copiar um job de webhook existente e apontar o `scriptPath` para o Jenkinsfile desta app, ou executar `./ci/jenkins/create-webhook-job-from-template.sh <job-template> <novo-job> <caminho-jenkinsfile>` a partir da raiz do clone em `~/infra` na VPS.
-3. No GitHub (repo da aplicação): webhook POST para `https://jenkins.<DOMAIN>/generic-webhook-trigger/invoke?token=<segredo>`, conforme o Jenkinsfile.
+2. **`jenkins copy-job` copia o XML persistido do job**, incluindo o bloco **Generic Webhook Trigger** com o **`tokenCredentialId` do template**. Só alterar o `scriptPath` no Jenkins **não** atualiza esse bloco: o plugin continua a registar o token antigo e o webhook responde `Did not find any jobs with GenericTrigger configured! A token was supplied.` O script `ci/jenkins/create-webhook-job-from-template.sh` faz `get-job | sed` do `scriptPath`, **`tokenCredentialId`** e **`causeString`**, depois `update-job`. Uso: `./ci/jenkins/create-webhook-job-from-template.sh <job-template> <novo-job> <caminho-jenkinsfile-no-infra> <webhook-credential-id> [display-slug]` (o slug para o `causeString` pode omitir-se: deriva-se do nome do job, ex. `deploy-foo-webhook` → `foo`).
+3. No GitHub (repo da aplicação): webhook POST para `https://jenkins.<DOMAIN>/generic-webhook-trigger/invoke?token=<segredo>`, com o mesmo valor que a credencial Secret text cujo ID está no job (e no Jenkinsfile).
 
 ## Referência
 

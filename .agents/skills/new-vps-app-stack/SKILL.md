@@ -43,7 +43,7 @@ Use this skill to scaffold a new app stack in this repo.
 
 1. **`ci/apps/<slug>.sh`** com `APP_COMPOSE_DIR`, e se a app tiver clone no deploy, `APP_GIT_SUBDIR`, `APP_GIT_REMOTE`, `APP_GIT_BRANCH`.
 2. **Jenkins:** ficheiro de pipeline em `ci/jenkins/` (ex.: `Deploy<Slug>Webhook.Jenkinsfile` com `generic-webhook-trigger` e `tokenCredentialId` coerente) e **seed Groovy** `ci/jenkins/seed-deploy-<slug>-webhook-job.groovy` para referência ou primeiro arranque do Jenkins.
-3. **Job no Jenkins em produção:** não basta versionar o ficheiro — é necessário **criar o job** no servidor (após o Jenkins existir), usando a URL pública `JENKINS_URL` (não `localhost:8080`) com `jenkins-cli` ou o script `ci/jenkins/create-webhook-job-from-template.sh` a partir de `~/infra` na VPS. Ver `.cursor/rules/novos-projetos-ci-jenkins.mdc` e `docs/arquitetura.md`.
+3. **Job no Jenkins em produção:** não basta versionar o ficheiro — é necessário **criar o job** no servidor (após o Jenkins existir), usando a URL pública `JENKINS_URL` (não `localhost:8080`) com `jenkins-cli` ou o script `ci/jenkins/create-webhook-job-from-template.sh` a partir de `~/infra` na VPS. Ao copiar um job de webhook de outra app, o XML persistido inclui o **`tokenCredentialId` antigo**; o script acima corrige `scriptPath`, `tokenCredentialId` e `causeString` (não confiar só no Jenkinsfile até haver build que sincronize). Ver `.cursor/rules/novos-projetos-ci-jenkins.mdc` e `docs/arquitetura.md`.
 4. **GitHub:** webhook no repositório da app apontando ao `generic-webhook-trigger` com o mesmo segredo que a credencial Jenkins.
 5. Opcional: exemplo de GitHub Actions no repositório da app (ficheiro `.example` neste repo, se fizer sentido).
 

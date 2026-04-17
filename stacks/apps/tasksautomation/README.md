@@ -39,7 +39,7 @@ cd ~/infra && ./ci/deploy-app.sh tasksautomation
 
 ## CI/CD
 
-- **Jenkins:** job `deploy-tasksautomation-webhook` (ver `ci/jenkins/DeployTasksautomationWebhook.Jenkinsfile` e `seed-deploy-tasksautomation-webhook-job.groovy`); webhook GitHub no repositório da aplicação com token `tasksautomation-webhook-token`.
+- **Jenkins:** job `deploy-tasksautomation-webhook` (ver `ci/jenkins/DeployTasksautomationWebhook.Jenkinsfile` e `seed-deploy-tasksautomation-webhook-job.groovy`). Criação/atualização na VPS: `./ci/jenkins/create-webhook-job-from-template.sh deploy-ematricula-webhook deploy-tasksautomation-webhook ci/jenkins/DeployTasksautomationWebhook.Jenkinsfile tasksautomation-webhook-token` (ajusta `tokenCredentialId` persistido, não só o Jenkinsfile). Webhook GitHub: credencial Secret text `tasksautomation-webhook-token` = mesmo valor do parâmetro `token=` na URL.
 - **GitHub Actions (repo infra):** workflow `.github/workflows/tasksautomation-stack.yml` valida `docker compose config` quando alteras esta stack.
 - **GitHub Actions (repo da app):** modelo em `ci/tasksautomation-app-github-ci.yml.example` na raiz do repositório **infra** — copiar para `.github/workflows/ci.yml` no repositório `tasksautomation` e ajustar passos (PHP, testes) ao que o projeto usar.
 
