@@ -310,6 +310,7 @@ docker compose build && docker compose up -d
 7. **Jenkins deploy:** `INFRA_HOST_PATH`, `DOCKER_GID`, mount e socket ativos; `docker exec infra_jenkins docker ps` funciona
 8. **Webhook:** credencial ID exata `ematricula-webhook-token`, URL com mesmo token, branch `main`, paths `api/`
 9. **Stacks Swarm:** `docker stack ls`, `docker stack ps <nome>`
+10. **404 em path Laravel (`/api/...`):** se `X-Powered-By: PHP`, o pedido chegou à app — confirmar `php artisan route:list` no contentor e alinhar código deployado (push + `./ci/deploy-app.sh`) com o repositório da app; não atribuir a Traefik/Nginx sem este passo.
 
 ---
 

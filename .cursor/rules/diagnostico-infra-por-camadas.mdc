@@ -29,3 +29,7 @@ Quando o utilizador reportar erro em domínio, app, webhook, TLS, 502, 504, cont
 - Se a aplicação aparentar falhar internamente, reportar o sintoma e logs relevantes, mas manter as correções no lado infra.
 - Antes de qualquer ação com impacto, preferir checks de leitura e validação.
 
+## 404 em URLs Laravel (ex.: `/api/health`)
+
+Se a resposta tiver **`X-Powered-By: PHP`** ou corpo típico de erro Laravel, o proxy **não** é a causa: o Laravel tratou o pedido e devolveu 404 (rota inexistente ou política da app). Confirmar com `php artisan route:list` **dentro do contentor** e comparar com o repositório da app; se a rota só existir localmente, fazer **push** e **redeploy** da imagem — não confundir com falha de Traefik ou Nginx.
+

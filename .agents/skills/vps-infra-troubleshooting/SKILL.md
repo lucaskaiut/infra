@@ -50,6 +50,17 @@ Find the failing infra layer quickly without changing application source code.
 - App stacks live in `stacks/apps/*/`
 - Operational guidance lives in `docs/arquitetura.md`
 
+## 404 em rotas Laravel (`/api/...`, etc.)
+
+Se `curl` devolver **404** mas os cabeçalhos incluírem **`X-Powered-By: PHP`** (ou `Server: nginx` com resposta gerada pela app), o pedido **já chegou ao Laravel**: não é Traefik nem Nginx a “perder” o path. Comparar o que está **na imagem** com o repositório da app:
+
+- `docker exec <container> sh -c "cd /var/www/html && su-exec www-data php artisan route:list --path=api"`
+- `docker exec <container> cat /var/www/html/routes/api.php` (ou o ficheiro de rotas relevante)
+
+Se a rota existir no `git` local mas **não** no contentor, o build em produção está **atrás do branch** (commit não fez push, ou deploy não correu após o push). A correção é **atualizar código da app e voltar a correr** `./ci/deploy-app.sh <slug>` — não é alteração de Nginx neste repositório.
+
+Para health pública de stack, o padrão deste infra costuma ser **`/up`** (Laravel) nas labels Traefik, não um path arbitrário em `/api/*`, salvo a app o expor nas rotas versionadas.
+
 ## Common Findings
 
 - `DOMAIN` or other vars missing because `docker compose` ran without the expected `--env-file`
