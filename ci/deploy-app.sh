@@ -174,6 +174,12 @@ if [[ "${APP_USE_SWARM:-0}" == 1 && "$SWARM_ACTIVE" == true ]]; then
   docker stack deploy -c "$RENDERED" "$STACK_NAME"
   rm -f "$RENDERED"
   SWARM_DONE=1
+  if [[ "${APP_SWARM_FORCE_SERVICE_UPDATE:-0}" == "1" && -n "${APP_SWARM_FORCE_IMAGE:-}" ]]; then
+    echo "Swarm: a forçar recriação de tarefas para imagem local (digest nova com a mesma tag :latest)."
+    for _role in ${APP_SWARM_FORCE_SERVICE_ROLES:-app worker scheduler}; do
+      docker service update --force --image "${APP_SWARM_FORCE_IMAGE}" "${APP_SWARM_STACK_NAME}_${_role}" 2>/dev/null || true
+    done
+  fi
 else
   if [[ "${APP_USE_SWARM:-0}" == 1 && "$SWARM_ACTIVE" != true ]]; then
     echo "AVISO: APP_USE_SWARM=1 mas este daemon não é manager Swarm ativo — deploy via Compose." >&2

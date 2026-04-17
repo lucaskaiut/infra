@@ -37,7 +37,9 @@ Deploy:
 cd ~/infra && ./ci/deploy-app.sh tasksautomation
 ```
 
-O script faz `git pull` no clone da app **e** `docker compose build`; a imagem inclui o ficheiro **`.app-git-commit`** (commit Git da app no momento do build). Se o código em GitHub estiver à frente dos contentores, o clone em `tasksautomation/` pode já estar atualizado, mas a imagem em execução **não** — falta correr o deploy (ou o webhook Jenkins) para **reconstruir** a imagem. Para confirmar: `docker exec <container> cat /var/www/html/.app-git-commit` e comparar com `git -C stacks/apps/tasksautomation/tasksautomation rev-parse HEAD` na VPS.
+O script faz `git pull` no clone da app **e** `docker compose build`; a imagem inclui o ficheiro **`.app-git-commit`** (commit Git da app no momento do build). Com **Swarm** e imagem **`local/tasksautomation-app:latest`**, o `docker stack deploy` pode não recriar tarefas quando só muda a digest local — `ci/apps/tasksautomation.sh` ativa `APP_SWARM_FORCE_SERVICE_UPDATE` para correr `docker service update --force` nos serviços após o deploy.
+
+Se o código em GitHub estiver à frente dos contentores, o clone em `tasksautomation/` pode já estar atualizado, mas a imagem em execução **não** — falta correr o deploy (ou o webhook Jenkins) para **reconstruir** a imagem. Para confirmar: `docker exec <container> cat /var/www/html/.app-git-commit` e comparar com `git -C stacks/apps/tasksautomation/tasksautomation rev-parse HEAD` na VPS.
 
 ## CI/CD
 

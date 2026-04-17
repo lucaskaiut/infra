@@ -61,6 +61,8 @@ Se a rota existir no `git` local mas **não** no contentor, o build em produçã
 
 Em stacks com clone da app na VPS (`APP_GIT_SUBDIR`), o diretório pode estar atualizado com `git pull` manual **sem** ter corrido `./ci/deploy-app.sh` depois — a imagem `local/...-app:latest` continua antiga. O deploy do repo **infra** imprime `Commit da app (...)` antes do build; em **tasksautomation** a imagem contém **`/var/www/html/.app-git-commit`** para comparar com `git rev-parse HEAD` no clone.
 
+Com **Swarm**, mesmo após `docker compose build`, o **`docker stack deploy`** pode deixar tarefas a correr uma **digest antiga** da mesma tag `local/...:latest`. Sintoma: ficheiros no clone alinhados com GitHub, mas `routes/` no contentor desatualizado. Mitigação: `APP_SWARM_FORCE_SERVICE_UPDATE` em `ci/apps/<slug>.sh` (ver **tasksautomation**) ou `docker service update --force --image <imagem>` nos serviços da stack.
+
 Para health pública de stack, o padrão deste infra costuma ser **`/up`** (Laravel) nas labels Traefik, não um path arbitrário em `/api/*`, salvo a app o expor nas rotas versionadas.
 
 ## Common Findings
