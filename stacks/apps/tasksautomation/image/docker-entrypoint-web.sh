@@ -40,6 +40,17 @@ if [ "$i" -ge 90 ]; then
   exit 1
 fi
 
-php artisan migrate --force
+i=0
+while [ "$i" -lt 90 ]; do
+  if php artisan migrate --force --isolated; then
+    break
+  fi
+  i=$((i + 1))
+  sleep 2
+done
+if [ "$i" -ge 90 ]; then
+  echo "migrate failed after retries"
+  exit 1
+fi
 
 exec /usr/bin/supervisord -c /etc/supervisord.conf
