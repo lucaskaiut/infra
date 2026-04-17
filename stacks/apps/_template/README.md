@@ -9,7 +9,7 @@ Este diretório não é deployado diretamente: serve de modelo para criar `stack
 3. Ajustar `image`, `container_name`, portas internas e labels Traefik conforme a sua aplicação real (este modelo usa `whoami` na porta 80).
 4. Subir com `docker compose --env-file ../../../.env up -d` a partir da pasta da nova app (três níveis abaixo da raiz do repo, como em `demo`).
 5. Validar: `https://<slug>.<DOMAIN>` com TLS e resposta esperada.
-6. **CI (opcional):** para notificar o n8n após deploy, cria `ci/apps/<slug>.sh` (com `APP_GIT_SUBDIR` se o clone não for só `<slug>/`) e usa o padrão do ficheiro `ci/jenkins/DeployApp.Jenkinsfile.example` (`post { always { ... notify-n8n-deploy.sh } }`). Variáveis: `N8N_DEPLOY_WEBHOOK_URL` ou `N8N_API_URL` no `.env` do Jenkins / raiz do infra.
+6. **CI/CD (quando pedido):** `ci/apps/<slug>.sh`, Jenkinsfile em `ci/jenkins/`, credencial de webhook no Jenkins e **criação do job no Jenkins em produção** (URL pública `JENKINS_URL`, nunca só `localhost` — ver `ci/jenkins/create-webhook-job-from-template.sh` e `docs/arquitetura.md`). Para notificar o n8n após deploy, segue o padrão de `ci/jenkins/DeployApp.Jenkinsfile.example` (`post { always { ... notify-n8n-deploy.sh } }`). Variáveis: `N8N_DEPLOY_WEBHOOK_URL` ou `N8N_API_URL` no `.env` do Jenkins / raiz do infra.
 
 ## Convenções
 

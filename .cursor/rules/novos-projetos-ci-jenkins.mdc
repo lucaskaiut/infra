@@ -1,0 +1,28 @@
+---
+description: Ao adicionar stack de aplicação ou quando o pedido incluir CI/CD, incluir criação do job Jenkins e artefactos de pipeline
+globs: stacks/apps/**,ci/jenkins/**,ci/apps/**
+alwaysApply: false
+---
+
+# Novos projetos, CI/CD e Jenkins
+
+## Quando o utilizador pedir CI/CD para uma app
+
+Além de `ci/apps/<slug>.sh`, Jenkinsfile e (se aplicável) `seed-*.groovy` versionados, o trabalho **inclui criar o job no Jenkins em produção** quando o Jenkins já existir na VPS.
+
+## Entregáveis versionados no repositório `infra`
+
+- `ci/jenkins/Deploy<Slug>Webhook.Jenkinsfile` (ou variante alinhada ao `deploy-app.sh` / `notify-n8n-deploy.sh`).
+- `ci/jenkins/seed-deploy-<slug>-webhook-job.groovy` para bootstrap em Jenkins novo (volume virgem) ou referência documental.
+- Credencial do webhook: **Secret text** no Jenkins com o ID referenciado no Jenkinsfile (ex.: `<slug>-webhook-token`); o valor não vai para o Git.
+
+## Criar o job na VPS (Jenkins já a correr)
+
+1. **`JENKINS_URL`** em `stacks/jenkins/.env` tem de ser HTTPS público (ex.: `https://jenkins.<DOMAIN>`), alinhado ao Traefik. Chamadas à API ou `jenkins-cli` contra `http://127.0.0.1:8080` falham com **403** (*Unexpected request origin*) — usar sempre a URL pública.
+2. Copiar um job de webhook existente e apontar o `scriptPath` para o Jenkinsfile desta app, ou executar `./ci/jenkins/create-webhook-job-from-template.sh <job-template> <novo-job> <caminho-jenkinsfile>` a partir da raiz do clone em `~/infra` na VPS.
+3. No GitHub (repo da aplicação): webhook POST para `https://jenkins.<DOMAIN>/generic-webhook-trigger/invoke?token=<segredo>`, conforme o Jenkinsfile.
+
+## Referência
+
+- `docs/arquitetura.md` (secção Jenkins e tabela de jobs).
+- Skill `.agents/skills/new-vps-app-stack/SKILL.md` (checklist CI/CD).

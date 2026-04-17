@@ -257,6 +257,10 @@ docker compose build && docker compose up -d
 | **ci-smoke** | Init Groovy (só volume novo) | Checkout do repo infra + echo (smoke CI) |
 | **deploy-app** | Criar via `ci/jenkins/seed-deploy-app-job.groovy` ou Pipeline from SCM → `ci/jenkins/DeployApp.Jenkinsfile` | Parâmetro `APP_SLUG`; `git pull` + `./ci/deploy-app.sh`; no fim chama `ci/notify-n8n-deploy.sh` (payload com Jenkins + alterações no clone **infra**). Modelo genérico: `ci/jenkins/DeployApp.Jenkinsfile.example`. |
 | **deploy-ematricula-webhook** | Seed `ci/jenkins/seed-deploy-ematricula-webhook-job.groovy` ou SCM → `DeployEmatriculaWebhook.Jenkinsfile` | Webhook GitHub: push em `main` no repo **ematricula** com alterações em **`api/`**; notificação n8n inclui `commits` do payload GitHub, intervalo Git e ficheiros alterados em `api/`. |
+| **deploy-nox-schduler-webhook** | Seed `ci/jenkins/seed-deploy-nox-schduler-webhook-job.groovy` ou SCM → `DeployNoxSchdulerWebhook.Jenkinsfile` | Webhook no repo **nox-schduler**; deploy via `ci/deploy-app.sh`. |
+| **deploy-tasksautomation-webhook** | Seed `ci/jenkins/seed-deploy-tasksautomation-webhook-job.groovy`, cópia a partir de outro job webhook, ou `./ci/jenkins/create-webhook-job-from-template.sh` na VPS | Webhook no repo **tasksautomation**; `ci/deploy-app.sh tasksautomation`. |
+
+**API Jenkins / CLI:** com `JENKINS_URL` em HTTPS (Traefik), usar essa URL para `jenkins-cli` e REST. Chamadas a `http://127.0.0.1:8080` a partir do contentor podem receber **403** (*Unexpected request origin*); na VPS preferir `https://jenkins.<DOMAIN>/...`.
 
 **Manutenção:** alterações em `init.groovy.d` **não** atualizam jobs já criados — editar o job no Jenkins ou recriar o volume (perde estado).
 
