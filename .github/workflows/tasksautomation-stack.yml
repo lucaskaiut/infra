@@ -1,0 +1,26 @@
+name: tasksautomation stack
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'stacks/apps/tasksautomation/**'
+      - 'ci/apps/tasksautomation.sh'
+  pull_request:
+    paths:
+      - 'stacks/apps/tasksautomation/**'
+      - 'ci/apps/tasksautomation.sh'
+
+jobs:
+  validate-compose:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Interpolar compose (tasksautomation)
+        run: |
+          set -euo pipefail
+          cd stacks/apps/tasksautomation
+          cp .env.example .env
+          sed -i 's/^APP_KEY=$/APP_KEY=base64:c2hhMjU2LWR1bW15LWtleS1mb3ItY2k=/' .env
+          docker compose -f docker-compose.yml --env-file .env config >/tmp/tasksautomation.compose.rendered.yml
+          head -n 40 /tmp/tasksautomation.compose.rendered.yml

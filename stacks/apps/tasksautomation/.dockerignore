@@ -1,0 +1,7 @@
+tasksautomation/**/node_modules
+tasksautomation/**/vendor
+tasksautomation/**/.git
+tasksautomation/**/storage/logs/*
+tasksautomation/**/storage/framework/cache/*
+tasksautomation/**/storage/framework/sessions/*
+tasksautomation/**/bootstrap/cache/*
