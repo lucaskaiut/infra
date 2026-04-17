@@ -6,6 +6,8 @@ services:
     build:
       context: .
       dockerfile: image/Dockerfile
+      args:
+        APP_GIT_COMMIT: ${APP_GIT_COMMIT:-unknown}
     restart: unless-stopped
     env_file:
       - .env

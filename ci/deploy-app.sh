@@ -131,6 +131,11 @@ if [[ -n "${APP_GIT_SUBDIR:-}" && -n "${APP_GIT_REMOTE:-}" ]]; then
   fi
 fi
 
+if [[ -n "${APP_GIT_SUBDIR:-}" ]] && [[ -d "${APP_GIT_SUBDIR}/.git" ]]; then
+  export APP_GIT_COMMIT="$(git -C "${APP_GIT_SUBDIR}" rev-parse HEAD)"
+  echo "Commit da app (${APP_GIT_SUBDIR}): $(git -C "${APP_GIT_SUBDIR}" rev-parse --short HEAD) — a imagem deve incluir este commit após o build."
+fi
+
 COMPOSE_LOCAL=()
 if [[ -f docker-compose.yml ]]; then
   COMPOSE_LOCAL=(-f docker-compose.yml)

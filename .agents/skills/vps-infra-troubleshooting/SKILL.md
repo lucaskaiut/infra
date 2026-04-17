@@ -59,6 +59,8 @@ Se `curl` devolver **404** mas os cabeçalhos incluírem **`X-Powered-By: PHP`**
 
 Se a rota existir no `git` local mas **não** no contentor, o build em produção está **atrás do branch** (commit não fez push, ou deploy não correu após o push). A correção é **atualizar código da app e voltar a correr** `./ci/deploy-app.sh <slug>` — não é alteração de Nginx neste repositório.
 
+Em stacks com clone da app na VPS (`APP_GIT_SUBDIR`), o diretório pode estar atualizado com `git pull` manual **sem** ter corrido `./ci/deploy-app.sh` depois — a imagem `local/...-app:latest` continua antiga. O deploy do repo **infra** imprime `Commit da app (...)` antes do build; em **tasksautomation** a imagem contém **`/var/www/html/.app-git-commit`** para comparar com `git rev-parse HEAD` no clone.
+
 Para health pública de stack, o padrão deste infra costuma ser **`/up`** (Laravel) nas labels Traefik, não um path arbitrário em `/api/*`, salvo a app o expor nas rotas versionadas.
 
 ## Common Findings

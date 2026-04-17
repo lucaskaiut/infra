@@ -34,6 +34,9 @@ WORKDIR /var/www/html
 COPY --from=vendor /app /var/www/html
 COPY --from=assets /app/public/build /var/www/html/public/build
 
+ARG APP_GIT_COMMIT=unknown
+RUN printf '%s\n' "$APP_GIT_COMMIT" > /var/www/html/.app-git-commit
+
 COPY image/nginx.conf /etc/nginx/http.d/default.conf
 COPY image/supervisord.conf /etc/supervisord.conf
 COPY image/www-fpm-override.conf /usr/local/etc/php-fpm.d/zz-www.conf

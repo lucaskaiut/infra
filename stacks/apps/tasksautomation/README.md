@@ -37,6 +37,8 @@ Deploy:
 cd ~/infra && ./ci/deploy-app.sh tasksautomation
 ```
 
+O script faz `git pull` no clone da app **e** `docker compose build`; a imagem inclui o ficheiro **`.app-git-commit`** (commit Git da app no momento do build). Se o código em GitHub estiver à frente dos contentores, o clone em `tasksautomation/` pode já estar atualizado, mas a imagem em execução **não** — falta correr o deploy (ou o webhook Jenkins) para **reconstruir** a imagem. Para confirmar: `docker exec <container> cat /var/www/html/.app-git-commit` e comparar com `git -C stacks/apps/tasksautomation/tasksautomation rev-parse HEAD` na VPS.
+
 ## CI/CD
 
 - **Jenkins:** job `deploy-tasksautomation-webhook` (ver `ci/jenkins/DeployTasksautomationWebhook.Jenkinsfile` e `seed-deploy-tasksautomation-webhook-job.groovy`). Criação/atualização na VPS: `./ci/jenkins/create-webhook-job-from-template.sh deploy-ematricula-webhook deploy-tasksautomation-webhook ci/jenkins/DeployTasksautomationWebhook.Jenkinsfile tasksautomation-webhook-token` (ajusta `tokenCredentialId` persistido, não só o Jenkinsfile). Webhook GitHub: credencial Secret text `tasksautomation-webhook-token` = mesmo valor do parâmetro `token=` na URL.
