@@ -62,6 +62,22 @@ services:
     networks:
       - shared_data
 
+  websocket:
+    image: local/tasksautomation-app:latest
+    container_name: infra_tasksautomation_websocket
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      CONTAINER_ROLE: websocket
+    command: ["php", "artisan", "tasks:websocket", "--host=0.0.0.0", "--bridge-host=0.0.0.0"]
+    depends_on:
+      app:
+        condition: service_healthy
+    networks:
+      - shared_data
+    stop_grace_period: 45s
+
 networks:
   edge:
     external: true

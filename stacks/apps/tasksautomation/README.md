@@ -1,6 +1,6 @@
 # tasksautomation (Laravel)
 
-Imagem a partir do repositório [tasksautomation](https://github.com/lucaskaiut/tasksautomation): Nginx + PHP-FPM, worker de filas e scheduler. TLS e hostname no Traefik: `tasksautomation.${DOMAIN}` (ex.: `tasksautomation.lucaskaiut.com.br`).
+Imagem a partir do repositório [tasksautomation](https://github.com/lucaskaiut/tasksautomation): Nginx + PHP-FPM, worker de filas, scheduler e websocket dedicado. TLS e hostname no Traefik: `tasksautomation.${DOMAIN}` (ex.: `tasksautomation.lucaskaiut.com.br`).
 
 ## Pré-requisitos na VPS
 
@@ -29,7 +29,12 @@ git clone https://github.com/lucaskaiut/tasksautomation.git tasksautomation
 cp .env.example .env
 ```
 
-Editar `.env`: `APP_KEY` (ex.: `php artisan key:generate --show`), `DB_*`, `APP_URL` coerente com o hostname público.
+Editar `.env`: `APP_KEY` (ex.: `php artisan key:generate --show`), `DB_*`, `APP_URL` coerente com o hostname público e variáveis de realtime:
+
+- `TASKS_REALTIME_BRIDGE_HOST=websocket`
+- `TASKS_REALTIME_BRIDGE_PORT=8082`
+- `TASKS_REALTIME_WS_PATH=/ws/tasks`
+- `TASKS_REALTIME_TOKEN_TTL_SECONDS=28800`
 
 Deploy:
 
@@ -37,7 +42,11 @@ Deploy:
 cd ~/infra && ./ci/deploy-app.sh tasksautomation
 ```
 
-O script faz `git pull` no clone da app **e** `docker compose build`; a imagem inclui o ficheiro **`.app-git-commit`** (commit Git da app no momento do build). Com **Swarm** e imagem **`local/tasksautomation-app:latest`**, o `docker stack deploy` pode não recriar tarefas quando só muda a digest local — `ci/apps/tasksautomation.sh` ativa `APP_SWARM_FORCE_SERVICE_UPDATE` para correr `docker service update --force` nos serviços após o deploy.
+O script faz `git pull` no clone da app **e** `docker compose build`; a imagem inclui o ficheiro **`.app-git-commit`** (commit Git da app no momento do build). O build também gera os assets frontend com `npm run build` dentro da imagem, então mudanças de JS/Blade ligadas ao realtime seguem no mesmo artefato do deploy.
+
+Com **Swarm** e imagem **`local/tasksautomation-app:latest`**, o `docker stack deploy` pode não recriar tarefas quando só muda a digest local — `ci/apps/tasksautomation.sh` ativa `APP_SWARM_FORCE_SERVICE_UPDATE` para correr `docker service update --force` nos serviços `app`, `worker`, `scheduler` e `websocket` após o deploy. Isto é obrigatório para o websocket, porque ele é processo longo e não recarrega código sozinho.
+
+O Nginx da imagem faz proxy de `/ws/tasks` para o serviço interno `websocket:8081`, mantendo o PHP-FPM isolado no processo web normal.
 
 Se o código em GitHub estiver à frente dos contentores, o clone em `tasksautomation/` pode já estar atualizado, mas a imagem em execução **não** — falta correr o deploy (ou o webhook Jenkins) para **reconstruir** a imagem. Para confirmar: `docker exec <container> cat /var/www/html/.app-git-commit` e comparar com `git -C stacks/apps/tasksautomation/tasksautomation rev-parse HEAD` na VPS.
 
@@ -50,3 +59,16 @@ Se o código em GitHub estiver à frente dos contentores, o clone em `tasksautom
 ## Compose sem Swarm
 
 Em `ci/apps/tasksautomation.sh`, definir `APP_USE_SWARM=0` (ou export antes do deploy) para usar só `docker compose` com réplicas locais conforme `APP_COMPOSE_SCALES`.
+
+Nesse modo, quando houver mudança de realtime, recriar explicitamente os contentores afetados:
+
+```bash
+docker compose up -d --force-recreate app websocket
+```
+
+Validação recomendada após deploy:
+
+- `docker service ls | grep tasksautomation` ou `docker compose ps`
+- `docker service logs infra-app-tasksautomation_websocket --tail 100` ou `docker compose logs websocket --tail 100`
+- `curl -I https://tasksautomation.<domínio>/ws/tasks`
+- testar criação, claim, update e delete na interface

@@ -73,6 +73,31 @@ services:
         constraints:
           - node.role == manager
 
+  websocket:
+    image: local/tasksautomation-app:latest
+    env_file:
+      - .env
+    environment:
+      CONTAINER_ROLE: websocket
+    command: ["php", "artisan", "tasks:websocket", "--host=0.0.0.0", "--bridge-host=0.0.0.0"]
+    networks:
+      - shared_data
+    stop_grace_period: 45s
+    deploy:
+      mode: replicated
+      replicas: 1
+      update_config:
+        order: start-first
+        parallelism: 1
+        delay: 10s
+        failure_action: rollback
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+      placement:
+        constraints:
+          - node.role == manager
+
 networks:
   edge:
     external: true

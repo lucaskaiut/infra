@@ -14,6 +14,10 @@ if [ "$role" = "scheduler" ]; then
   exec su-exec www-data sh -c 'while true; do php artisan schedule:run --verbose --no-interaction; sleep 60; done'
 fi
 
+if [ "$role" = "websocket" ] && [ "$#" -eq 0 ]; then
+  set -- php artisan tasks:websocket --host=0.0.0.0 --bridge-host=0.0.0.0
+fi
+
 echo "Waiting for MySQL..."
 i=0
 while [ "$i" -lt 90 ]; do
@@ -51,6 +55,10 @@ done
 if [ "$i" -ge 90 ]; then
   echo "migrate failed after retries"
   exit 1
+fi
+
+if [ "$#" -gt 0 ]; then
+  exec su-exec www-data "$@"
 fi
 
 exec /usr/bin/supervisord -c /etc/supervisord.conf
