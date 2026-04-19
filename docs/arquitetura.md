@@ -283,7 +283,7 @@ docker compose build && docker compose up -d
 
 - **`ci/apps/<slug>.sh`:** define `APP_COMPOSE_DIR`, e opcionalmente `APP_GIT_SUBDIR`, `APP_GIT_REMOTE`, `APP_GIT_BRANCH`.
 - **Swarm (ex.: eMatricula):** por omissão `APP_USE_SWARM=1` em `ci/apps/ematricula.sh`. Com **Swarm ativo** (manager), o script usa **`docker stack deploy`**. Se `APP_USE_SWARM=1` mas o daemon **não** estiver em Swarm, o `deploy-app.sh` **não falha**: emite aviso, usa **`docker compose up`** e define por omissão `APP_COMPOSE_SCALES=app=2` quando ainda não estava definido.
-- **Imagem local `local/...:latest` no Swarm:** após `docker compose build`, a tag pode apontar para uma digest nova sem o **`stack deploy`** recriar tarefas. Em apps que constroem imagem local (ex.: **tasksautomation**), `ci/apps/<slug>.sh` pode definir `APP_SWARM_FORCE_SERVICE_UPDATE=1` e `APP_SWARM_FORCE_IMAGE` para o `deploy-app.sh` executar **`docker service update --force`** nos serviços listados em `APP_SWARM_FORCE_SERVICE_ROLES`.
+- **Imagem local `local/...:latest` no Swarm:** após `docker compose build`, a tag pode apontar para uma digest nova sem o **`stack deploy`** recriar tarefas. Preferir mudar a própria spec do serviço a cada release (por exemplo, renderizando `APP_GIT_COMMIT` num `environment:` ou label) para que o Swarm faça o rollout normal da stack; isto evita um segundo ciclo de `docker service update --force`, que pode aumentar a janela de indisponibilidade percebida.
 - **Compose forçado:** `export APP_USE_SWARM=0` antes do script — `docker compose up -d` e `APP_COMPOSE_SCALES` em `ci/apps/<slug>.sh` quando aplicável.
 - **`ci/swarm-bootstrap.sh`:** inicialização do Swarm e criação das redes overlay (ver secção 3.1).
 - Modelo vazio: `ci/apps/_template.sh.example`.
