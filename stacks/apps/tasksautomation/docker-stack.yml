@@ -5,6 +5,10 @@ services:
       - .env
     environment:
       CONTAINER_ROLE: web
+      TASKS_REALTIME_BRIDGE_HOST: websocket
+      TASKS_REALTIME_BRIDGE_PORT: "8082"
+      TASKS_REALTIME_WS_PATH: /ws/tasks
+      TASKS_REALTIME_TOKEN_TTL_SECONDS: "28800"
     networks:
       - edge
       - shared_data
@@ -43,6 +47,10 @@ services:
       - .env
     environment:
       CONTAINER_ROLE: worker
+      TASKS_REALTIME_BRIDGE_HOST: websocket
+      TASKS_REALTIME_BRIDGE_PORT: "8082"
+      TASKS_REALTIME_WS_PATH: /ws/tasks
+      TASKS_REALTIME_TOKEN_TTL_SECONDS: "28800"
     networks:
       - shared_data
     deploy:
@@ -61,6 +69,10 @@ services:
       - .env
     environment:
       CONTAINER_ROLE: scheduler
+      TASKS_REALTIME_BRIDGE_HOST: websocket
+      TASKS_REALTIME_BRIDGE_PORT: "8082"
+      TASKS_REALTIME_WS_PATH: /ws/tasks
+      TASKS_REALTIME_TOKEN_TTL_SECONDS: "28800"
     networks:
       - shared_data
     deploy:
@@ -79,6 +91,10 @@ services:
       - .env
     environment:
       CONTAINER_ROLE: websocket
+      TASKS_REALTIME_BRIDGE_HOST: websocket
+      TASKS_REALTIME_BRIDGE_PORT: "8082"
+      TASKS_REALTIME_WS_PATH: /ws/tasks
+      TASKS_REALTIME_TOKEN_TTL_SECONDS: "28800"
     command: ["php", "artisan", "tasks:websocket", "--host=0.0.0.0", "--bridge-host=0.0.0.0"]
     networks:
       - shared_data

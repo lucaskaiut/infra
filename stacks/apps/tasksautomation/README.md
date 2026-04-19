@@ -46,7 +46,9 @@ O script faz `git pull` no clone da app **e** `docker compose build`; a imagem i
 
 Com **Swarm** e imagem **`local/tasksautomation-app:latest`**, o `docker stack deploy` pode não recriar tarefas quando só muda a digest local — `ci/apps/tasksautomation.sh` ativa `APP_SWARM_FORCE_SERVICE_UPDATE` para correr `docker service update --force` nos serviços `app`, `worker`, `scheduler` e `websocket` após o deploy. Isto é obrigatório para o websocket, porque ele é processo longo e não recarrega código sozinho.
 
-O Nginx da imagem faz proxy de `/ws/tasks` para o serviço interno `websocket:8081`, mantendo o PHP-FPM isolado no processo web normal.
+O Nginx da imagem faz proxy de `/ws/tasks` para o serviço interno `websocket:8081`, mantendo o PHP-FPM isolado no processo web normal. O Laravel publica eventos no **bridge TCP** (`TASKS_REALTIME_BRIDGE_HOST` / porta 8082): é outro canal do browser→WSS. O `docker-compose.yml` e o `docker-stack.yml` fixam essas variáveis nos serviços `app`, `worker`, `scheduler` e `websocket` para não depender de um `.env` incompleto ou copiado do repo da app com `127.0.0.1`.
+
+Se a lista inicial sincroniza mas as alterações em tempo real não aparecem: confirma que o serviço `websocket` está em execução e que, a partir de um contentor `app`, `gethostbyname('websocket')` e ligação TCP à porta 8082 funcionam (o publisher falha em silêncio se o bridge não for alcançável).
 
 Se o código em GitHub estiver à frente dos contentores, o clone em `tasksautomation/` pode já estar atualizado, mas a imagem em execução **não** — falta correr o deploy (ou o webhook Jenkins) para **reconstruir** a imagem. Para confirmar: `docker exec <container> cat /var/www/html/.app-git-commit` e comparar com `git -C stacks/apps/tasksautomation/tasksautomation rev-parse HEAD` na VPS.
 
