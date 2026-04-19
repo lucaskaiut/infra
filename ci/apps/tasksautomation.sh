@@ -9,7 +9,3 @@ if [[ "$APP_USE_SWARM" == "0" ]]; then
   : "${APP_COMPOSE_SCALES:=app=2}"
 fi
 APP_HTTP_PROBE_SERVICE_HOST="tasksautomation"
-
-APP_SWARM_FORCE_SERVICE_UPDATE=1
-APP_SWARM_FORCE_IMAGE="local/tasksautomation-app:latest"
-APP_SWARM_FORCE_SERVICE_ROLES="app worker scheduler websocket"

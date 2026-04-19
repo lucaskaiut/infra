@@ -4,6 +4,7 @@ services:
     env_file:
       - .env
     environment:
+      APP_BUILD_COMMIT: ${APP_GIT_COMMIT:-unknown}
       CONTAINER_ROLE: web
       TASKS_REALTIME_BRIDGE_HOST: websocket
       TASKS_REALTIME_BRIDGE_PORT: "8082"
@@ -46,6 +47,7 @@ services:
     env_file:
       - .env
     environment:
+      APP_BUILD_COMMIT: ${APP_GIT_COMMIT:-unknown}
       CONTAINER_ROLE: worker
       TASKS_REALTIME_BRIDGE_HOST: websocket
       TASKS_REALTIME_BRIDGE_PORT: "8082"
@@ -68,6 +70,7 @@ services:
     env_file:
       - .env
     environment:
+      APP_BUILD_COMMIT: ${APP_GIT_COMMIT:-unknown}
       CONTAINER_ROLE: scheduler
       TASKS_REALTIME_BRIDGE_HOST: websocket
       TASKS_REALTIME_BRIDGE_PORT: "8082"
@@ -90,6 +93,7 @@ services:
     env_file:
       - .env
     environment:
+      APP_BUILD_COMMIT: ${APP_GIT_COMMIT:-unknown}
       CONTAINER_ROLE: websocket
       TASKS_REALTIME_BRIDGE_HOST: websocket
       TASKS_REALTIME_BRIDGE_PORT: "8082"
