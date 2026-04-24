@@ -1,0 +1,19 @@
+http:
+  middlewares:
+    tasksautomation-apidog-redirect:
+      redirectRegex:
+        regex: ^https://tasksautomation\.lucaskaiut\.com\.br/docs(.*)$
+        replacement: https://pe1hme405o.apidog.io$1
+        permanent: false
+
+  routers:
+    tasksautomation-apidog-docs:
+      rule: Host(`tasksautomation.lucaskaiut.com.br`) && PathPrefix(`/docs`)
+      entryPoints:
+        - websecure
+      middlewares:
+        - tasksautomation-apidog-redirect
+      service: noop@internal
+      tls:
+        certResolver: letsencrypt
+      priority: 100
