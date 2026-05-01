@@ -274,6 +274,7 @@ docker compose build && docker compose up -d
 | **ci-smoke** | Init Groovy (só volume novo) | Checkout do repo infra + echo (smoke CI) |
 | **deploy-app** | Criar via `ci/jenkins/seed-deploy-app-job.groovy` ou Pipeline from SCM → `ci/jenkins/DeployApp.Jenkinsfile` | Parâmetro `APP_SLUG`; `git pull` + `./ci/deploy-app.sh`; no fim chama `ci/notify-n8n-deploy.sh` (payload com Jenkins + alterações no clone **infra**). Modelo genérico: `ci/jenkins/DeployApp.Jenkinsfile.example`. |
 | **deploy-ematricula-webhook** | Seed `ci/jenkins/seed-deploy-ematricula-webhook-job.groovy` ou SCM → `DeployEmatriculaWebhook.Jenkinsfile` | Webhook GitHub: push em `main` no repo **ematricula** com alterações em **`api/`**; notificação n8n inclui `commits` do payload GitHub, intervalo Git e ficheiros alterados em `api/`. |
+| **deploy-horus-webhook** | Seed `ci/jenkins/seed-deploy-horus-webhook-job.groovy`, ou `./ci/jenkins/create-webhook-job-from-template.sh` (ver `stacks/apps/horus/README.md`) | Webhook GitHub: push em `main` no repo **horus** com alterações em **`api/`**; `./ci/deploy-app.sh horus`; credencial **`horus-webhook-token`**. |
 | **deploy-nox-schduler-webhook** | Seed `ci/jenkins/seed-deploy-nox-schduler-webhook-job.groovy` ou SCM → `DeployNoxSchdulerWebhook.Jenkinsfile` | Webhook no repo **nox-schduler**; deploy via `ci/deploy-app.sh`. |
 | **deploy-tasksautomation-webhook** | Seed `ci/jenkins/seed-deploy-tasksautomation-webhook-job.groovy`, cópia a partir de outro job webhook, ou `./ci/jenkins/create-webhook-job-from-template.sh` na VPS | Webhook no repo **tasksautomation**; `ci/deploy-app.sh tasksautomation`. |
 
@@ -284,6 +285,34 @@ docker compose build && docker compose up -d
 **Manutenção:** alterações em `init.groovy.d` **não** atualizam jobs já criados — editar o job no Jenkins ou recriar o volume (perde estado).
 
 **ci-smoke:** não usar `options { timestamps() }` sem o plugin Timestamper.
+
+### Webhook Horus (`deploy-horus-webhook`)
+
+1. **Gerar um segredo** (guarde-o só em gestor de passwords ou na credencial Jenkins — não versionar): por exemplo `openssl rand -hex 32`.
+2. Credencial Jenkins **Secret text**: ID exato **`horus-webhook-token`**, valor = esse segredo (`Manage Jenkins` → `Credentials` → scope adequado, tipo *Secret text*).
+3. **Job no Jenkins:** nome recomendado **`deploy-horus-webhook`**, Jenkinsfile **`ci/jenkins/DeployHorusWebhook.Jenkinsfile`** no repo **infra**. Se já existir **deploy-ematricula-webhook** como modelo, na VPS (com Docker do Jenkins acessível):
+
+```bash
+cd ~/infra
+./ci/jenkins/create-webhook-job-from-template.sh \
+  deploy-ematricula-webhook \
+  deploy-horus-webhook \
+  ci/jenkins/DeployHorusWebhook.Jenkinsfile \
+  horus-webhook-token \
+  horus
+```
+
+(Isto atualiza **`tokenCredentialId`** e **`causeString`** no XML persistido; não basta mudar só o `scriptPath` no UI.)
+
+4. **GitHub** (repositório **`lucaskaiut/horus`**): *Settings* → *Webhooks* → *Add webhook* — **Payload URL**:
+
+   `https://jenkins.<DOMAIN>/generic-webhook-trigger/invoke?token=<MESMO_SEGREDO_DA_CREDENCIAL_horus-webhook-token>`
+
+   — **Content type:** `application/json` — **events:** *Just the push events* — branch relevante: **`main`** (o pipeline ignora outras refs).
+
+5. Build manual do job no Jenkins corre deploy **sempre** (ignora filtros de `api/`).
+
+**Referência:** `stacks/apps/horus/README.md` (secção Jenkins). **`JENKINS_URL`** em `stacks/jenkins/.env` deve ser HTTPS público (ex.: `https://jenkins.<DOMAIN>`), igual ao host usado no webhook.
 
 ### Webhook eMatricula (configuração única)
 
@@ -326,7 +355,7 @@ docker compose build && docker compose up -d
 5. **Traefik:** labels em **`deploy.labels`** nas stacks Swarm; em Compose clássico, labels ao nível do serviço
 6. **App com BD:** app na rede `infra_shared`, variáveis DB/Redis corretas
 7. **Jenkins deploy:** `INFRA_HOST_PATH`, `DOCKER_GID`, mount e socket ativos; `docker exec infra_jenkins docker ps` funciona
-8. **Webhook:** credencial ID exata `ematricula-webhook-token`, URL com mesmo token, branch `main`, paths `api/`
+8. **Webhooks:** credenciais com ID exatos (`ematricula-webhook-token`, `horus-webhook-token`, …), URL GitHub `https://jenkins.<DOMAIN>/generic-webhook-trigger/invoke?token=<segredo>` igual ao valor da credencial; branch `main`; para eMatricula e Horus o pipeline só faz deploy se houver mudanças em **`api/`** (exceto build manual)
 9. **Stacks Swarm:** `docker stack ls`, `docker stack ps <nome>`
 10. **404 em path Laravel (`/api/...`):** se `X-Powered-By: PHP`, o pedido chegou à app — confirmar `php artisan route:list` no contentor e alinhar código deployado (push + `./ci/deploy-app.sh`) com o repositório da app; não atribuir a Traefik/Nginx sem este passo.
 

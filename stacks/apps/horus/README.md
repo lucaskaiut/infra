@@ -62,3 +62,57 @@ MySQL e Redis estão em **`stacks/shared/`**.
 ## Notas de segurança (OpenSearch)
 
 O compose usa `plugins.security.disabled=true` num nó interno à rede Docker — adequado para tráfego só entre containers. Para modelo com TLS e credenciais (recomendado pelo README upstream para cenários mais expostos), será preciso outra imagem/configuração e **`OPENSEARCH_URL`** com autenticação.
+
+## Jenkins — deploy automático (push em `api/`)
+
+Pipeline no repo **infra**: `ci/jenkins/DeployHorusWebhook.Jenkinsfile`. Em pushes para **`main`** no GitHub **`lucaskaiut/horus`**, só corre `./ci/deploy-app.sh horus` se os commits tocarem em **`api/`** (ou em build manual do job).
+
+### 1. Credencial no Jenkins
+
+Gera um segredo seguro (ex.: `openssl rand -hex 32`) e usa **o mesmo valor** na credencial abaixo e no parâmetro `token=` da URL do GitHub.
+
+| Campo | Valor |
+|--------|--------|
+| Tipo | **Secret text** |
+| **ID** (obrigatório, literal) | `horus-webhook-token` |
+| Secret | String longa aleatória (ex.: `openssl rand -hex 32`) |
+
+O valor **não** vai para o Git: define-o só no Jenkins (e replica **exactamente** na query string do webhook GitHub abaixo).
+
+### 2. Criar o job `deploy-horus-webhook` na VPS
+
+Com o Jenkins a correr (`infra_jenkins`) e já existindo um job webhook modelo (ex.: **deploy-ematricula-webhook**):
+
+```bash
+cd ~/infra
+git pull origin main
+./ci/jenkins/create-webhook-job-from-template.sh \
+  deploy-ematricula-webhook \
+  deploy-horus-webhook \
+  ci/jenkins/DeployHorusWebhook.Jenkinsfile \
+  horus-webhook-token \
+  horus
+```
+
+Alternativa em Jenkins novo (volume CasC/init): executar o seed `ci/jenkins/seed-deploy-horus-webhook-job.groovy` conforme o fluxo dos outros jobs (requer credencial **`horus-webhook-token`** criada **antes** do primeiro POST do GitHub).
+
+### 3. URL do webhook no GitHub
+
+No repositório da app (**Settings → Webhooks → Add webhook**):
+
+| Campo | Valor |
+|--------|--------|
+| **Payload URL** | `https://jenkins.<TEU_DOMÍNIO>/generic-webhook-trigger/invoke?token=`**`SEGREDO`** |
+| **Content type** | `application/json` |
+| **SSL verification** | Enable (recomendado) |
+| **Which events** | **Just the push events** |
+
+Substitua `<TEU_DOMÍNIO>` pelo mesmo domínio público do Jenkins (ex.: o `DOMAIN` onde responde `https://jenkins.<DOMAIN>`). O parâmetro **`token=`** deve ser **igual byte-a-byte** ao secret guardado na credencial **`horus-webhook-token`**.
+
+**Exemplo** (domínio ilustrativo — o segredo é fictício):
+
+```text
+https://jenkins.exemplo.com/generic-webhook-trigger/invoke?token=a1b2c3d4e5f6789...
+```
+
+**Nota:** `JENKINS_URL` em `stacks/jenkins/.env` deve ser HTTPS público alinhado a este host; ver `docs/arquitetura.md` (secção Jenkins / webhooks).
