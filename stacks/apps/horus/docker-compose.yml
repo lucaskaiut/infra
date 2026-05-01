@@ -1,0 +1,95 @@
+name: infra-app-horus
+
+services:
+  app:
+    image: local/horus-api:latest
+    build:
+      context: .
+      dockerfile: image/Dockerfile
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      CONTAINER_ROLE: web
+    networks:
+      - edge
+      - shared_data
+      - horus_internal
+    depends_on:
+      opensearch:
+        condition: service_healthy
+    stop_grace_period: 45s
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1/up || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 120s
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.horus-api.rule=Host(`horus-api.${DOMAIN:?defina DOMAIN no .env da stack}`)
+      - traefik.http.routers.horus-api.entrypoints=websecure
+      - traefik.http.routers.horus-api.tls=true
+      - traefik.http.routers.horus-api.tls.certresolver=letsencrypt
+      - traefik.http.services.horus-api.loadbalancer.server.port=80
+      - traefik.http.services.horus-api.loadbalancer.healthcheck.path=/up
+      - traefik.http.services.horus-api.loadbalancer.healthcheck.interval=5s
+      - traefik.http.services.horus-api.loadbalancer.healthcheck.timeout=4s
+
+  worker:
+    image: local/horus-api:latest
+    container_name: infra_horus_worker
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      CONTAINER_ROLE: worker
+    depends_on:
+      app:
+        condition: service_healthy
+      opensearch:
+        condition: service_healthy
+    networks:
+      - shared_data
+      - horus_internal
+
+  opensearch:
+    image: opensearchproject/opensearch:2
+    container_name: infra_horus_opensearch
+    restart: unless-stopped
+    environment:
+      - discovery.type=single-node
+      - plugins.security.disabled=true
+      - OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m
+      - bootstrap.memory_lock=true
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    volumes:
+      - horus_opensearch_data:/usr/share/opensearch/data
+    networks:
+      - horus_internal
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:9200 >/dev/null || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 60s
+
+networks:
+  edge:
+    external: true
+    name: infra_edge
+  shared_data:
+    external: true
+    name: infra_shared
+  horus_internal:
+    name: infra_horus_internal
+    driver: bridge
+
+volumes:
+  horus_opensearch_data:

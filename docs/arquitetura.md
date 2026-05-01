@@ -9,7 +9,7 @@ Documento único: visão da plataforma Docker na VPS, decisões técnicas, como 
 | Repositório | Conteúdo |
 |-------------|----------|
 | **infra** (este) | Traefik, redes overlay Swarm, MySQL/Redis partilhados, `docker-stack.yml` + Compose (build / Jenkins), scripts `ci/`, documentação operacional |
-| **Aplicações** (ex.: `ematricula`) | Código, testes, lógica de negócio. A imagem da API eMatricula constrói-se a partir de `ematricula/api` no monorepo; alterações de produto fazem-se **lá**, não na infra |
+| **Aplicações** (ex.: `ematricula`, `horus`) | Código nas apps; imagens costumam construir-se a partir de `…/api` no monorepo (ex.: `ematricula/api`, `horus/api`) |
 
 ---
 
@@ -69,7 +69,7 @@ O script ativa o Swarm se necessário e cria **`infra_edge`** e **`infra_shared`
 1. **`ci/swarm-bootstrap.sh`** — Swarm + redes overlay `infra_edge` e `infra_shared` (uma vez, ou após migração).
 2. **shared (Swarm)** — `docker stack deploy` com `stacks/shared/docker-stack.yml` → stack **`infra-shared`** (MySQL e Redis).
 3. **edge (Swarm)** — `docker stack deploy` com `stacks/edge/docker-stack.yml` → **`infra-edge`** (Traefik).
-4. **apps (Swarm)** — ex.: eMatricula via `./ci/deploy-app.sh ematricula` (build Compose + deploy stack **`infra-app-ematricula`**); **n8n** via `./ci/deploy-app.sh n8n` (imagem upstream, stack **`infra-app-n8n`**).
+4. **apps (Swarm)** — ex.: eMatricula via `./ci/deploy-app.sh ematricula` (stack **`infra-app-ematricula`**); **Horus** (só API) via `./ci/deploy-app.sh horus` (**`infra-app-horus`**); **n8n** via `./ci/deploy-app.sh n8n` (stack **`infra-app-n8n`**).
 5. **jenkins (Compose)** — `docker compose up -d` em `stacks/jenkins/` (liga à rede **`infra_edge`** já existente).
 
 Sem **shared** a correr, apps que dependem de MySQL/Redis falham ou ficam à espera.
@@ -78,7 +78,7 @@ Sem **shared** a correr, apps que dependem de MySQL/Redis falham ou ficam à esp
 
 ## 6. DNS e firewall
 
-- Registos **`A`** (ou wildcard) para: `traefik.<DOMAIN>`, `demo.<DOMAIN>`, `ematricula-api.<DOMAIN>`, `n8n.<DOMAIN>`, `jenkins.<DOMAIN>`, etc., conforme as stacks ativas.
+- Registos **`A`** (ou wildcard) para: `traefik.<DOMAIN>`, `demo.<DOMAIN>`, `ematricula-api.<DOMAIN>`, `horus-api.<DOMAIN>`, `n8n.<DOMAIN>`, `jenkins.<DOMAIN>`, etc., conforme as stacks ativas.
 - **UFW (exemplo):** `OpenSSH`, `80/tcp`, `443/tcp` permitidos.
 
 ---
@@ -98,7 +98,7 @@ docker compose --env-file ../../.env ps
 
 **Atalho:** `ln -sf ../../.env .env` na pasta da stack para não repetir `--env-file`.
 
-**Stacks com `.env` local:** `stacks/shared/.env`, `stacks/apps/ematricula/.env`, `stacks/jenkins/.env` — não versionados; usar `.env.example` como modelo.
+**Stacks com `.env` local:** `stacks/shared/.env`, `stacks/apps/ematricula/.env`, `stacks/apps/horus/.env`, `stacks/jenkins/.env` — não versionados; usar `.env.example` como modelo.
 
 ---
 
@@ -209,6 +209,23 @@ cd ~/infra && ./ci/deploy-app.sh ematricula
 ```
 
 O script faz **`docker compose -f docker-compose.yml build`** (imagem `local/ematricula-app:latest`), renderiza **`docker-stack.yml`** com `docker compose … config` (interpolação de `${DOMAIN}` e restantes variáveis a partir do `.env` da stack) e corre **`docker stack deploy`** na stack **`infra-app-ematricula`**. O serviço `app` tem **2 réplicas**, healthcheck, labels Traefik em **`deploy.labels`** (exigência do provider Swarm) e **`deploy.update_config`** com **`order: start-first`**, **`parallelism: 1`** e **`failure_action: rollback`** para rolling update. `horizon` e `scheduler` ficam com **`restart_policy`** (o Swarm ignora `depends_on` entre serviços).
+
+### Stack Horus (API Laravel, ingestão de logs)
+
+**Serviços nesta stack:** `app` (Nginx + PHP-FPM, Traefik), **`worker`** (`queue:work redis --queue=logs`), **`opensearch`** (OpenSearch 2.x só na rede interna **`infra_horus_internal`**). MySQL e Redis continuam no **shared**. Clone do monorepo em `stacks/apps/horus/horus/`; Dockerfile em `image/` usa **`horus/api`**.
+
+**Hostname Traefik:** `horus-api.${DOMAIN}`. Ver `stacks/apps/horus/.env.example` e **`stacks/apps/horus/README.md`**.
+
+**Primeira subida:** criar base MySQL `horus` (ou o nome em `DB_DATABASE`) com permissões para o utilizador do shared; DNS **`horus-api.<DOMAIN>`**; depois:
+
+```bash
+cd ~/infra/stacks/apps/horus
+git clone https://github.com/lucaskaiut/horus.git horus
+cp .env.example .env
+cd ~/infra && ./ci/deploy-app.sh horus
+```
+
+Documentação da app (serviços e variáveis): README do repositório **horus**, secção *Publicação em produção*.
 
 ---
 

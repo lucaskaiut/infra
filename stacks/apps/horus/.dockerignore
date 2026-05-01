@@ -1,0 +1,7 @@
+horus/**/node_modules
+horus/**/vendor
+horus/**/.git
+horus/**/storage/logs/*
+horus/**/storage/framework/cache/*
+horus/**/storage/framework/sessions/*
+horus/**/bootstrap/cache/*
