@@ -1,7 +1,12 @@
-# Proxy reverso: https://horus-api.<domínio>/docs/* → origem https://horus-api-docs.<domínio>
-# (sem redirect; path e query preservados). Prioridade acima do router Docker da API.
+# Proxy reverso: browser em https://horus-api…/docs/* mas o upstream (horus-api-docs)
+# só serve na raiz — remove-se o prefixo /docs antes do forward (query string mantém-se).
 http:
   middlewares:
+    horus-api-docs-stripprefix:
+      stripPrefix:
+        prefixes:
+          - /docs
+
     horus-api-docs-proxy-headers:
       headers:
         customRequestHeaders:
@@ -22,6 +27,7 @@ http:
       entryPoints:
         - websecure
       middlewares:
+        - horus-api-docs-stripprefix
         - horus-api-docs-proxy-headers
       service: horus-api-docs-origin
       tls:
