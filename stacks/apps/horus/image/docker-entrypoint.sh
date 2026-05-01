@@ -39,7 +39,8 @@ wait_redis() {
       \$host = getenv('REDIS_HOST') ?: '127.0.0.1';
       \$port = (int) (getenv('REDIS_PORT') ?: 6379);
       \$pw = getenv('REDIS_PASSWORD');
-      \$pw = (\$pw !== false && \$pw !== '') ? \$pw : null;
+    if (\$pw === false || \$pw === '') \$pw = null;
+    elseif (strtolower(trim(\$pw)) === 'null') \$pw = null;
       try {
         \$r = new Redis();
         if (!\$r->connect(\$host, \$port, 2.0)) exit(1);
