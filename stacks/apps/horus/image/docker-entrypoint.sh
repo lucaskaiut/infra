@@ -81,6 +81,6 @@ if [ "$role" = "worker" ]; then
 fi
 
 wait_mysql
-php artisan migrate --force
+php artisan migrate --force --isolated
 
 exec /usr/bin/supervisord -c /etc/supervisord.conf
