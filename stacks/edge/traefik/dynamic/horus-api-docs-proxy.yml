@@ -1,0 +1,29 @@
+# Proxy reverso: https://horus-api.<domínio>/docs/* → origem https://horus-api-docs.<domínio>
+# (sem redirect; path e query preservados). Prioridade acima do router Docker da API.
+http:
+  middlewares:
+    horus-api-docs-proxy-headers:
+      headers:
+        customRequestHeaders:
+          Host: "horus-api-docs.lucaskaiut.com.br"
+          X-Forwarded-Host: "horus-api.lucaskaiut.com.br"
+          X-Forwarded-Proto: "https"
+
+  services:
+    horus-api-docs-origin:
+      loadBalancer:
+        passHostHeader: false
+        servers:
+          - url: "https://horus-api-docs.lucaskaiut.com.br"
+
+  routers:
+    horus-api-docs-proxy:
+      rule: Host(`horus-api.lucaskaiut.com.br`) && PathPrefix(`/docs`)
+      entryPoints:
+        - websecure
+      middlewares:
+        - horus-api-docs-proxy-headers
+      service: horus-api-docs-origin
+      tls:
+        certResolver: letsencrypt
+      priority: 100
