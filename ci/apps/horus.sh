@@ -10,3 +10,8 @@ if [[ "$APP_USE_SWARM" == "0" ]]; then
 fi
 APP_HTTP_PROBE_SERVICE_HOST="horus-api"
 APP_DEPLOY_SUBPATH_GUARD="api"
+# Mesma tag (:latest): após rebuild o digest local muda mas o stack spec não —
+# o Swarm pode manter réplicas na imagem antiga. Força recreação das tarefas da API.
+APP_SWARM_FORCE_SERVICE_UPDATE=1
+APP_SWARM_FORCE_IMAGE="local/horus-api:latest"
+APP_SWARM_FORCE_SERVICE_ROLES="${APP_SWARM_FORCE_SERVICE_ROLES:-app worker}"
