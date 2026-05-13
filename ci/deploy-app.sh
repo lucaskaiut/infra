@@ -53,6 +53,13 @@ fi
 # shellcheck source=/dev/null
 source "$CFG"
 
+if [[ "${APP_GIT_USE_SSH:-0}" == "1" ]]; then
+  KEY="${ROOT}/stacks/jenkins/keys-plutao/id_ed25519"
+  if [[ -f "$KEY" ]]; then
+    export GIT_SSH_COMMAND="ssh -i ${KEY} -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new"
+  fi
+fi
+
 [[ -n "${APP_COMPOSE_DIR:-}" ]] || {
   echo "APP_COMPOSE_DIR tem de estar definido em $CFG" >&2
   exit 1

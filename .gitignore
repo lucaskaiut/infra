@@ -8,6 +8,10 @@ stacks/apps/n8n/.env
 stacks/apps/ematricula/ematricula/
 stacks/apps/horus/.env
 stacks/apps/horus/horus/
+stacks/apps/plutao/.env
+stacks/apps/plutao/plutao/
+stacks/jenkins/keys-plutao/id_ed25519
+stacks/jenkins/keys-plutao/id_ed25519.pub
 stacks/apps/nox-schduler/.env
 stacks/apps/nox-schduler/nox-schduler/
 stacks/apps/uptime-kuma/.env

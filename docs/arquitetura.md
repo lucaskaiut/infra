@@ -98,7 +98,7 @@ docker compose --env-file ../../.env ps
 
 **Atalho:** `ln -sf ../../.env .env` na pasta da stack para não repetir `--env-file`.
 
-**Stacks com `.env` local:** `stacks/shared/.env`, `stacks/apps/ematricula/.env`, `stacks/apps/horus/.env`, `stacks/jenkins/.env` — não versionados; usar `.env.example` como modelo.
+**Stacks com `.env` local:** `stacks/shared/.env`, `stacks/apps/ematricula/.env`, `stacks/apps/horus/.env`, `stacks/apps/plutao/.env`, `stacks/jenkins/.env` — não versionados; usar `.env.example` como modelo.
 
 ---
 
@@ -275,6 +275,7 @@ docker compose build && docker compose up -d
 | **deploy-app** | Criar via `ci/jenkins/seed-deploy-app-job.groovy` ou Pipeline from SCM → `ci/jenkins/DeployApp.Jenkinsfile` | Parâmetro `APP_SLUG`; `git pull` + `./ci/deploy-app.sh`; no fim chama `ci/notify-n8n-deploy.sh` (payload com Jenkins + alterações no clone **infra**). Modelo genérico: `ci/jenkins/DeployApp.Jenkinsfile.example`. |
 | **deploy-ematricula-webhook** | Seed `ci/jenkins/seed-deploy-ematricula-webhook-job.groovy` ou SCM → `DeployEmatriculaWebhook.Jenkinsfile` | Webhook GitHub: push em `main` no repo **ematricula** com alterações em **`api/`**; notificação n8n inclui `commits` do payload GitHub, intervalo Git e ficheiros alterados em `api/`. |
 | **deploy-horus-webhook** | Seed `ci/jenkins/seed-deploy-horus-webhook-job.groovy`, ou `./ci/jenkins/create-webhook-job-from-template.sh` (ver `stacks/apps/horus/README.md`) | Webhook GitHub: push em `main` no repo **horus** com alterações em **`api/`**; `./ci/deploy-app.sh horus`; credencial **`horus-webhook-token`**. |
+| **deploy-plutao-webhook** | Seed `ci/jenkins/seed-deploy-plutao-webhook-job.groovy`, ou `./ci/jenkins/create-webhook-job-from-template.sh` (ver `stacks/apps/plutao/README.md`) | Webhook GitHub: push em `main` no repo **plutao** com alterações em **`api/`**; `./ci/deploy-app.sh plutao`; credencial **`plutao-webhook-token`**. Deploy key SSH em `stacks/jenkins/keys-plutao/`. |
 | **deploy-nox-schduler-webhook** | Seed `ci/jenkins/seed-deploy-nox-schduler-webhook-job.groovy` ou SCM → `DeployNoxSchdulerWebhook.Jenkinsfile` | Webhook no repo **nox-schduler**; deploy via `ci/deploy-app.sh`. |
 | **deploy-tasksautomation-webhook** | Seed `ci/jenkins/seed-deploy-tasksautomation-webhook-job.groovy`, cópia a partir de outro job webhook, ou `./ci/jenkins/create-webhook-job-from-template.sh` na VPS | Webhook no repo **tasksautomation**; `ci/deploy-app.sh tasksautomation`. |
 
