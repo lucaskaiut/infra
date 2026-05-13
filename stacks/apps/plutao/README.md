@@ -36,4 +36,6 @@ cd ~/infra
 
 ## Clonar o código da app no host/Jenkins
 
-O script `deploy-app.sh` usa SSH para `git@github.com:lucaskaiut/plutao.git` quando existe o ficheiro `stacks/jenkins/keys-plutao/id_ed25519` no checkout infra (montado em `/infra-deploy` no Jenkins). Adiciona a **chave pública** correspondente como *Deploy key* no repositório GitHub **plutao**.
+Por defeito o clone usa **HTTPS** (`https://github.com/lucaskaiut/plutao.git`), suficiente para o repo público.
+
+Opcional (repo privado ou preferência SSH): coloca `id_ed25519` e `id_ed25519.pub` em `stacks/jenkins/keys-plutao/`, regista a **chave pública** como *Deploy key* no GitHub **plutao**, e em `ci/apps/plutao.sh` define `APP_GIT_REMOTE="git@github.com:lucaskaiut/plutao.git"` e `APP_GIT_USE_SSH=1`.
