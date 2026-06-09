@@ -1,0 +1,8 @@
+.env
+.git
+toth/.git
+toth/node_modules
+toth/api/node_modules
+toth/api/vendor
+toth/api/storage/logs
+docker-stack.rendered.yml

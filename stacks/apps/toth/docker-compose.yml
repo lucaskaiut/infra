@@ -1,0 +1,134 @@
+name: infra-app-toth
+
+services:
+  api:
+    image: local/toth-php:latest
+    build:
+      context: .
+      dockerfile: image/Dockerfile
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      TOTH_BOOTSTRAP: "1"
+    networks:
+      - shared_data
+      - toth_internal
+    healthcheck:
+      test: ["CMD-SHELL", "php -r \"exit(@fsockopen('127.0.0.1',9000)?0:1);\""]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 120s
+
+  nginx:
+    image: local/toth-nginx:latest
+    build:
+      context: .
+      dockerfile: image/Dockerfile.nginx
+    restart: unless-stopped
+    depends_on:
+      api:
+        condition: service_healthy
+    networks:
+      - edge
+      - toth_internal
+    stop_grace_period: 45s
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1/up || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 120s
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.toth-api.rule=Host(`toth-api.${DOMAIN:?defina DOMAIN no .env da stack}`)
+      - traefik.http.routers.toth-api.entrypoints=websecure
+      - traefik.http.routers.toth-api.tls=true
+      - traefik.http.routers.toth-api.tls.certresolver=letsencrypt
+      - traefik.http.services.toth-api.loadbalancer.server.port=80
+      - traefik.http.services.toth-api.loadbalancer.healthcheck.path=/up
+      - traefik.http.services.toth-api.loadbalancer.healthcheck.interval=5s
+      - traefik.http.services.toth-api.loadbalancer.healthcheck.timeout=4s
+
+  worker:
+    image: local/toth-php:latest
+    container_name: infra_toth_worker
+    restart: unless-stopped
+    env_file:
+      - .env
+    command:
+      - php
+      - artisan
+      - queue:work
+      - redis
+      - --queue=default,redis
+      - --sleep=1
+      - --tries=3
+      - --timeout=300
+    depends_on:
+      api:
+        condition: service_healthy
+    networks:
+      - shared_data
+      - toth_internal
+
+  reverb:
+    image: local/toth-php:latest
+    container_name: infra_toth_reverb
+    restart: unless-stopped
+    env_file:
+      - .env
+    command:
+      - php
+      - artisan
+      - reverb:start
+      - --host=0.0.0.0
+      - --port=8081
+    depends_on:
+      api:
+        condition: service_healthy
+    networks:
+      - edge
+      - shared_data
+      - toth_internal
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.toth-reverb.rule=Host(`toth-ws.${DOMAIN:?defina DOMAIN no .env da stack}`)
+      - traefik.http.routers.toth-reverb.entrypoints=websecure
+      - traefik.http.routers.toth-reverb.tls=true
+      - traefik.http.routers.toth-reverb.tls.certresolver=letsencrypt
+      - traefik.http.services.toth-reverb.loadbalancer.server.port=8081
+
+  postgres-vector:
+    image: pgvector/pgvector:pg16
+    container_name: infra_toth_postgres_vector
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_VECTOR_DATABASE:-toth_vectors}
+      POSTGRES_USER: ${POSTGRES_VECTOR_USERNAME:-toth}
+      POSTGRES_PASSWORD: ${POSTGRES_VECTOR_PASSWORD:?defina POSTGRES_VECTOR_PASSWORD no .env da stack}
+    volumes:
+      - toth_postgres_vector_data:/var/lib/postgresql/data
+    networks:
+      - toth_internal
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_VECTOR_USERNAME:-toth} -d ${POSTGRES_VECTOR_DATABASE:-toth_vectors}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+networks:
+  edge:
+    external: true
+    name: infra_edge
+  shared_data:
+    external: true
+    name: infra_shared
+  toth_internal:
+    name: infra_toth_internal
+    driver: bridge
+
+volumes:
+  toth_postgres_vector_data:

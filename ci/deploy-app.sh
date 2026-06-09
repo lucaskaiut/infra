@@ -181,11 +181,20 @@ if [[ "${APP_USE_SWARM:-0}" == 1 && "$SWARM_ACTIVE" == true ]]; then
   docker stack deploy -c "$RENDERED" "$STACK_NAME"
   rm -f "$RENDERED"
   SWARM_DONE=1
-  if [[ "${APP_SWARM_FORCE_SERVICE_UPDATE:-0}" == "1" && -n "${APP_SWARM_FORCE_IMAGE:-}" ]]; then
+  if [[ "${APP_SWARM_FORCE_SERVICE_UPDATE:-0}" == "1" ]]; then
     echo "Swarm: a forçar recriação de tarefas para imagem local (digest nova com a mesma tag :latest)."
-    for _role in ${APP_SWARM_FORCE_SERVICE_ROLES:-app worker scheduler}; do
-      docker service update --force --image "${APP_SWARM_FORCE_IMAGE}" "${APP_SWARM_STACK_NAME}_${_role}" 2>/dev/null || true
-    done
+    if [[ -n "${APP_SWARM_FORCE_IMAGES:-}" ]]; then
+      while IFS= read -r _line; do
+        [[ -z "${_line//[[:space:]]/}" ]] && continue
+        _role="${_line%% *}"
+        _image="${_line#* }"
+        docker service update --force --image "${_image}" "${APP_SWARM_STACK_NAME}_${_role}" 2>/dev/null || true
+      done <<<"${APP_SWARM_FORCE_IMAGES}"
+    elif [[ -n "${APP_SWARM_FORCE_IMAGE:-}" ]]; then
+      for _role in ${APP_SWARM_FORCE_SERVICE_ROLES:-app worker scheduler}; do
+        docker service update --force --image "${APP_SWARM_FORCE_IMAGE}" "${APP_SWARM_STACK_NAME}_${_role}" 2>/dev/null || true
+      done
+    fi
   fi
 else
   if [[ "${APP_USE_SWARM:-0}" == 1 && "$SWARM_ACTIVE" != true ]]; then

@@ -278,6 +278,7 @@ docker compose build && docker compose up -d
 | **deploy-plutao-webhook** | Seed `ci/jenkins/seed-deploy-plutao-webhook-job.groovy`, ou `./ci/jenkins/create-webhook-job-from-template.sh` (ver `stacks/apps/plutao/README.md`) | Webhook GitHub: push em `main` no repo **plutao** com alterações em **`api/`**; `./ci/deploy-app.sh plutao`; credencial **`plutao-webhook-token`**. Deploy key SSH em `stacks/jenkins/keys-plutao/`. |
 | **deploy-nox-schduler-webhook** | Seed `ci/jenkins/seed-deploy-nox-schduler-webhook-job.groovy` ou SCM → `DeployNoxSchdulerWebhook.Jenkinsfile` | Webhook no repo **nox-schduler**; deploy via `ci/deploy-app.sh`. |
 | **deploy-tasksautomation-webhook** | Seed `ci/jenkins/seed-deploy-tasksautomation-webhook-job.groovy`, cópia a partir de outro job webhook, ou `./ci/jenkins/create-webhook-job-from-template.sh` na VPS | Webhook no repo **tasksautomation**; `ci/deploy-app.sh tasksautomation`. |
+| **deploy-toth-webhook** | Seed `ci/jenkins/seed-deploy-toth-webhook-job.groovy` ou `./ci/jenkins/create-webhook-job-from-template.sh` (ver `stacks/apps/toth/README.md`) | Webhook GitHub: push em `main` no repo **toth** com alterações em **`api/`**; `./ci/deploy-app.sh toth`; credencial **`toth-webhook-token`**. API em `toth-api.<DOMAIN>`. |
 
 **API Jenkins / CLI:** com `JENKINS_URL` em HTTPS (Traefik), usar essa URL para `jenkins-cli` e REST. Chamadas a `http://127.0.0.1:8080` a partir do contentor podem receber **403** (*Unexpected request origin*); na VPS preferir `https://jenkins.<DOMAIN>/...`.
 

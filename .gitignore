@@ -14,6 +14,8 @@ stacks/jenkins/keys-plutao/id_ed25519
 stacks/jenkins/keys-plutao/id_ed25519.pub
 stacks/apps/nox-schduler/.env
 stacks/apps/nox-schduler/nox-schduler/
+stacks/apps/toth/.env
+stacks/apps/toth/toth/
 stacks/apps/uptime-kuma/.env
 stacks/shared/.env
 stacks/jenkins/.env
