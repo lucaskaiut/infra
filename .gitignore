@@ -19,6 +19,11 @@ stacks/apps/toth/toth/
 stacks/apps/uptime-kuma/.env
 stacks/shared/.env
 stacks/jenkins/.env
+stacks/apps/vulcano/.env
+stacks/apps/vulcano/vulcano/
+stacks/jenkins/keys-vulcano/id_ed25519
+stacks/jenkins/keys-vulcano/webhook-token.txt
+stacks/apps/tasksautomation/tasksautomation/
 __pycache__/
 *.pyc
 *.log
