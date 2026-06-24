@@ -54,7 +54,7 @@ fi
 source "$CFG"
 
 if [[ "${APP_GIT_USE_SSH:-0}" == "1" ]]; then
-  KEY="${ROOT}/stacks/jenkins/keys-plutao/id_ed25519"
+  KEY="${APP_GIT_SSH_KEY:-${ROOT}/stacks/jenkins/keys-${SLUG}/id_ed25519}"
   if [[ -f "$KEY" ]]; then
     export GIT_SSH_COMMAND="ssh -i ${KEY} -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new"
   fi

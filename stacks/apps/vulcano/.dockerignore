@@ -1,0 +1,7 @@
+vulcano/**/node_modules
+vulcano/**/vendor
+vulcano/**/.git
+vulcano/**/storage/logs/*
+vulcano/**/storage/framework/cache/*
+vulcano/**/storage/framework/sessions/*
+vulcano/**/bootstrap/cache/*
