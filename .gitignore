@@ -24,6 +24,10 @@ stacks/apps/vulcano/vulcano/
 stacks/jenkins/keys-vulcano/id_ed25519
 stacks/jenkins/keys-vulcano/webhook-token.txt
 stacks/apps/tasksautomation/tasksautomation/
+stacks/apps/atena/.env
+stacks/apps/atena/atena/
+stacks/jenkins/keys-atena/id_ed25519
+stacks/jenkins/keys-atena/webhook-token.txt
 __pycache__/
 *.pyc
 *.log

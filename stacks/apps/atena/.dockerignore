@@ -1,0 +1,7 @@
+atena/**/node_modules
+atena/**/vendor
+atena/**/.git
+atena/**/storage/logs/*
+atena/**/storage/framework/cache/*
+atena/**/storage/framework/sessions/*
+atena/**/bootstrap/cache/*
