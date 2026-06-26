@@ -53,8 +53,7 @@ while [ "$i" -lt 90 ]; do
   sleep 2
 done
 if [ "$i" -ge 90 ]; then
-  echo "migrate failed after retries"
-  exit 1
+  echo "migrate failed after retries — container will start with current schema" >&2
 fi
 
 if [ "$#" -gt 0 ]; then

@@ -51,7 +51,8 @@ if [ "${TOTH_BOOTSTRAP:-0}" = "1" ]; then
     done
   fi
 
-  php artisan migrate --force
+  echo "Running migrations..."
+  php artisan migrate --force || echo "WARNING: migrations failed — container will start with current schema" >&2
   if php artisan list --raw 2>/dev/null | grep -qx 'vector:migrate'; then
     php artisan vector:migrate --force
   fi

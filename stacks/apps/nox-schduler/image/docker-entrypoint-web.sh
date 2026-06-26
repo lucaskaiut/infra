@@ -40,6 +40,7 @@ if [ "$i" -ge 90 ]; then
   exit 1
 fi
 
-php artisan migrate --force
+echo "Running migrations..."
+php artisan migrate --force || echo "WARNING: migrations failed — container will start with current schema" >&2
 
 exec /usr/bin/supervisord -c /etc/supervisord.conf

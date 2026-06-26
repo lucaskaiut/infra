@@ -82,6 +82,7 @@ if [ "$role" = "worker" ]; then
 fi
 
 wait_mysql
-php artisan migrate --force --isolated
+echo "Running migrations..."
+php artisan migrate --force --isolated || echo "WARNING: migrations failed — container will start with current schema" >&2
 
 exec /usr/bin/supervisord -c /etc/supervisord.conf
