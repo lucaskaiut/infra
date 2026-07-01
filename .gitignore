@@ -28,6 +28,10 @@ stacks/apps/atena/.env
 stacks/apps/atena/atena/
 stacks/jenkins/keys-atena/id_ed25519
 stacks/jenkins/keys-atena/webhook-token.txt
+stacks/apps/alura/.env
+stacks/apps/alura/alura/
+stacks/jenkins/keys-alura/id_ed25519
+stacks/jenkins/keys-alura/webhook-token.txt
 __pycache__/
 *.pyc
 *.log
