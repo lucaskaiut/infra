@@ -1,0 +1,18 @@
+http:
+  middlewares:
+    cors-allow-all:
+      headers:
+        accessControlAllowCredentials: true
+        accessControlAllowMethods:
+          - GET
+          - POST
+          - PUT
+          - PATCH
+          - DELETE
+          - OPTIONS
+        accessControlAllowHeaders:
+          - "*"
+        accessControlAllowOriginListRegex:
+          - "^https?://.*"
+        accessControlMaxAge: 86400
+        addVaryHeader: true

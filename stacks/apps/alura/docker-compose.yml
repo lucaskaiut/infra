@@ -27,6 +27,7 @@ services:
       - traefik.http.routers.alura-api.entrypoints=websecure
       - traefik.http.routers.alura-api.tls=true
       - traefik.http.routers.alura-api.tls.certresolver=letsencrypt
+      - traefik.http.routers.alura-api.middlewares=cors-allow-all@file
       - traefik.http.services.alura-api.loadbalancer.server.port=80
       - traefik.http.services.alura-api.loadbalancer.healthcheck.path=/up
       - traefik.http.services.alura-api.loadbalancer.healthcheck.interval=5s
