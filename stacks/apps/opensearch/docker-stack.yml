@@ -1,0 +1,47 @@
+services:
+  opensearch:
+    image: opensearchproject/opensearch:2.18.0
+    environment:
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - OPENSEARCH_JAVA_OPTS=-Xms1g -Xmx1g
+      - DISABLE_SECURITY_PLUGIN=true
+      - DISABLE_INSTALL_DEMO_CONFIG=true
+    volumes:
+      - opensearch_data:/usr/share/opensearch/data
+    networks:
+      - edge
+      - shared_data
+    ulimits:
+      memlock: { soft: -1, hard: -1 }
+      nofile: { soft: 65536, hard: 65536 }
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      resources:
+        limits:
+          memory: 2G
+        reservations:
+          memory: 1G
+      labels:
+        - traefik.enable=true
+        - traefik.http.routers.opensearch.rule=Host(`opensearch.lucaskaiut.com.br`)
+        - traefik.http.routers.opensearch.entrypoints=websecure
+        - traefik.http.routers.opensearch.tls=true
+        - traefik.http.routers.opensearch.tls.certresolver=letsencrypt
+        - traefik.http.routers.opensearch.middlewares=opensearch-auth@file
+        - traefik.http.services.opensearch.loadbalancer.server.port=9200
+
+networks:
+  edge:
+    external: true
+    name: infra_edge
+  shared_data:
+    external: true
+    name: infra_shared
+
+volumes:
+  opensearch_data:
