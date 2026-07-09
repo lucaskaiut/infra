@@ -37,6 +37,7 @@ COPY --from=assets /app/public/build /var/www/html/public/build
 COPY image/nginx.conf /etc/nginx/http.d/default.conf
 COPY image/supervisord.conf /etc/supervisord.conf
 COPY image/www-fpm-override.conf /usr/local/etc/php-fpm.d/zz-www.conf
+COPY image/php-custom.ini /usr/local/etc/php/conf.d/99-custom.ini
 COPY image/docker-entrypoint-web.sh /docker-entrypoint.sh
 RUN chmod +x /docker-entrypoint.sh \
   && chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
