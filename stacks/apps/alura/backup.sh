@@ -37,15 +37,12 @@ check_var() {
   local name="$1" val="${!1:-}"
   if [[ -z "$val" ]]; then
     echo "[ERRO] Variável obrigatória não definida: $name" | tee -a "$LOG_FILE"
-    exit 1
+    return 1
   fi
 }
 
-# R2
-check_var R2_ACCESS_KEY_ID
-check_var R2_SECRET_ACCESS_KEY
-check_var R2_ENDPOINT         # ex: https://<account_id>.r2.cloudflarestorage.com
-check_var R2_BUCKET
+# R2 (validado sob demanda no passo 5 — opcional)
+# R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, R2_ENDPOINT, R2_BUCKET
 
 # MySQL
 MYSQL_CONTAINER="${MYSQL_CONTAINER:-infra-shared_mysql.1.$(docker service ps infra-shared_mysql -q --no-trunc 2>/dev/null | head -1)}"
@@ -178,9 +175,9 @@ else
 fi
 
 # ---------------------------------------------------------------------------
-# 4. Compactar tudo e enviar para R2
+# 4. Compactar
 # ---------------------------------------------------------------------------
-log "4/4 Compactando e enviando para R2..."
+log "4/5 Compactando..."
 
 ARCHIVE_NAME="alura_backup_${TIMESTAMP}.tar.gz"
 ARCHIVE_PATH="${BACKUP_ROOT}/${ARCHIVE_NAME}"
@@ -190,20 +187,34 @@ tar czf "$ARCHIVE_PATH" -C "$BACKUP_DIR" . \
 
 log "   Arquivo: $ARCHIVE_NAME ($(du -h "$ARCHIVE_PATH" | cut -f1))"
 
-# Upload para R2 via rclone
-export RCLONE_CONFIG_S3_TYPE=s3
-export RCLONE_CONFIG_S3_PROVIDER=Cloudflare
-export RCLONE_CONFIG_S3_ACCESS_KEY_ID="$R2_ACCESS_KEY_ID"
-export RCLONE_CONFIG_S3_SECRET_ACCESS_KEY="$R2_SECRET_ACCESS_KEY"
-export RCLONE_CONFIG_S3_ENDPOINT="$R2_ENDPOINT"
-export RCLONE_CONFIG_S3_ACL=private
+# ---------------------------------------------------------------------------
+# 5. Upload para R2 (opcional — pula se credenciais não definidas)
+# ---------------------------------------------------------------------------
+R2_OK=true
+for var in R2_ACCESS_KEY_ID R2_SECRET_ACCESS_KEY R2_ENDPOINT R2_BUCKET; do
+  if ! check_var "$var"; then R2_OK=false; fi
+done
 
-if rclone copyto "$ARCHIVE_PATH" "s3:${R2_BUCKET}/alura/${ARCHIVE_NAME}" \
-    --s3-no-check-bucket \
-    --progress 2>&1 | tail -5; then
-  log "   Upload R2: OK"
+if $R2_OK && command -v rclone &>/dev/null; then
+  log "5/5 Enviando para R2..."
+
+  # Upload para R2 via rclone
+  export RCLONE_CONFIG_S3_TYPE=s3
+  export RCLONE_CONFIG_S3_PROVIDER=Cloudflare
+  export RCLONE_CONFIG_S3_ACCESS_KEY_ID="$R2_ACCESS_KEY_ID"
+  export RCLONE_CONFIG_S3_SECRET_ACCESS_KEY="$R2_SECRET_ACCESS_KEY"
+  export RCLONE_CONFIG_S3_ENDPOINT="$R2_ENDPOINT"
+  export RCLONE_CONFIG_S3_ACL=private
+
+  if rclone copyto "$ARCHIVE_PATH" "s3:${R2_BUCKET}/alura/${ARCHIVE_NAME}" \
+      --s3-no-check-bucket \
+      --progress 2>&1 | tail -5; then
+    log "   Upload R2: OK"
+  else
+    die "Falha no upload para R2"
+  fi
 else
-  die "Falha no upload para R2"
+  log "5/5 Upload R2: pulado (credenciais não configuradas ou rclone indisponível)"
 fi
 
 # ---------------------------------------------------------------------------
