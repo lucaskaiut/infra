@@ -162,13 +162,13 @@ if $R2_OK && command -v rclone &>/dev/null; then
   DELETED=$(rclone delete "s3:${R2_BUCKET}/vulcano" \
     --s3-no-check-bucket \
     --min-age "${RETENTION_HOURS}h" \
-    --dry-run 2>&1 | grep -v 'NOTICE:')
+    --dry-run 2>&1 | { grep -v 'NOTICE:' || true; })
   if [[ -n "$DELETED" ]]; then
     echo "$DELETED" | while read -r f; do [[ -n "$f" ]] && log "   [dry-run] Removeria: $f"; done
     rclone delete "s3:${R2_BUCKET}/vulcano" \
       --s3-no-check-bucket \
       --min-age "${RETENTION_HOURS}h" 2>&1 \
-      | grep -v 'NOTICE:' \
+      | { grep -v 'NOTICE:' || true; } \
       | while read -r f; do [[ -n "$f" ]] && log "   Removido R2: $f"; done
     log "   Limpeza R2: concluída"
   else
