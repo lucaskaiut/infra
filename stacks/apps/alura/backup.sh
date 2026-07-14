@@ -10,11 +10,11 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-BACKUP_ROOT="${BACKUP_ROOT:-/var/backups/alura}"
-RETENTION_HOURS="${RETENTION_HOURS:-24}"
+BACKUP_ROOT="/var/backups/alura"
+RETENTION_HOURS=24
 TIMESTAMP="$(date -u +%Y%m%d_%H%M%S)"
-BACKUP_DIR="${BACKUP_ROOT}/${TIMESTAMP}"
-LOG_FILE="${BACKUP_ROOT}/backup.log"
+BACKUP_DIR=""
+LOG_FILE=""
 
 # Garante que rclone está no PATH (instalado em ~/.local/bin)
 export PATH="$HOME/.local/bin:$PATH"
@@ -29,6 +29,18 @@ if [[ -f "$ENV_FILE" ]]; then
   source "$ENV_FILE"
   set +a
 fi
+
+# Aplica defaults após carregar .env
+BACKUP_ROOT="${BACKUP_ROOT:-/var/backups/alura}"
+RETENTION_HOURS="${RETENTION_HOURS:-24}"
+BACKUP_DIR="${BACKUP_ROOT}/${TIMESTAMP}"
+LOG_FILE="${BACKUP_ROOT}/backup.log"
+
+# ---------------------------------------------------------------------------
+# Helpers
+# ---------------------------------------------------------------------------
+log() { echo "[$(date '+%Y-%m-%d %H:%M:%S')] $*" | tee -a "$LOG_FILE"; }
+die()  { log "[ERRO] $*"; exit 1; }
 
 # ---------------------------------------------------------------------------
 # Validação de variáveis obrigatórias
@@ -58,12 +70,6 @@ OPENSEARCH_URL="${OPENSEARCH_URL:-http://localhost:9200}"
 # Alura app (para storage)
 ALURA_APP_CONTAINER="${ALURA_APP_CONTAINER:-infra-app-alura_app.1.$(docker service ps infra-app-alura_app -q --no-trunc 2>/dev/null | head -1)}"
 ALURA_STORAGE_PATH="${ALURA_STORAGE_PATH:-/var/www/html/storage/app}"
-
-# ---------------------------------------------------------------------------
-# Helpers
-# ---------------------------------------------------------------------------
-log() { echo "[$(date '+%Y-%m-%d %H:%M:%S')] $*" | tee -a "$LOG_FILE"; }
-die()  { log "[ERRO] $*"; exit 1; }
 
 # ---------------------------------------------------------------------------
 # Pre-flight
