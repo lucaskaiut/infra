@@ -132,7 +132,7 @@ tar czf "$ARCHIVE_PATH" -C "$BACKUP_DIR" . \
 log "   Arquivo: $ARCHIVE_NAME ($(du -h "$ARCHIVE_PATH" | cut -f1))"
 
 # ===========================================================================
-# 4. Upload para R2 (opcional — pula se credenciais não definidas)
+# 4. Upload para R2 + limpeza de arquivos antigos no bucket
 # ===========================================================================
 R2_OK=true
 for var in R2_ACCESS_KEY_ID R2_SECRET_ACCESS_KEY R2_ENDPOINT R2_BUCKET; do
@@ -140,7 +140,7 @@ for var in R2_ACCESS_KEY_ID R2_SECRET_ACCESS_KEY R2_ENDPOINT R2_BUCKET; do
 done
 
 if $R2_OK && command -v rclone &>/dev/null; then
-  log "4/4 Enviando para R2..."
+  log "4/5 Enviando para R2..."
 
   export RCLONE_CONFIG_S3_TYPE=s3
   export RCLONE_CONFIG_S3_PROVIDER=Cloudflare
@@ -156,8 +156,25 @@ if $R2_OK && command -v rclone &>/dev/null; then
   else
     die "Falha no upload para R2"
   fi
+
+  log "5/5 Limpando arquivos antigos no R2 (>${RETENTION_HOURS}h)..."
+  DELETED=$(rclone delete "s3:${R2_BUCKET}/vulcano" \
+    --s3-no-check-bucket \
+    --min-age "${RETENTION_HOURS}h" \
+    --dry-run 2>&1)
+  if [[ -n "$DELETED" ]]; then
+    echo "$DELETED" | while read -r f; do log "   [dry-run] Removeria: $f"; done
+    rclone delete "s3:${R2_BUCKET}/vulcano" \
+      --s3-no-check-bucket \
+      --min-age "${RETENTION_HOURS}h" 2>&1 \
+      | while read -r f; do log "   Removido R2: $f"; done
+    log "   Limpeza R2: concluída"
+  else
+    log "   Limpeza R2: nada a remover"
+  fi
 else
-  log "4/4 Upload R2: pulado (credenciais não configuradas ou rclone indisponível)"
+  log "4/5 Upload R2: pulado (credenciais não configuradas ou rclone indisponível)"
+  log "5/5 Limpeza R2: pulada"
 fi
 
 # ===========================================================================
