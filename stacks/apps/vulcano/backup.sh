@@ -158,17 +158,20 @@ if $R2_OK && command -v rclone &>/dev/null; then
   fi
 
   log "5/5 Limpando arquivos antigos no R2 (>${RETENTION_HOURS}h)..."
-  # rclone emite NOTICE de config no stdout — filtra para pegar só nomes de arquivo
-  DELETED=$(rclone delete "s3:${R2_BUCKET}/vulcano" \
+
+  # Lista arquivos que seriam removidos (dry-run) para log
+  # Trailing slash é obrigatório: sem ele o rclone trata como single file e rejeita --min-age
+  TO_DELETE=$(rclone delete "s3:${R2_BUCKET}/vulcano/" \
     --s3-no-check-bucket \
     --min-age "${RETENTION_HOURS}h" \
-    --dry-run 2>&1 | { grep -v 'NOTICE:' || true; })
-  if [[ -n "$DELETED" ]]; then
-    echo "$DELETED" | while read -r f; do [[ -n "$f" ]] && log "   [dry-run] Removeria: $f"; done
-    rclone delete "s3:${R2_BUCKET}/vulcano" \
+    --dry-run 2>&1)
+  if [[ -n "$TO_DELETE" ]]; then
+    echo "$TO_DELETE" | while read -r f; do [[ -n "$f" ]] && log "   [dry-run] Removeria: $f"; done
+
+    # Delete real — sem grep, as linhas NOTICE do rclone são os arquivos removidos
+    rclone delete "s3:${R2_BUCKET}/vulcano/" \
       --s3-no-check-bucket \
       --min-age "${RETENTION_HOURS}h" 2>&1 \
-      | { grep -v 'NOTICE:' || true; } \
       | while read -r f; do [[ -n "$f" ]] && log "   Removido R2: $f"; done
     log "   Limpeza R2: concluída"
   else
