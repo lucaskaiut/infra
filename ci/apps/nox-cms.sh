@@ -1,8 +1,8 @@
 APP_COMPOSE_DIR="stacks/apps/nox-cms"
 APP_GIT_SUBDIR="nox-cms"
-APP_GIT_REMOTE="git@github.com:lucaskaiut/nox-cms.git"
+APP_GIT_REMOTE="https://github.com/lucaskaiut/nox-cms.git"
 APP_GIT_BRANCH="${APP_GIT_BRANCH:-main}"
-APP_GIT_USE_SSH=1
+APP_GIT_USE_SSH=0
 : "${APP_USE_SWARM:=1}"
 : "${APP_SWARM_STACK_NAME:=infra-app-nox-cms}"
 : "${APP_SWARM_COMPOSE_FILE:=docker-stack.yml}"
