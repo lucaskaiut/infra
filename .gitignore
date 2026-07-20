@@ -32,6 +32,8 @@ stacks/apps/alura/.env
 stacks/apps/alura/alura/
 stacks/jenkins/keys-alura/id_ed25519
 stacks/jenkins/keys-alura/webhook-token.txt
+stacks/apps/nox-cms/.env
+stacks/apps/nox-cms/nox-cms/
 __pycache__/
 *.pyc
 *.log
