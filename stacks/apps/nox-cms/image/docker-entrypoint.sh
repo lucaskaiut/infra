@@ -27,7 +27,7 @@ if [ "$role" = "worker" ]; then
     i=$((i + 1))
     sleep 2
   done
-  exec su-exec www-data php artisan queue:work database --sleep=3 --tries=3 --max-time=3600
+  exec su-exec www-data sh -c 'while true; do php artisan queue:work database --sleep=3 --tries=3 --max-time=3600; done'
 fi
 
 if [ "$role" = "scheduler" ]; then
