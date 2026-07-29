@@ -25,7 +25,15 @@ if ! grep -q '^APP_KEY=[^[:space:]]' .env 2>/dev/null || grep -q '^APP_KEY=$' .e
 fi
 
 # ---------------------------------------------------------------------------
-# 3) Storage link
+# 3) Dump autoload com scripts (package:discover) — precisa do Redis disponível
+# ---------------------------------------------------------------------------
+if [ ! -f vendor/autoload.php ] || [ ! -f bootstrap/cache/packages.php ]; then
+    log "Executando composer dump-autoload (package:discover)..."
+    composer dump-autoload --no-interaction --optimize --classmap-authoritative
+fi
+
+# ---------------------------------------------------------------------------
+# 4) Storage link
 # ---------------------------------------------------------------------------
 if [ ! -e public/storage ]; then
     php artisan storage:link --no-interaction || log "AVISO: storage link falhou"

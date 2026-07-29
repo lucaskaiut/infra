@@ -4,7 +4,7 @@ ENV COMPOSER_ALLOW_SUPERUSER=1
 COPY chat-one/api/composer.json chat-one/api/composer.lock ./
 RUN composer install --no-dev --no-scripts --no-autoloader --ignore-platform-reqs
 COPY chat-one/api/ .
-RUN composer install --no-dev --optimize-autoloader --classmap-authoritative --ignore-platform-reqs
+RUN composer install --no-dev --no-scripts --optimize-autoloader --classmap-authoritative --ignore-platform-reqs
 
 FROM php:8.4-fpm-alpine
 RUN apk add --no-cache \
