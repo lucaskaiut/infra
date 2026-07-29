@@ -1,0 +1,147 @@
+services:
+  app:
+    image: local/chat-one-api:latest
+    env_file:
+      - .env
+    environment:
+      CONTAINER_ROLE: web
+    networks:
+      - edge
+      - internal
+    stop_grace_period: 45s
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1/up || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 120s
+    deploy:
+      mode: replicated
+      replicas: 1
+      update_config:
+        order: start-first
+        parallelism: 1
+        delay: 15s
+        failure_action: rollback
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+      labels:
+        - traefik.enable=true
+        - "traefik.http.routers.chatone-api.rule=Host(`chatone-api.${DOMAIN:?defina DOMAIN no .env da stack}`)"
+        - traefik.http.routers.chatone-api.entrypoints=websecure
+        - traefik.http.routers.chatone-api.tls=true
+        - traefik.http.routers.chatone-api.tls.certresolver=letsencrypt
+        - traefik.http.services.chatone-api.loadbalancer.server.port=80
+        - traefik.http.services.chatone-api.loadbalancer.healthcheck.path=/up
+        - traefik.http.services.chatone-api.loadbalancer.healthcheck.interval=5s
+        - traefik.http.services.chatone-api.loadbalancer.healthcheck.timeout=4s
+
+  worker:
+    image: local/chat-one-api:latest
+    env_file:
+      - .env
+    environment:
+      CONTAINER_ROLE: worker
+    networks:
+      - internal
+    command: ["php", "artisan", "queue:work", "redis", "--queue=whatsapp-webhooks,default", "--sleep=1", "--tries=3", "--max-time=3600"]
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: any
+        delay: 10s
+      placement:
+        constraints:
+          - node.role == manager
+
+  reverb:
+    image: local/chat-one-api:latest
+    env_file:
+      - .env
+    networks:
+      - edge
+      - internal
+    command: ["php", "artisan", "reverb:start", "--host=0.0.0.0", "--port=8080", "--no-interaction"]
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: any
+        delay: 10s
+      placement:
+        constraints:
+          - node.role == manager
+      labels:
+        - traefik.enable=true
+        - "traefik.http.routers.chatone-reverb.rule=Host(`chatone-api.${DOMAIN:?defina DOMAIN no .env da stack}`) && PathPrefix(`/apps/`)"
+        - traefik.http.routers.chatone-reverb.entrypoints=websecure
+        - traefik.http.routers.chatone-reverb.tls=true
+        - traefik.http.routers.chatone-reverb.tls.certresolver=letsencrypt
+        - traefik.http.services.chatone-reverb.loadbalancer.server.port=8080
+
+  mysql:
+    image: mysql:8.4
+    env_file:
+      - .env
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:?defina DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_DATABASE:?defina DB_DATABASE}
+      MYSQL_USER: ${DB_USERNAME:?defina DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD:?defina DB_PASSWORD}
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./chat-one/docker/mysql/my.cnf:/etc/mysql/conf.d/custom.cnf:ro
+    networks:
+      - internal
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h127.0.0.1 -uroot -p\"$$MYSQL_ROOT_PASSWORD\" --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 30s
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+      placement:
+        constraints:
+          - node.role == manager
+
+  redis:
+    image: redis:7-alpine
+    env_file:
+      - .env
+    command: redis-server --appendonly yes --requirepass "${REDIS_PASSWORD:?defina REDIS_PASSWORD}"
+    volumes:
+      - redis_data:/data
+    networks:
+      - internal
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+      placement:
+        constraints:
+          - node.role == manager
+
+networks:
+  edge:
+    external: true
+    name: infra_edge
+  internal:
+    driver: overlay
+
+volumes:
+  mysql_data:
+  redis_data:

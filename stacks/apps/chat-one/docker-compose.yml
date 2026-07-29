@@ -1,0 +1,125 @@
+name: infra-app-chat-one
+
+services:
+  app:
+    image: local/chat-one-api:latest
+    build:
+      context: .
+      dockerfile: image/Dockerfile
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      CONTAINER_ROLE: web
+    networks:
+      - edge
+      - internal
+    stop_grace_period: 45s
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1/up || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 120s
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.chatone-api.rule=Host(`chatone-api.${DOMAIN:?defina DOMAIN no .env da stack}`)
+      - traefik.http.routers.chatone-api.entrypoints=websecure
+      - traefik.http.routers.chatone-api.tls=true
+      - traefik.http.routers.chatone-api.tls.certresolver=letsencrypt
+      - traefik.http.services.chatone-api.loadbalancer.server.port=80
+      - traefik.http.services.chatone-api.loadbalancer.healthcheck.path=/up
+      - traefik.http.services.chatone-api.loadbalancer.healthcheck.interval=5s
+      - traefik.http.services.chatone-api.loadbalancer.healthcheck.timeout=4s
+
+  worker:
+    image: local/chat-one-api:latest
+    container_name: infra_chat_one_worker
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      CONTAINER_ROLE: worker
+    depends_on:
+      app:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - internal
+    command: ["php", "artisan", "queue:work", "redis", "--queue=whatsapp-webhooks,default", "--sleep=1", "--tries=3", "--max-time=3600"]
+
+  reverb:
+    image: local/chat-one-api:latest
+    container_name: infra_chat_one_reverb
+    restart: unless-stopped
+    env_file:
+      - .env
+    depends_on:
+      app:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - edge
+      - internal
+    command: ["php", "artisan", "reverb:start", "--host=0.0.0.0", "--port=8080", "--no-interaction"]
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.chatone-reverb.rule=Host(`chatone-api.${DOMAIN:?defina DOMAIN no .env da stack}`) && PathPrefix(`/apps/`)
+      - traefik.http.routers.chatone-reverb.entrypoints=websecure
+      - traefik.http.routers.chatone-reverb.tls=true
+      - traefik.http.routers.chatone-reverb.tls.certresolver=letsencrypt
+      - traefik.http.services.chatone-reverb.loadbalancer.server.port=8080
+
+  mysql:
+    image: mysql:8.4
+    container_name: infra_chat_one_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:?defina DB_ROOT_PASSWORD no .env}
+      MYSQL_DATABASE: ${DB_DATABASE:?defina DB_DATABASE no .env}
+      MYSQL_USER: ${DB_USERNAME:?defina DB_USERNAME no .env}
+      MYSQL_PASSWORD: ${DB_PASSWORD:?defina DB_PASSWORD no .env}
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./chat-one/docker/mysql/my.cnf:/etc/mysql/conf.d/custom.cnf:ro
+    networks:
+      - internal
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h127.0.0.1 -uroot -p\"$$MYSQL_ROOT_PASSWORD\" --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 30s
+
+  redis:
+    image: redis:7-alpine
+    container_name: infra_chat_one_redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes --requirepass "${REDIS_PASSWORD:?defina REDIS_PASSWORD no .env}"
+    volumes:
+      - redis_data:/data
+    networks:
+      - internal
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+networks:
+  edge:
+    external: true
+    name: infra_edge
+  internal:
+    driver: bridge
+
+volumes:
+  mysql_data:
+  redis_data:
