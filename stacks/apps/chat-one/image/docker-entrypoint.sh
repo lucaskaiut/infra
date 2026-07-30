@@ -15,6 +15,8 @@ fi
 if ! grep -q '^APP_KEY=[^[:space:]]' .env 2>/dev/null; then
     log "APP_KEY vazia - gerando..."
     php artisan key:generate --force --no-interaction
+    # Exporta APP_KEY para o ambiente (Docker env var vazia sobrescreve .env)
+    export APP_KEY=$(grep '^APP_KEY=' .env | cut -d= -f2-)
     rm -f bootstrap/cache/config.php
     php artisan config:clear --no-interaction 2>/dev/null || true
 fi
