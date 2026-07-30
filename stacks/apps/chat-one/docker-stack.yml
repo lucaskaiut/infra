@@ -75,7 +75,7 @@ services:
           - node.role == manager
       labels:
         - traefik.enable=true
-        - "traefik.http.routers.chatone-reverb.rule=Host(`chatone-api.${DOMAIN:?defina DOMAIN no .env da stack}`) && PathPrefix(`/apps/`)"
+        - "traefik.http.routers.chatone-reverb.rule=Host(`chatone-api.${DOMAIN:?defina DOMAIN no .env da stack}`) && PathPrefix(`/app`)"
         - traefik.http.routers.chatone-reverb.entrypoints=websecure
         - traefik.http.routers.chatone-reverb.tls=true
         - traefik.http.routers.chatone-reverb.tls.certresolver=letsencrypt
