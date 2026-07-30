@@ -58,10 +58,10 @@ php artisan route:cache --no-interaction || true
 php artisan view:cache --no-interaction || true
 php artisan event:cache --no-interaction || true
 
-# 7) Migrations
+# 7) Migrations (não falha se tabelas já existem - race condition entre containers)
 if [ "${CONTAINER_ROLE:-web}" = "web" ]; then
     log "Executando migrations..."
-    php artisan migrate --force --no-interaction
+    php artisan migrate --force --no-interaction || log "AVISO: migrations falharam (tabelas ja existem?)"
 fi
 
 # 8) Permissoes
