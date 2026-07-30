@@ -42,3 +42,4 @@ stacks/apps/chat-one/.env
 /apps/
 stacks/jenkins/keys-chat-one/id_ed25519
 stacks/jenkins/keys-chat-one/webhook-token.txt
+stacks/jenkins/keys-chat-one/webhook-token.txt
