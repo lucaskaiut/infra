@@ -43,8 +43,9 @@ fi
 # 5) Aguarda MySQL
 # ---------------------------------------------------------------------------
 env_get() {
-    local key="$1" default="${2:-}" value
-    value="$(grep -E "^${key}=" .env | tail -n1 | cut -d '=' -f2- | tr -d '"' | tr -d "'" || true)"
+    key="$1"
+    default="${2:-}"
+    value=$(grep -E "^${key}=" .env | tail -n1 | cut -d '=' -f2- | sed 's/^"//;s/"$//;s/^\\'"'"'//;s/\\'"'"'$//' 2>/dev/null)
     echo "${value:-$default}"
 }
 DB_HOST_VAL="$(env_get DB_HOST mysql)"
