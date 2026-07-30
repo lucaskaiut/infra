@@ -69,5 +69,24 @@ mkdir -p storage/framework/cache/data storage/framework/sessions storage/framewo
 chown -R www-data:www-data storage bootstrap/cache 2>/dev/null || true
 chmod -R ug+rwX storage bootstrap/cache 2>/dev/null || true
 
-log "Iniciando nginx + php-fpm..."
-exec /usr/bin/supervisord -c /etc/supervisord.conf
+# Dispatch: se tem argumentos (command do docker), executa direto
+if [ $# -gt 0 ]; then
+    log "Executando comando: $*"
+    exec "$@"
+fi
+
+# Ou pelo CONTAINER_ROLE
+case "${CONTAINER_ROLE:-web}" in
+    worker)
+        log "Iniciando queue worker..."
+        exec php artisan queue:work redis --queue=whatsapp-webhooks,default --sleep=1 --tries=3 --max-time=3600
+        ;;
+    reverb)
+        log "Iniciando Reverb..."
+        exec php artisan reverb:start --host=0.0.0.0 --port=8080 --no-interaction
+        ;;
+    *)
+        log "Iniciando nginx + php-fpm..."
+        exec /usr/bin/supervisord -c /etc/supervisord.conf
+        ;;
+esac
