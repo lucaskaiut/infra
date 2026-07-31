@@ -10,6 +10,7 @@ services:
     networks:
       - edge
       - internal
+      - shared_data
     stop_grace_period: 45s
     healthcheck:
       test: ["CMD-SHELL", "wget -qO- http://127.0.0.1/up || exit 1"]
@@ -49,6 +50,7 @@ services:
       REVERB_PORT: 8080
     networks:
       - internal
+      - shared_data
     command: ["php", "artisan", "queue:work", "redis", "--queue=whatsapp-webhooks,default", "--sleep=1", "--tries=3", "--max-time=3600"]
     deploy:
       mode: replicated
@@ -70,6 +72,7 @@ services:
     networks:
       - edge
       - internal
+      - shared_data
     command: ["php", "artisan", "reverb:start", "--host=0.0.0.0", "--port=8080", "--no-interaction"]
     deploy:
       mode: replicated
@@ -96,6 +99,7 @@ services:
       CONTAINER_ROLE: scheduler
     networks:
       - internal
+      - shared_data
     command: ["php", "artisan", "schedule:work"]
     deploy:
       mode: replicated
@@ -103,36 +107,6 @@ services:
       restart_policy:
         condition: on-failure
         delay: 10s
-      placement:
-        constraints:
-          - node.role == manager
-
-  mysql:
-    image: mysql:8.4
-    env_file:
-      - .env
-    environment:
-      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:?defina DB_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${DB_DATABASE:?defina DB_DATABASE}
-      MYSQL_USER: ${DB_USERNAME:?defina DB_USERNAME}
-      MYSQL_PASSWORD: ${DB_PASSWORD:?defina DB_PASSWORD}
-    volumes:
-      - mysql_data:/var/lib/mysql
-      - ./chat-one/docker/mysql/my.cnf:/etc/mysql/conf.d/custom.cnf:ro
-    networks:
-      - internal
-    healthcheck:
-      test: ["CMD-SHELL", "mysqladmin ping -h127.0.0.1 -uroot -p\"$$MYSQL_ROOT_PASSWORD\" --silent"]
-      interval: 5s
-      timeout: 5s
-      retries: 30
-      start_period: 30s
-    deploy:
-      mode: replicated
-      replicas: 1
-      restart_policy:
-        condition: on-failure
-        delay: 5s
       placement:
         constraints:
           - node.role == manager
@@ -167,7 +141,9 @@ networks:
     name: infra_edge
   internal:
     driver: overlay
+  shared_data:
+    external: true
+    name: infra_shared
 
 volumes:
-  mysql_data:
   redis_data:
