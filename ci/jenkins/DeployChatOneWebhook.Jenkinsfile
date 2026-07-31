@@ -55,6 +55,8 @@ pipeline {
               script: """
                 set +e
                 cd /infra-deploy
+                git checkout -- . 2>/dev/null || true
+                git clean -fd stacks/ 2>/dev/null || true
                 git pull origin main
                 ./ci/check-git-range-touches-path.sh 'https://github.com/lucaskaiut/chat-one.git' '${before}' '${after}' api
                 exit \$?
@@ -127,13 +129,46 @@ pipeline {
         environment name: 'RUN_DEPLOY', value: '1'
       }
       steps {
+        writeFile file: "${env.WORKSPACE}/.jenkins-notify-commits.json", text: env.COMMITS_PAYLOAD ?: '[]'
         sh """
           set -euo pipefail
           cd /infra-deploy
+          git checkout -- . 2>/dev/null || true
+          git clean -fd stacks/ 2>/dev/null || true
+          INFRA_BEFORE=\$(git rev-parse HEAD)
           git pull origin main
+          INFRA_AFTER=\$(git rev-parse HEAD)
+          echo "\${INFRA_BEFORE}..\${INFRA_AFTER}" > "${env.WORKSPACE}/.jenkins-notify-infra-range.txt"
           export DEPLOY_SUBPATH_GIT_RANGE="\${DEPLOY_SUBPATH_GIT_RANGE:-}"
+          export COMMITS_PAYLOAD_FILE="${env.WORKSPACE}/.jenkins-notify-commits.json"
+          export NOTIFY_APP_SLUG=chat-one
           ./ci/deploy-app.sh chat-one
         """
+      }
+      post {
+        always {
+          script {
+            env.NOTIFY_BUILD_RESULT = currentBuild.currentResult ?: 'FAILURE'
+          }
+          sh """
+            set -eu
+            export INFRA_ROOT=/infra-deploy
+            export APP_SLUG=chat-one
+            export NOTIFY_APP_SLUG=chat-one
+            export NOTIFY_BUILD_RESULT='${env.NOTIFY_BUILD_RESULT}'
+            export COMMITS_PAYLOAD_FILE='${env.WORKSPACE}/.jenkins-notify-commits.json'
+            export NOTIFY_GIT_BEFORE='${env.GIT_BEFORE ?: ""}'
+            export NOTIFY_GIT_AFTER='${env.GIT_AFTER ?: ""}'
+            export NOTIFY_GIT_REF='${env.GIT_REF ?: ""}'
+            export NOTIFY_REPO_FULL='${env.REPO_FULL ?: ""}'
+            export DEPLOY_SUBPATH_GIT_RANGE='${env.DEPLOY_SUBPATH_GIT_RANGE ?: ""}'
+            RFILE='${env.WORKSPACE}/.jenkins-notify-infra-range.txt'
+            if [ -f "\$RFILE" ]; then
+              export NOTIFY_INFRA_GIT_RANGE="\$(cat "\$RFILE")"
+            fi
+            /infra-deploy/ci/notify-n8n-deploy.sh || true
+          """
+        }
       }
     }
   }
