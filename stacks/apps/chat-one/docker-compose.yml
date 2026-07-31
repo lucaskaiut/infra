@@ -77,6 +77,23 @@ services:
       - traefik.http.routers.chatone-reverb.tls.certresolver=letsencrypt
       - traefik.http.services.chatone-reverb.loadbalancer.server.port=8080
 
+  scheduler:
+    image: local/chat-one-api:latest
+    container_name: infra_chat_one_scheduler
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      CONTAINER_ROLE: scheduler
+    depends_on:
+      app:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - internal
+    command: ["php", "artisan", "schedule:work"]
+
   mysql:
     image: mysql:8.4
     container_name: infra_chat_one_mysql
