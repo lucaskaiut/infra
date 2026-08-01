@@ -4,6 +4,7 @@ ENV COMPOSER_ALLOW_SUPERUSER=1
 COPY chat-one/api/composer.json chat-one/api/composer.lock ./
 RUN composer install --no-dev --no-scripts --no-autoloader --ignore-platform-reqs
 COPY chat-one/api/ .
+RUN rm -rf bootstrap/cache/*.php 2>/dev/null; true
 RUN composer install --no-dev --no-scripts --optimize-autoloader --classmap-authoritative --ignore-platform-reqs
 
 FROM php:8.4-fpm

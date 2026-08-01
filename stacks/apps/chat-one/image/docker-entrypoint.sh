@@ -55,10 +55,14 @@ while [ "$tries" -lt 90 ]; do
 done
 [ "$tries" -ge 90 ] && { log "ERRO: MySQL indisponivel"; exit 1; }
 
-# 6) Cache
+# 6) Cache — limpa antes de gerar para nunca usar cache stale
 log "Otimizando caches..."
-php artisan config:cache --no-interaction || true
-php artisan route:cache --no-interaction || true
+php artisan config:clear --no-interaction 2>/dev/null || true
+php artisan route:clear --no-interaction 2>/dev/null || true
+php artisan view:clear --no-interaction 2>/dev/null || true
+php artisan event:clear --no-interaction 2>/dev/null || true
+php artisan config:cache --no-interaction || { log "AVISO: config:cache falhou"; }
+php artisan route:cache --no-interaction || { log "AVISO: route:cache falhou — rotas serao lidas dinamicamente"; }
 php artisan view:cache --no-interaction || true
 php artisan event:cache --no-interaction || true
 
