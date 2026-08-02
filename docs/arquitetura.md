@@ -87,6 +87,7 @@ Sem **shared** a correr, apps que dependem de MySQL/Redis falham ou ficam à esp
 
 - Na **raiz** do clone (`~/infra`): `DOMAIN`, `ACME_EMAIL`, etc., para stacks que usam `--env-file ../../.env` (ex.: **edge**, **demo**).
 - **`${DOMAIN}` nos labels Traefik** do YAML é resolvido pelo **Compose** a partir do ficheiro passado com `--env-file` (ou `.env` na pasta do projeto), **não** pelo `env_file:` interno do serviço (esse injeta variáveis **dentro** do container).
+- **Atenção:** variáveis já exportadas no shell (ex.: `DOMAIN` vindo de `~/infra/.env` via `ci/deploy-app.sh`) **têm prioridade** sobre o `--env-file` da stack. O deploy-app limpa do shell as chaves do `.env` da app antes do `docker compose config`, para stacks com domínio próprio (ex.: **chat-one** → `noxtecnologias.com.br`) não herdarem `lucaskaiut.com.br`.
 
 **Boas práticas:**
 
@@ -98,7 +99,7 @@ docker compose --env-file ../../.env ps
 
 **Atalho:** `ln -sf ../../.env .env` na pasta da stack para não repetir `--env-file`.
 
-**Stacks com `.env` local:** `stacks/shared/.env`, `stacks/apps/ematricula/.env`, `stacks/apps/horus/.env`, `stacks/apps/plutao/.env`, `stacks/jenkins/.env` — não versionados; usar `.env.example` como modelo.
+**Stacks com `.env` local:** `stacks/shared/.env`, `stacks/apps/ematricula/.env`, `stacks/apps/horus/.env`, `stacks/apps/plutao/.env`, `stacks/apps/chat-one/.env`, `stacks/jenkins/.env` — não versionados; usar `.env.example` como modelo.
 
 ---
 

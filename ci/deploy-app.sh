@@ -100,6 +100,24 @@ finalize_probe_report() {
 
 cd "$STACK"
 
+# O Compose prioriza variáveis já presentes no shell sobre --env-file.
+# O source de ROOT/.env no início (ex.: DOMAIN=lucaskaiut.com.br) sobrescrevia
+# stacks com DOMAIN próprio (ex.: chat-one → noxtecnologias.com.br) e gerava
+# labels Traefik erradas no `docker compose config` / `stack deploy`.
+# Removemos do shell as chaves definidas no .env da stack para o --env-file mandar
+# (sem `source` do .env: valores com espaços/caracteres especiais quebram o bash).
+if [[ -f .env ]]; then
+  while IFS= read -r _env_line || [[ -n "${_env_line}" ]]; do
+    _env_line="${_env_line%$'\r'}"
+    [[ "${_env_line}" =~ ^[[:space:]]*# ]] && continue
+    [[ "${_env_line}" =~ ^[[:space:]]*$ ]] && continue
+    _env_key="${_env_line%%=*}"
+    if [[ "${_env_key}" =~ ^[A-Za-z_][A-Za-z0-9_]*$ ]]; then
+      unset "${_env_key}" 2>/dev/null || true
+    fi
+  done < .env
+fi
+
 if [[ -n "${APP_HTTP_PROBE_SERVICE_HOST:-}" && -f .env ]]; then
   DOMAIN_VAL=$(grep -E '^DOMAIN=' .env | head -1 | cut -d= -f2- | tr -d '\r' | sed 's/^["'\'']//;s/["'\'']$//')
   if [[ -n "$DOMAIN_VAL" ]]; then
