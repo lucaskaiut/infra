@@ -12,6 +12,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     nginx \
     supervisor \
     wget \
+    ffmpeg \
     libicu-dev \
     libzip-dev \
     libonig-dev \
