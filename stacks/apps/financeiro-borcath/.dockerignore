@@ -1,0 +1,8 @@
+financeiro-borcath/**/node_modules
+financeiro-borcath/**/vendor
+financeiro-borcath/**/.git
+financeiro-borcath/**/storage/logs/*
+financeiro-borcath/**/storage/framework/cache/*
+financeiro-borcath/**/storage/framework/sessions/*
+financeiro-borcath/**/bootstrap/cache/*
+financeiro-borcath/web

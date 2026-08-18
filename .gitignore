@@ -43,3 +43,9 @@ stacks/apps/chat-one/.env
 stacks/jenkins/keys-chat-one/id_ed25519
 stacks/jenkins/keys-chat-one/webhook-token.txt
 stacks/jenkins/keys-chat-one/webhook-token.txt
+
+# financeiro-borcath
+stacks/apps/financeiro-borcath/.env
+stacks/apps/financeiro-borcath/financeiro-borcath/
+stacks/jenkins/keys-financeiro-borcath/webhook-token.txt
+stacks/jenkins/keys-financeiro-borcath/cred-financeiro.groovy
