@@ -58,7 +58,7 @@ MYSQL_DATABASE="${MYSQL_DATABASE:-financeiro_borcath}"
 MYSQL_USER="${MYSQL_USER:-root}"
 MYSQL_PASSWORD=
 # App (para storage)
-APP_CONTAINER="${APP_CONTAINER:-infra-app-financeiro-borcath_app.1.$(docker service ps infra-app-financeiro-borcath_app -q --no-trunc 2>/dev/null | head -1)}"
+APP_CONTAINER="${APP_CONTAINER:-$(docker ps --filter name=infra-app-financeiro-borcath_app --format '{{.Names}}' 2>/dev/null | head -1)}"
 APP_STORAGE_PATH="${APP_STORAGE_PATH:-/var/www/html/storage/app/public}"
 
 # R2 (validado sob demanda — opcional)
