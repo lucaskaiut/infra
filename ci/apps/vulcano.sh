@@ -9,7 +9,7 @@ APP_GIT_USE_SSH=1
 if [[ "$APP_USE_SWARM" == "0" ]]; then
   : "${APP_COMPOSE_SCALES:=app=2}"
 fi
-APP_HTTP_PROBE_SERVICE_HOST="vulcano-api"
+APP_HTTP_PROBE_SERVICE_HOST="sistema-api"
 APP_DEPLOY_SUBPATH_GUARD="api"
 APP_SWARM_FORCE_SERVICE_UPDATE=1
 APP_SWARM_FORCE_IMAGE="local/vulcano-api:latest"

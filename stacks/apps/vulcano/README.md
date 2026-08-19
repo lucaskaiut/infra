@@ -4,7 +4,7 @@ Stack **Swarm** em produção (`infra-app-vulcano`). Imagem `local/vulcano-api:l
 
 ## Domínio público
 
-`https://vulcano-api.${DOMAIN}` via Traefik.
+`https://sistema-api.${DOMAIN}` via Traefik.
 
 ## Base de dados partilhada
 
@@ -36,4 +36,4 @@ cd ~/infra
 
 ## Uptime Kuma
 
-Monitor HTTP: `GET https://vulcano-api.<DOMAIN>/api/health` → 200 (quando a rota existir na app).
+Monitor HTTP: `GET https://sistema-api.<DOMAIN>/api/health` → 200 (quando a rota existir na app).

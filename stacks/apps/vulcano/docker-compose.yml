@@ -25,14 +25,14 @@ services:
       start_period: 120s
     labels:
       - traefik.enable=true
-      - traefik.http.routers.vulcano-api.rule=Host(`vulcano-api.${DOMAIN:?defina DOMAIN no .env da stack}`)
-      - traefik.http.routers.vulcano-api.entrypoints=websecure
-      - traefik.http.routers.vulcano-api.tls=true
-      - traefik.http.routers.vulcano-api.tls.certresolver=letsencrypt
-      - traefik.http.services.vulcano-api.loadbalancer.server.port=80
-      - traefik.http.services.vulcano-api.loadbalancer.healthcheck.path=/up
-      - traefik.http.services.vulcano-api.loadbalancer.healthcheck.interval=5s
-      - traefik.http.services.vulcano-api.loadbalancer.healthcheck.timeout=4s
+      - traefik.http.routers.sistema-api.rule=Host(`sistema-api.${DOMAIN:?defina DOMAIN no .env da stack}`)
+      - traefik.http.routers.sistema-api.entrypoints=websecure
+      - traefik.http.routers.sistema-api.tls=true
+      - traefik.http.routers.sistema-api.tls.certresolver=letsencrypt
+      - traefik.http.services.sistema-api.loadbalancer.server.port=80
+      - traefik.http.services.sistema-api.loadbalancer.healthcheck.path=/up
+      - traefik.http.services.sistema-api.loadbalancer.healthcheck.interval=5s
+      - traefik.http.services.sistema-api.loadbalancer.healthcheck.timeout=4s
 
   worker:
     image: local/vulcano-api:latest
