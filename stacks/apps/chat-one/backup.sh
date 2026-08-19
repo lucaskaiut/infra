@@ -53,7 +53,7 @@ check_var() {
 # ---------------------------------------------------------------------------
 
 # MySQL
-MYSQL_CONTAINER="${MYSQL_CONTAINER:-infra-app-chat-one_mysql.1.$(docker service ps infra-app-chat-one_mysql -q --no-trunc 2>/dev/null | head -1)}"
+MYSQL_CONTAINER="${MYSQL_CONTAINER:-infra-shared_mysql.1.$(docker service ps infra-shared_mysql -q --no-trunc 2>/dev/null | head -1)}"
 MYSQL_DATABASE="${MYSQL_DATABASE:-chat_one}"
 MYSQL_USER="${MYSQL_USER:-root}"
 MYSQL_PASSWORD=
