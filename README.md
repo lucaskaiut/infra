@@ -17,6 +17,7 @@ Repositório de infraestrutura: Traefik (TLS e roteamento), MySQL e Redis partil
 | `stacks/apps/_template/` | Modelo para nova app |
 | `stacks/jenkins/` | Jenkins (CI/CD) |
 | `ci/` | `deploy-app.sh`, `ci/apps/*.sh`, Jenkinsfiles |
+| `scripts/` | Utilitários pontuais (ex.: credencial Jenkins via API) |
 
 ## Variáveis de ambiente
 
