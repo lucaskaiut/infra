@@ -102,7 +102,6 @@ A infra serve **quatro domínios base**. O `DOMAIN` da raiz (`~/infra/.env`) é 
 | Hostname | Stack | Serviço |
 |----------|-------|---------|
 | `chatone-api.noxtecnologias.com.br` | `infra-app-chat-one` | API ChatOne (+ `/app` → Reverb) |
-| `financeiro-borcath-api.noxtecnologias.com.br` | `infra-app-financeiro-borcath` | API Financeiro Borcath |
 | `cms-api.noxtecnologias.com.br` | `infra-app-nox-cms` | API nox-cms |
 
 **`noxagenda.com.br`**:
@@ -116,6 +115,7 @@ A infra serve **quatro domínios base**. O `DOMAIN` da raiz (`~/infra/.env`) é 
 | Hostname | Stack | Serviço |
 |----------|-------|---------|
 | `sistema-api.dborcath.com.br` | `infra-app-vulcano` | API Vulcano |
+| `financeiro-api.dborcath.com.br` | `infra-app-financeiro-borcath` | API Financeiro Borcath |
 
 - Registos **`A`** por hostname (não há wildcard genérico aplicado).
 - **UFW (exemplo):** `OpenSSH`, `80/tcp`, `443/tcp` permitidos.
@@ -224,7 +224,7 @@ docker stack deploy -c /tmp/infra-shared.stack.yml infra-shared
 | `infra-app-alura` | `app` (2), `scheduler`, `worker` (0) | `local/alura-api:latest` | `alura-api.lucaskaiut.com.br` | `./ci/deploy-app.sh alura` (build) |
 | `infra-app-chat-one` | `app`, `redis`, `reverb`, `scheduler`, `worker` | `local/chat-one-api:latest`, `redis:7-alpine` | `chatone-api.noxtecnologias.com.br` | `./ci/deploy-app.sh chat-one` (build) |
 | `infra-app-evolutionapi` | `evolutionapi`, `evolutionapi_postgres`, `evolutionapi_redis` | `evoapicloud/evolution-api:v2.3.7`, `postgres:15`, `redis:7.4-alpine` | `evolution.lucaskaiut.com.br` | `./ci/deploy-app.sh evolutionapi` (pull-only) |
-| `infra-app-financeiro-borcath` | `app` (2), `worker` (0) | `local/financeiro-borcath-api:latest` | `financeiro-borcath-api.noxtecnologias.com.br` | `./ci/deploy-app.sh financeiro-borcath` (build) |
+| `infra-app-financeiro-borcath` | `app` (2), `worker` (0) | `local/financeiro-borcath-api:latest` | `financeiro-api.dborcath.com.br` | `./ci/deploy-app.sh financeiro-borcath` (build) |
 | `infra-app-hedgedoc` | `database`, `hedgedoc` | `quay.io/hedgedoc/hedgedoc:1.10.7`, `postgres:17.7-alpine` | `docs.lucaskaiut.com.br` | manual (`docker stack deploy`) |
 | `infra-app-n8n` | `n8n` | `n8nio/n8n:2.15.1` | `n8n.lucaskaiut.com.br` | `./ci/deploy-app.sh n8n` (pull-only) |
 | `infra-app-nox-cms` | `app` (2), `scheduler`, `worker` | `local/nox-cms-api:latest` | `cms-api.noxtecnologias.com.br` | `./ci/deploy-app.sh nox-cms` (build) |

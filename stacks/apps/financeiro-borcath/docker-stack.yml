@@ -30,14 +30,14 @@ services:
         delay: 5s
       labels:
         - traefik.enable=true
-        - "traefik.http.routers.financeiro-borcath-api.rule=Host(`financeiro-borcath-api.${DOMAIN:?defina DOMAIN no .env da stack}`)"
-        - traefik.http.routers.financeiro-borcath-api.entrypoints=websecure
-        - traefik.http.routers.financeiro-borcath-api.tls=true
-        - traefik.http.routers.financeiro-borcath-api.tls.certresolver=letsencrypt
-        - traefik.http.services.financeiro-borcath-api.loadbalancer.server.port=80
-        - traefik.http.services.financeiro-borcath-api.loadbalancer.healthcheck.path=/up
-        - traefik.http.services.financeiro-borcath-api.loadbalancer.healthcheck.interval=5s
-        - traefik.http.services.financeiro-borcath-api.loadbalancer.healthcheck.timeout=4s
+        - "traefik.http.routers.financeiro-api.rule=Host(`financeiro-api.${DOMAIN:?defina DOMAIN no .env da stack}`)"
+        - traefik.http.routers.financeiro-api.entrypoints=websecure
+        - traefik.http.routers.financeiro-api.tls=true
+        - traefik.http.routers.financeiro-api.tls.certresolver=letsencrypt
+        - traefik.http.services.financeiro-api.loadbalancer.server.port=80
+        - traefik.http.services.financeiro-api.loadbalancer.healthcheck.path=/up
+        - traefik.http.services.financeiro-api.loadbalancer.healthcheck.interval=5s
+        - traefik.http.services.financeiro-api.loadbalancer.healthcheck.timeout=4s
 
   worker:
     image: local/financeiro-borcath-api:latest

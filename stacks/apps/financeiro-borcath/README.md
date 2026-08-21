@@ -6,16 +6,16 @@ Publica apenas a pasta `api` do monorepo
 
 ## Domínios
 
-- API: `https://financeiro-borcath-api.${DOMAIN}`
-- Frontend: `https://financeiro-borcath.${DOMAIN}` (construído fora desta stack)
+- API: `https://financeiro-api.${DOMAIN}`
+- Frontend: `https://financeiro.${DOMAIN}` (construído fora desta stack)
 
-`DOMAIN=noxtecnologias.com.br` no `.env` desta stack (alinhado ao padrão `chat-one`).
+`DOMAIN=dborcath.com.br` no `.env` desta stack (alinhado ao padrão `vulcano`).
 
 ## Pré-requisitos na VPS
 
 - Stack **edge** (Traefik) com rede `infra_edge`.
 - Stack **shared** com MySQL na rede `infra_shared`.
-- DNS `A` para `financeiro-borcath-api.noxtecnologias.com.br` → IP da VPS.
+- DNS `A` para `financeiro-api.dborcath.com.br` → IP da VPS.
 - Base de dados `financeiro_borcath` + usuário com privilégios no MySQL compartilhado.
 
 ## Deploy
