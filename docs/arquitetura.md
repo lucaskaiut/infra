@@ -103,6 +103,7 @@ A infra serve **quatro domínios base**. O `DOMAIN` da raiz (`~/infra/.env`) é 
 |----------|-------|---------|
 | `chatone-api.noxtecnologias.com.br` | `infra-app-chat-one` | API ChatOne (+ `/app` → Reverb) |
 | `cms-api.noxtecnologias.com.br` | `infra-app-nox-cms` | API nox-cms |
+| `monensure-api.noxtecnologias.com.br` | `infra-app-monensure` | API Monensure |
 
 **`noxagenda.com.br`**:
 
@@ -138,7 +139,7 @@ docker compose --env-file ../../.env ps
 
 **Atalho:** `ln -sf ../../.env .env` na pasta da stack para não repetir `--env-file`.
 
-**Stacks com `.env` local** (todas têm `.env.example` versionado): `stacks/shared/`, `stacks/jenkins/`, `stacks/apps/<slug>/` (alura, atena, chat-one, ematricula, evolutionapi, financeiro-borcath, hedgedoc, horus, n8n, nox-cms, nox-schduler, opensearch, plutao, tasksautomation, toth, toth-ai, uptime-kuma, vulcano). **Exceção:** `stacks/apps/netdata/` — o `docker-stack.yml` fixa o hostname (`netdata.lucaskaiut.com.br`) e não usa `.env`.
+**Stacks com `.env` local** (todas têm `.env.example` versionado): `stacks/shared/`, `stacks/jenkins/`, `stacks/apps/<slug>/` (alura, atena, chat-one, ematricula, evolutionapi, financeiro-borcath, monensure, hedgedoc, horus, n8n, nox-cms, nox-schduler, opensearch, plutao, tasksautomation, toth, toth-ai, uptime-kuma, vulcano). **Exceção:** `stacks/apps/netdata/` — o `docker-stack.yml` fixa o hostname (`netdata.lucaskaiut.com.br`) e não usa `.env`.
 
 ---
 
@@ -358,6 +359,7 @@ Jobs presentes no Jenkins de produção (13):
 | **deploy-chat-one-webhook** | Webhook push em `main` no repo **chat-one** → `./ci/deploy-app.sh chat-one` |
 | **deploy-ematricula-webhook** | Webhook push em `main` no repo **ematricula** (alterações em `api/`) → `./ci/deploy-app.sh ematricula` |
 | **deploy-financeiro-borcath-webhook** | Webhook push em `main` no repo **financeiro-borcath** → `./ci/deploy-app.sh financeiro-borcath` |
+| **deploy-monensure-webhook** | Webhook push em `main` no repo **monensure** → `./ci/deploy-app.sh monensure` |
 | **deploy-horus-webhook** | Webhook push em `main` no repo **horus** (alterações em `api/`) → `./ci/deploy-app.sh horus` |
 | **deploy-nox-cms-webhook** | Webhook push em `main` no repo **nox-cms** → `./ci/deploy-app.sh nox-cms` |
 | **deploy-nox-schduler-webhook** | Webhook push no repo **nox-schduler** → `./ci/deploy-app.sh nox-schduler` |

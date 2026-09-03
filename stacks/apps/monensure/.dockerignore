@@ -1,0 +1,8 @@
+monensure/**/node_modules
+monensure/**/vendor
+monensure/**/.git
+monensure/**/storage/logs/*
+monensure/**/storage/framework/cache/*
+monensure/**/storage/framework/sessions/*
+monensure/**/bootstrap/cache/*
+monensure/web

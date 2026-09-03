@@ -49,3 +49,9 @@ stacks/apps/financeiro-borcath/.env
 stacks/apps/financeiro-borcath/financeiro-borcath/
 stacks/jenkins/keys-financeiro-borcath/webhook-token.txt
 stacks/jenkins/keys-financeiro-borcath/cred-financeiro.groovy
+
+# monensure
+stacks/apps/monensure/.env
+stacks/apps/monensure/monensure/
+stacks/jenkins/keys-monensure/webhook-token.txt
+stacks/jenkins/keys-monensure/cred-monensure.groovy
