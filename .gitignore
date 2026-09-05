@@ -55,3 +55,5 @@ stacks/apps/monensure/.env
 stacks/apps/monensure/monensure/
 stacks/jenkins/keys-monensure/webhook-token.txt
 stacks/jenkins/keys-monensure/cred-monensure.groovy
+stacks/apps/financeiro-apolar/financeiro-apolar/
+stacks/jenkins/keys-financeiro-apolar/

@@ -1,0 +1,8 @@
+financeiro-apolar/**/node_modules
+financeiro-apolar/**/vendor
+financeiro-apolar/**/.git
+financeiro-apolar/**/storage/logs/*
+financeiro-apolar/**/storage/framework/cache/*
+financeiro-apolar/**/storage/framework/sessions/*
+financeiro-apolar/**/bootstrap/cache/*
+financeiro-apolar/web
