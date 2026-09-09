@@ -57,3 +57,8 @@ stacks/jenkins/keys-monensure/webhook-token.txt
 stacks/jenkins/keys-monensure/cred-monensure.groovy
 stacks/apps/financeiro-apolar/financeiro-apolar/
 stacks/jenkins/keys-financeiro-apolar/
+
+# webraster
+stacks/apps/webraster/.env
+stacks/apps/webraster/webraster/
+stacks/jenkins/keys-webraster/

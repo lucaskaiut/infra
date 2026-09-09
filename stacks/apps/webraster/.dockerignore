@@ -1,0 +1,8 @@
+webraster/**/node_modules
+webraster/**/vendor
+webraster/**/.git
+webraster/**/storage/logs/*
+webraster/**/storage/framework/cache/*
+webraster/**/storage/framework/sessions/*
+webraster/**/bootstrap/cache/*
+webraster/web

@@ -104,6 +104,7 @@ A infra serve **quatro domínios base**. O `DOMAIN` da raiz (`~/infra/.env`) é 
 | `chatone-api.noxtecnologias.com.br` | `infra-app-chat-one` | API ChatOne (+ `/app` → Reverb) |
 | `cms-api.noxtecnologias.com.br` | `infra-app-nox-cms` | API nox-cms |
 | `monensure-api.noxtecnologias.com.br` | `infra-app-monensure` | API Monensure |
+| `webraster-api.noxtecnologias.com.br` | `infra-app-webraster` | API Webraster |
 
 **`noxagenda.com.br`**:
 
@@ -232,6 +233,7 @@ docker stack deploy -c /tmp/infra-shared.stack.yml infra-shared
 | `infra-app-nox-schduler` | `app` (2), `horizon`, `scheduler` | `local/nox-schduler-app:latest` | `api.noxagenda.com.br` | `./ci/deploy-app.sh nox-schduler` (build) |
 | `infra-app-uptime-kuma` | `uptime-kuma` | `louislam/uptime-kuma:2.2.1` | `uptime.lucaskaiut.com.br` | manual (`docker stack deploy`) |
 | `infra-app-vulcano` | `app` (2), `scheduler`, `worker` (0) | `local/vulcano-api:latest` | `sistema-api.dborcath.com.br` | `./ci/deploy-app.sh vulcano` (build) |
+| `infra-app-webraster` | `app` (2), `worker`, `scheduler` | `local/webraster-api:latest` | `webraster-api.noxtecnologias.com.br` | `./ci/deploy-app.sh webraster` (build) |
 | `infra-netdata` | `netdata` | `netdata/netdata:stable` | `netdata.lucaskaiut.com.br` | manual (`docker stack deploy`) |
 | `infra-opensearch` | `opensearch` | `opensearchproject/opensearch:2.18.0` | `opensearch.lucaskaiut.com.br` | manual (`docker stack deploy`) |
 
@@ -245,7 +247,7 @@ Notas:
 
 ### 10.2 Métodos de deploy
 
-- **Build local + Swarm:** `./ci/deploy-app.sh <slug>` — clona/atualiza o monorepo, faz `docker compose build`, renderiza `docker-stack.yml` e faz `docker stack deploy`. Exemplos: `alura`, `chat-one`, `financeiro-borcath`, `nox-cms`, `nox-schduler`, `vulcano`.
+- **Build local + Swarm:** `./ci/deploy-app.sh <slug>` — clona/atualiza o monorepo, faz `docker compose build`, renderiza `docker-stack.yml` e faz `docker stack deploy`. Exemplos: `alura`, `chat-one`, `financeiro-borcath`, `nox-cms`, `nox-schduler`, `vulcano`, `webraster`.
 - **Pull-only:** `./ci/deploy-app.sh <slug>` com `APP_COMPOSE_PULL_ONLY=1`. Exemplos: `evolutionapi`, `n8n`.
 - **Manual:** `docker stack deploy` direto (sem `ci/apps/<slug>.sh`). Exemplos: `hedgedoc`, `netdata`, `opensearch`, `uptime-kuma`.
 
@@ -349,7 +351,7 @@ docker compose build && docker compose up -d
 
 ### Jobs
 
-Jobs presentes no Jenkins de produção (13):
+Jobs presentes no Jenkins de produção (15):
 
 | Job | Função |
 |-----|--------|
@@ -367,6 +369,7 @@ Jobs presentes no Jenkins de produção (13):
 | **deploy-tasksautomation-webhook** | Webhook no repo **tasksautomation** → `./ci/deploy-app.sh tasksautomation` |
 | **deploy-toth-webhook** | Webhook push em `main` no repo **toth** → `./ci/deploy-app.sh toth` |
 | **deploy-vulcano-webhook** | Webhook push em `main` no repo **vulcano** → `./ci/deploy-app.sh vulcano` |
+| **deploy-webraster-webhook** | Webhook push em `main` no repo **rastreamento-veicular** (alterações em `api/`) → `./ci/deploy-app.sh webraster` |
 
 Jenkinsfiles correspondentes em `ci/jenkins/Deploy<App>Webhook.Jenkinsfile`; seeds em `ci/jenkins/seed-deploy-*.groovy`. Modelo genérico: `ci/jenkins/DeployApp.Jenkinsfile` / `DeployApp.Jenkinsfile.example`.
 
