@@ -62,3 +62,8 @@ stacks/jenkins/keys-financeiro-apolar/
 stacks/apps/webraster/.env
 stacks/apps/webraster/webraster/
 stacks/jenkins/keys-webraster/
+
+# minha-rotina
+stacks/apps/minha-rotina/.env
+stacks/apps/minha-rotina/minha-rotina/
+stacks/jenkins/keys-minha-rotina/

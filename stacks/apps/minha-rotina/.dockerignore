@@ -1,0 +1,8 @@
+.env
+minha-rotina/.git
+minha-rotina/.github
+minha-rotina/web
+minha-rotina/api/vendor
+minha-rotina/api/node_modules
+minha-rotina/api/storage/logs
+minha-rotina/api/database/database.sqlite

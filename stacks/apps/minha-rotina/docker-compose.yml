@@ -1,0 +1,74 @@
+name: infra-app-minha-rotina
+
+services:
+  app:
+    image: local/minha-rotina-api:latest
+    build:
+      context: .
+      dockerfile: image/Dockerfile
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      CONTAINER_ROLE: web
+    networks:
+      - edge
+      - shared_data
+    volumes:
+      - minha_rotina_storage:/var/www/html/storage/app/public
+    stop_grace_period: 45s
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1/up || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 120s
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.minha-rotina-api.rule=Host(`minharotina-api.${DOMAIN:?defina DOMAIN no .env da stack}`)
+      - traefik.http.routers.minha-rotina-api.entrypoints=websecure
+      - traefik.http.routers.minha-rotina-api.tls=true
+      - traefik.http.routers.minha-rotina-api.tls.certresolver=letsencrypt
+      - traefik.http.services.minha-rotina-api.loadbalancer.server.port=80
+      - traefik.http.services.minha-rotina-api.loadbalancer.healthcheck.path=/up
+      - traefik.http.services.minha-rotina-api.loadbalancer.healthcheck.interval=5s
+      - traefik.http.services.minha-rotina-api.loadbalancer.healthcheck.timeout=4s
+
+  worker:
+    image: local/minha-rotina-api:latest
+    container_name: infra_minha_rotina_worker
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      CONTAINER_ROLE: worker
+    depends_on:
+      app:
+        condition: service_healthy
+    networks:
+      - shared_data
+
+  scheduler:
+    image: local/minha-rotina-api:latest
+    container_name: infra_minha_rotina_scheduler
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      CONTAINER_ROLE: scheduler
+    depends_on:
+      app:
+        condition: service_healthy
+    networks:
+      - shared_data
+
+networks:
+  edge:
+    external: true
+    name: infra_edge
+  shared_data:
+    external: true
+    name: infra_shared
+
+volumes:
+  minha_rotina_storage:

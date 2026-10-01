@@ -103,6 +103,7 @@ A infra serve **quatro domínios base**. O `DOMAIN` da raiz (`~/infra/.env`) é 
 |----------|-------|---------|
 | `chatone-api.noxtecnologias.com.br` | `infra-app-chat-one` | API ChatOne (+ `/app` → Reverb) |
 | `cms-api.noxtecnologias.com.br` | `infra-app-nox-cms` | API nox-cms |
+| `minharotina-api.noxtecnologias.com.br` | `infra-app-minha-rotina` | API Minha Rotina |
 | `monensure-api.noxtecnologias.com.br` | `infra-app-monensure` | API Monensure |
 | `webraster-api.noxtecnologias.com.br` | `infra-app-webraster` | API Webraster |
 
@@ -228,6 +229,7 @@ docker stack deploy -c /tmp/infra-shared.stack.yml infra-shared
 | `infra-app-evolutionapi` | `evolutionapi`, `evolutionapi_postgres`, `evolutionapi_redis` | `evoapicloud/evolution-api:v2.3.7`, `postgres:15`, `redis:7.4-alpine` | `evolution.lucaskaiut.com.br` | `./ci/deploy-app.sh evolutionapi` (pull-only) |
 | `infra-app-financeiro-borcath` | `app` (2), `worker` (0) | `local/financeiro-borcath-api:latest` | `financeiro-api.dborcath.com.br` | `./ci/deploy-app.sh financeiro-borcath` (build) |
 | `infra-app-hedgedoc` | `database`, `hedgedoc` | `quay.io/hedgedoc/hedgedoc:1.10.7`, `postgres:17.7-alpine` | `docs.lucaskaiut.com.br` | manual (`docker stack deploy`) |
+| `infra-app-minha-rotina` | `app` (2), `worker`, `scheduler` | `local/minha-rotina-api:latest` | `minharotina-api.noxtecnologias.com.br` | `./ci/deploy-app.sh minha-rotina` (build) |
 | `infra-app-n8n` | `n8n` | `n8nio/n8n:2.15.1` | `n8n.lucaskaiut.com.br` | `./ci/deploy-app.sh n8n` (pull-only) |
 | `infra-app-nox-cms` | `app` (2), `scheduler`, `worker` | `local/nox-cms-api:latest` | `cms-api.noxtecnologias.com.br` | `./ci/deploy-app.sh nox-cms` (build) |
 | `infra-app-nox-schduler` | `app` (2), `horizon`, `scheduler` | `local/nox-schduler-app:latest` | `api.noxagenda.com.br` | `./ci/deploy-app.sh nox-schduler` (build) |
@@ -351,7 +353,7 @@ docker compose build && docker compose up -d
 
 ### Jobs
 
-Jobs presentes no Jenkins de produção (15):
+Jobs presentes no Jenkins de produção (16):
 
 | Job | Função |
 |-----|--------|
@@ -361,6 +363,7 @@ Jobs presentes no Jenkins de produção (15):
 | **deploy-chat-one-webhook** | Webhook push em `main` no repo **chat-one** → `./ci/deploy-app.sh chat-one` |
 | **deploy-ematricula-webhook** | Webhook push em `main` no repo **ematricula** (alterações em `api/`) → `./ci/deploy-app.sh ematricula` |
 | **deploy-financeiro-borcath-webhook** | Webhook push em `main` no repo **financeiro-borcath** → `./ci/deploy-app.sh financeiro-borcath` |
+| **deploy-minha-rotina-webhook** | Webhook push em `main` no repo **minha-rotina** (alterações em `api/`) → `./ci/deploy-app.sh minha-rotina` |
 | **deploy-monensure-webhook** | Webhook push em `main` no repo **monensure** → `./ci/deploy-app.sh monensure` |
 | **deploy-horus-webhook** | Webhook push em `main` no repo **horus** (alterações em `api/`) → `./ci/deploy-app.sh horus` |
 | **deploy-nox-cms-webhook** | Webhook push em `main` no repo **nox-cms** → `./ci/deploy-app.sh nox-cms` |
