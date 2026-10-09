@@ -1,8 +1,8 @@
 APP_COMPOSE_DIR="stacks/apps/build-runner"
 APP_GIT_SUBDIR="android-build-runner"
-APP_GIT_REMOTE="git@github.com:lucaskaiut/android-build-runner.git"
+APP_GIT_REMOTE="https://github.com/lucaskaiut/android-build-runner.git"
 APP_GIT_BRANCH="${APP_GIT_BRANCH:-main}"
-APP_GIT_USE_SSH=1
+APP_GIT_USE_SSH=0
 : "${APP_USE_SWARM:=1}"
 : "${APP_SWARM_STACK_NAME:=infra-app-build-runner}"
 : "${APP_SWARM_COMPOSE_FILE:=docker-stack.yml}"
