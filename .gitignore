@@ -67,3 +67,9 @@ stacks/jenkins/keys-webraster/
 stacks/apps/minha-rotina/.env
 stacks/apps/minha-rotina/minha-rotina/
 stacks/jenkins/keys-minha-rotina/
+
+# build-runner
+stacks/apps/build-runner/.env
+stacks/apps/build-runner/android-build-runner/
+stacks/jenkins/keys-build-runner/id_ed25519
+stacks/jenkins/keys-build-runner/webhook-token.txt
