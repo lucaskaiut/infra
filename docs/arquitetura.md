@@ -234,7 +234,7 @@ docker stack deploy -c /tmp/infra-shared.stack.yml infra-shared
 | `infra-app-minha-rotina` | `app` (2), `worker`, `scheduler` | `local/minha-rotina-api:latest` | `minharotina-api.noxtecnologias.com.br` | `./ci/deploy-app.sh minha-rotina` (build) |
 | `infra-app-n8n` | `n8n` | `n8nio/n8n:2.15.1` | `n8n.lucaskaiut.com.br` | `./ci/deploy-app.sh n8n` (pull-only) |
 | `infra-app-nox-cms` | `app` (2), `scheduler`, `worker` | `local/nox-cms-api:latest` | `cms-api.noxtecnologias.com.br` | `./ci/deploy-app.sh nox-cms` (build) |
-| `infra-app-eywa` | `app` (2), `worker`, `scheduler`, `reverb` | `local/eywa-api:latest` | `eywa-api.noxtecnologias.com.br` | `./ci/deploy-app.sh eywa` (build) |
+| `infra-app-eywa` | `app` (2), `worker`, `scheduler`, `eywa-reverb` | `local/eywa-api:latest` | `eywa-api.noxtecnologias.com.br` | `./ci/deploy-app.sh eywa` (build) |
 | `infra-app-nox-schduler` | `app` (2), `horizon`, `scheduler` | `local/nox-schduler-app:latest` | `api.noxagenda.com.br` | `./ci/deploy-app.sh nox-schduler` (build) |
 | `infra-app-uptime-kuma` | `uptime-kuma` | `louislam/uptime-kuma:2.2.1` | `uptime.lucaskaiut.com.br` | manual (`docker stack deploy`) |
 | `infra-app-vulcano` | `app` (2), `scheduler`, `worker` (0) | `local/vulcano-api:latest` | `sistema-api.dborcath.com.br` | `./ci/deploy-app.sh vulcano` (build) |
@@ -295,7 +295,7 @@ Ao retomar qualquer uma destas apps, validar DNS, `.env` e rede `infra_shared` c
 ### EYWA
 
 - Pasta **`stacks/apps/eywa/`**, hostname **`eywa-api.noxtecnologias.com.br`** (API + `/app` → Reverb). Site público em `eywa.noxtecnologias.com.br` e painel em `dash-eywa.noxtecnologias.com.br` (ambos na Vercel).
-- Serviços: `app` (2), `worker`, `scheduler`, `reverb`; MySQL **shared** (base `eywa`, utilizador dedicado `eywa`).
+- Serviços: `app` (2), `worker`, `scheduler`, `eywa-reverb`; MySQL **shared** (base `eywa`, utilizador dedicado `eywa`).
 - **Videochamada (WebRTC):** o TURN (coturn) roda **fora do Swarm**, em Compose, com portas publicadas — `stacks/apps/eywa/docker-compose.coturn.yml`. Subir/atualizar:
   ```bash
   cd ~/infra/stacks/apps/eywa
