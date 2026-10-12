@@ -18,10 +18,14 @@ if ! grep -q '^APP_KEY=[^[:space:]]' .env 2>/dev/null && [ -z "${APP_KEY:-}" ]; 
     export APP_KEY=$(grep '^APP_KEY=' .env | cut -d= -f2-)
 fi
 
-# 3) Autoload
-if [ ! -f vendor/autoload.php ] || [ ! -f bootstrap/cache/packages.php ]; then
-    log "composer dump-autoload..."
-    composer dump-autoload --no-interaction --optimize --classmap-authoritative
+# 3) Autoload / cache de pacotes (a imagem de runtime não tem composer)
+if [ ! -f vendor/autoload.php ]; then
+    log "ERRO: vendor/autoload.php ausente na imagem"
+    exit 1
+fi
+if [ ! -f bootstrap/cache/packages.php ]; then
+    log "package:discover (cache de pacotes ausente)..."
+    php artisan package:discover --ansi || log "AVISO: package:discover falhou"
 fi
 
 # 4) Storage link
