@@ -105,6 +105,7 @@ A infra serve **quatro domínios base**. O `DOMAIN` da raiz (`~/infra/.env`) é 
 | `cms-api.noxtecnologias.com.br` | `infra-app-nox-cms` | API nox-cms |
 | `minharotina-api.noxtecnologias.com.br` | `infra-app-minha-rotina` | API Minha Rotina |
 | `monensure-api.noxtecnologias.com.br` | `infra-app-monensure` | API Monensure |
+| `eywa-api.noxtecnologias.com.br` | `infra-app-eywa` | API EYWA (+ `/app` → Reverb) |
 | `webraster-api.noxtecnologias.com.br` | `infra-app-webraster` | API Webraster |
 
 **`noxagenda.com.br`**:
@@ -122,6 +123,7 @@ A infra serve **quatro domínios base**. O `DOMAIN` da raiz (`~/infra/.env`) é 
 
 - Registos **`A`** por hostname (não há wildcard genérico aplicado).
 - **UFW (exemplo):** `OpenSSH`, `80/tcp`, `443/tcp` permitidos.
+- **TURN (EYWA / videochamada):** `3478/udp`, `3478/tcp` e a faixa `49160:49200/udp` (relay do coturn — ver secção 11, *EYWA*).
 
 ---
 
@@ -232,6 +234,7 @@ docker stack deploy -c /tmp/infra-shared.stack.yml infra-shared
 | `infra-app-minha-rotina` | `app` (2), `worker`, `scheduler` | `local/minha-rotina-api:latest` | `minharotina-api.noxtecnologias.com.br` | `./ci/deploy-app.sh minha-rotina` (build) |
 | `infra-app-n8n` | `n8n` | `n8nio/n8n:2.15.1` | `n8n.lucaskaiut.com.br` | `./ci/deploy-app.sh n8n` (pull-only) |
 | `infra-app-nox-cms` | `app` (2), `scheduler`, `worker` | `local/nox-cms-api:latest` | `cms-api.noxtecnologias.com.br` | `./ci/deploy-app.sh nox-cms` (build) |
+| `infra-app-eywa` | `app` (2), `worker`, `scheduler`, `reverb` | `local/eywa-api:latest` | `eywa-api.noxtecnologias.com.br` | `./ci/deploy-app.sh eywa` (build) |
 | `infra-app-nox-schduler` | `app` (2), `horizon`, `scheduler` | `local/nox-schduler-app:latest` | `api.noxagenda.com.br` | `./ci/deploy-app.sh nox-schduler` (build) |
 | `infra-app-uptime-kuma` | `uptime-kuma` | `louislam/uptime-kuma:2.2.1` | `uptime.lucaskaiut.com.br` | manual (`docker stack deploy`) |
 | `infra-app-vulcano` | `app` (2), `scheduler`, `worker` (0) | `local/vulcano-api:latest` | `sistema-api.dborcath.com.br` | `./ci/deploy-app.sh vulcano` (build) |
@@ -288,6 +291,18 @@ Ao retomar qualquer uma destas apps, validar DNS, `.env` e rede `infra_shared` c
 - Persistência: SQLite em volume Docker **`n8n_data`**. **Uma réplica** no Swarm; não aumentar réplicas sem migrar para PostgreSQL.
 - **Deploy:** `cd ~/infra && ./ci/deploy-app.sh n8n` (pull-only; com Swarm ativo faz `docker stack deploy` na stack **`infra-app-n8n`**).
 - **Notificações Jenkins → n8n:** fluxo em `ci/n8n/workflows/jenkins-deploy-notify.json`; publicar com `./ci/n8n/deploy-jenkins-deploy-notify-workflow.sh` (usa `N8N_API_URL` / `N8N_API_KEY` no `.env` raiz). Webhook de produção: `https://n8n.lucaskaiut.com.br/webhook/jenkins-deploy-notify` (variável `N8N_DEPLOY_WEBHOOK_URL` no `.env` do Jenkins).
+
+### EYWA
+
+- Pasta **`stacks/apps/eywa/`**, hostname **`eywa-api.noxtecnologias.com.br`** (API + `/app` → Reverb). Site público em `eywa.noxtecnologias.com.br` e painel em `dash-eywa.noxtecnologias.com.br` (ambos na Vercel).
+- Serviços: `app` (2), `worker`, `scheduler`, `reverb`; MySQL **shared** (base `eywa`, utilizador dedicado `eywa`).
+- **Videochamada (WebRTC):** o TURN (coturn) roda **fora do Swarm**, em Compose, com portas publicadas — `stacks/apps/eywa/docker-compose.coturn.yml`. Subir/atualizar:
+  ```bash
+  cd ~/infra/stacks/apps/eywa
+  docker compose -f docker-compose.coturn.yml up -d
+  ```
+  Credenciais TURN são efêmeras (REST API) e geradas pela API (`/api/public/customers/ice-servers`, `/api/ice-servers`);
+  `TURN_SECRET`/`TURN_EXTERNAL_IP` vivem no `.env` da stack (não versionado).
 
 ### evolutionapi
 
