@@ -1,7 +1,7 @@
 # Stack Webraster (API Laravel)
 
 Publica apenas a pasta `api` do monorepo
-[rastreamento-veicular](https://github.com/lucaskaiut/rastreamento-veicular). O frontend
+[webraster](https://github.com/lucaskaiut/webraster). O frontend
 (`web/`) é hospedado em outro lugar.
 
 ## Domínios

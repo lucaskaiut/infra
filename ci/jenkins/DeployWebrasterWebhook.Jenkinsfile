@@ -43,7 +43,7 @@ pipeline {
             echo "Branch ignorada: ${env.GIT_REF}"
             return
           }
-          if (env.REPO_FULL?.trim() && env.REPO_FULL != 'lucaskaiut/rastreamento-veicular') {
+          if (env.REPO_FULL?.trim() && env.REPO_FULL != 'lucaskaiut/webraster') {
             currentBuild.result = 'NOT_BUILT'
             echo "Repositório ignorado: ${env.REPO_FULL}"
             return
@@ -56,7 +56,7 @@ pipeline {
                 set +e
                 cd /infra-deploy
                 git pull origin main
-                ./ci/check-git-range-touches-path.sh 'https://github.com/lucaskaiut/rastreamento-veicular.git' '${before}' '${after}' api
+                ./ci/check-git-range-touches-path.sh 'https://github.com/lucaskaiut/webraster.git' '${before}' '${after}' api
                 exit \$?
               """,
               returnStatus: true

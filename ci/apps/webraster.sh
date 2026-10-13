@@ -1,6 +1,6 @@
 APP_COMPOSE_DIR="stacks/apps/webraster"
 APP_GIT_SUBDIR="webraster"
-APP_GIT_REMOTE="https://github.com/lucaskaiut/rastreamento-veicular.git"
+APP_GIT_REMOTE="https://github.com/lucaskaiut/webraster.git"
 APP_GIT_BRANCH="${APP_GIT_BRANCH:-main}"
 APP_GIT_USE_SSH=0
 : "${APP_USE_SWARM:=1}"

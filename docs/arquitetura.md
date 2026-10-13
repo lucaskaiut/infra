@@ -405,7 +405,7 @@ Jobs presentes no Jenkins de produção (16):
 | **deploy-tasksautomation-webhook** | Webhook no repo **tasksautomation** → `./ci/deploy-app.sh tasksautomation` |
 | **deploy-toth-webhook** | Webhook push em `main` no repo **toth** → `./ci/deploy-app.sh toth` |
 | **deploy-vulcano-webhook** | Webhook push em `main` no repo **vulcano** → `./ci/deploy-app.sh vulcano` |
-| **deploy-webraster-webhook** | Webhook push em `main` no repo **rastreamento-veicular** (alterações em `api/`) → `./ci/deploy-app.sh webraster` |
+| **deploy-webraster-webhook** | Webhook push em `main` no repo **webraster** (alterações em `api/`) → `./ci/deploy-app.sh webraster` |
 
 Jenkinsfiles correspondentes em `ci/jenkins/Deploy<App>Webhook.Jenkinsfile`; seeds em `ci/jenkins/seed-deploy-*.groovy`. Modelo genérico: `ci/jenkins/DeployApp.Jenkinsfile` / `DeployApp.Jenkinsfile.example`.
 
