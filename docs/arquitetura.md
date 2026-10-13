@@ -2,6 +2,10 @@
 
 Documento único: visão da plataforma Docker na VPS, decisões técnicas, como subir e corrigir problemas. Público-alvo: equipa que mantém **infra** (repositório separado do código das aplicações).
 
+**Agentes (IA):** começar por [`docs/guia-agentes.md`](guia-agentes.md) (SSH `contabo`, inventário de produção, checklist de novo projeto, segredos). Este ficheiro mantém o detalhe técnico.
+
+**Produção (auditoria 2026-10-13):** Swarm ativo; Jenkins em Compose; stacks listadas na secção 10.1. **Não** estavam deployadas: `infra-netdata`, `infra-opensearch`, `infra-app-uptime-kuma`. O checkout `~/infra` na VPS estava alinhado com `origin/main` mas com **working tree suja** (ficheiros locais não commitados) — preferir Git como fonte de verdade.
+
 ---
 
 ## 1. Papel deste repositório
@@ -79,7 +83,7 @@ Sem **shared** a correr, apps que dependem de MySQL/Redis falham ou ficam à esp
 
 ## 6. Domínios e firewall
 
-A infra serve **quatro domínios base**. O `DOMAIN` da raiz (`~/infra/.env`) é **`lucaskaiut.com.br`**; stacks com domínio próprio usam o seu `.env` local (ver secção 7).
+A infra serve **vários domínios base**. O `DOMAIN` da raiz (`~/infra/.env`) é **`lucaskaiut.com.br`**; stacks com domínio próprio usam o seu `.env` local (ver secção 7).
 
 ### 6.1 Hostnames em produção (por domínio)
 
@@ -93,20 +97,30 @@ A infra serve **quatro domínios base**. O `DOMAIN` da raiz (`~/infra/.env`) é 
 | `evolution.lucaskaiut.com.br` | `infra-app-evolutionapi` | Evolution API (WhatsApp) |
 | `docs.lucaskaiut.com.br` | `infra-app-hedgedoc` | HedgeDoc |
 | `n8n.lucaskaiut.com.br` | `infra-app-n8n` | n8n (automações) |
-| `uptime.lucaskaiut.com.br` | `infra-app-uptime-kuma` | Uptime Kuma |
-| `netdata.lucaskaiut.com.br` | `infra-netdata` | Monitorização Netdata |
-| `opensearch.lucaskaiut.com.br` | `infra-opensearch` | OpenSearch |
+
+Monitorização definida no repo mas **sem stack ativa** na VPS (2026-10-13): `uptime.lucaskaiut.com.br` (Uptime Kuma), `netdata.lucaskaiut.com.br`, `opensearch.lucaskaiut.com.br`.
 
 **`noxtecnologias.com.br`**:
 
 | Hostname | Stack | Serviço |
 |----------|-------|---------|
+| `runner.noxtecnologias.com.br` | `infra-app-build-runner` | API build-runner |
 | `chatone-api.noxtecnologias.com.br` | `infra-app-chat-one` | API ChatOne (+ `/app` → Reverb) |
+| `eywa-api.noxtecnologias.com.br` | `infra-app-eywa` | API Eywa (+ `/app` → Reverb) |
 | `cms-api.noxtecnologias.com.br` | `infra-app-nox-cms` | API nox-cms |
 | `minharotina-api.noxtecnologias.com.br` | `infra-app-minha-rotina` | API Minha Rotina |
 | `monensure-api.noxtecnologias.com.br` | `infra-app-monensure` | API Monensure |
-| `eywa-api.noxtecnologias.com.br` | `infra-app-eywa` | API EYWA (+ `/app` → Reverb) |
-| `webraster-api.noxtecnologias.com.br` | `infra-app-webraster` | API Webraster |
+| `financeiro-apolar-api.noxtecnologias.com.br` | `infra-app-financeiro-apolar` | API financeiro-apolar |
+| `traccar.noxtecnologias.com.br` | `infra-app-traccar` | Traccar (alias) |
+| `webraster-api.noxtecnologias.com.br` | `infra-app-webraster` | API webraster |
+| `webraster-ws.noxtecnologias.com.br` | `infra-app-webraster` | Reverb webraster |
+
+**`nuvemax.srv.br`** (hostnames em stacks específicas):
+
+| Hostname | Stack | Serviço |
+|----------|-------|---------|
+| `dispositivos.nuvemax.srv.br` | `infra-app-traccar` | Traccar |
+| `webraster-api.nuvemax.srv.br` | `infra-app-webraster` | API webraster (alias) |
 
 **`noxagenda.com.br`**:
 
@@ -227,32 +241,34 @@ docker stack deploy -c /tmp/infra-shared.stack.yml infra-shared
 | Stack | Serviços | Imagem(ns) | Hostname | Deploy |
 |-------|----------|------------|----------|--------|
 | `infra-app-alura` | `app` (2), `scheduler`, `worker` (0) | `local/alura-api:latest` | `alura-api.lucaskaiut.com.br` | `./ci/deploy-app.sh alura` (build) |
+| `infra-app-build-runner` | `app` (2), `scheduler` | `local/build-runner-api:latest` | `runner.noxtecnologias.com.br` | `./ci/deploy-app.sh build-runner` (build) |
 | `infra-app-chat-one` | `app`, `redis`, `reverb`, `scheduler`, `worker` | `local/chat-one-api:latest`, `redis:7-alpine` | `chatone-api.noxtecnologias.com.br` | `./ci/deploy-app.sh chat-one` (build) |
 | `infra-app-evolutionapi` | `evolutionapi`, `evolutionapi_postgres`, `evolutionapi_redis` | `evoapicloud/evolution-api:v2.3.7`, `postgres:15`, `redis:7.4-alpine` | `evolution.lucaskaiut.com.br` | `./ci/deploy-app.sh evolutionapi` (pull-only) |
+| `infra-app-eywa` | `app` (2), `eywa-reverb`, `scheduler`, `worker` | `local/eywa-api:latest` | `eywa-api.noxtecnologias.com.br` | `./ci/deploy-app.sh eywa` (build) |
+| `infra-app-financeiro-apolar` | `app` (2), `worker` | `local/financeiro-apolar-api:latest` | `financeiro-apolar-api.noxtecnologias.com.br` | `./ci/deploy-app.sh financeiro-apolar` (build) |
 | `infra-app-financeiro-borcath` | `app` (2), `worker` (0) | `local/financeiro-borcath-api:latest` | `financeiro-api.dborcath.com.br` | `./ci/deploy-app.sh financeiro-borcath` (build) |
 | `infra-app-hedgedoc` | `database`, `hedgedoc` | `quay.io/hedgedoc/hedgedoc:1.10.7`, `postgres:17.7-alpine` | `docs.lucaskaiut.com.br` | manual (`docker stack deploy`) |
-| `infra-app-minha-rotina` | `app` (2), `worker`, `scheduler` | `local/minha-rotina-api:latest` | `minharotina-api.noxtecnologias.com.br` | `./ci/deploy-app.sh minha-rotina` (build) |
+| `infra-app-minha-rotina` | `app` (2), `scheduler`, `worker` (0) | `local/minha-rotina-api:latest` | `minharotina-api.noxtecnologias.com.br` | `./ci/deploy-app.sh minha-rotina` (build) |
+| `infra-app-monensure` | `app` (2), `scheduler`, `worker` (0) | `local/monensure-api:latest` | `monensure-api.noxtecnologias.com.br` | `./ci/deploy-app.sh monensure` (build) |
 | `infra-app-n8n` | `n8n` | `n8nio/n8n:2.15.1` | `n8n.lucaskaiut.com.br` | `./ci/deploy-app.sh n8n` (pull-only) |
 | `infra-app-nox-cms` | `app` (2), `scheduler`, `worker` | `local/nox-cms-api:latest` | `cms-api.noxtecnologias.com.br` | `./ci/deploy-app.sh nox-cms` (build) |
-| `infra-app-eywa` | `app` (2), `worker`, `scheduler`, `eywa-reverb` | `local/eywa-api:latest` | `eywa-api.noxtecnologias.com.br` | `./ci/deploy-app.sh eywa` (build) |
 | `infra-app-nox-schduler` | `app` (2), `horizon`, `scheduler` | `local/nox-schduler-app:latest` | `api.noxagenda.com.br` | `./ci/deploy-app.sh nox-schduler` (build) |
-| `infra-app-uptime-kuma` | `uptime-kuma` | `louislam/uptime-kuma:2.2.1` | `uptime.lucaskaiut.com.br` | manual (`docker stack deploy`) |
+| `infra-app-traccar` | `database`, `traccar` | `mysql:8.4`, imagem local Traccar | `dispositivos.nuvemax.srv.br`, `traccar.noxtecnologias.com.br` | `./ci/deploy-app.sh traccar` — stack em produção; versionar no Git quando estabilizada |
 | `infra-app-vulcano` | `app` (2), `scheduler`, `worker` (0) | `local/vulcano-api:latest` | `sistema-api.dborcath.com.br` | `./ci/deploy-app.sh vulcano` (build) |
-| `infra-app-webraster` | `app` (2), `worker`, `scheduler` | `local/webraster-api:latest` | `webraster-api.noxtecnologias.com.br` | `./ci/deploy-app.sh webraster` (build) |
-| `infra-netdata` | `netdata` | `netdata/netdata:stable` | `netdata.lucaskaiut.com.br` | manual (`docker stack deploy`) |
-| `infra-opensearch` | `opensearch` | `opensearchproject/opensearch:2.18.0` | `opensearch.lucaskaiut.com.br` | manual (`docker stack deploy`) |
+| `infra-app-webraster` | `app` (2), `reverb`, `scheduler`, `worker` | `local/webraster-api:latest` | ver secção 6.1 | `./ci/deploy-app.sh webraster` (build) |
+
+**Definidas no repo, não observadas na VPS (2026-10-13):** `infra-app-uptime-kuma`, `infra-netdata`, `infra-opensearch` — deploy manual quando necessário (README de cada pasta).
 
 Notas:
 
-- `worker` a **0 réplicas** em `alura`, `financeiro-borcath` e `vulcano` — o serviço existe na stack mas está escalado a zero em produção.
-- `hedgedoc` a **0 réplicas** (só o `database` Postgres está a correr) — a aplicação em `docs.lucaskaiut.com.br` está atualmente inacessível.
+- `worker` a **0 réplicas** em `alura`, `financeiro-borcath`, `vulcano`, `monensure` e `minha-rotina` — o serviço existe na stack mas está escalado a zero em produção.
 - Apps com `build` constroem imagem local `local/<slug>-api:latest` a partir do clone do monorepo dentro da pasta da stack (gitignored); após o build o `deploy-app.sh` força a recriação das tarefas (`APP_SWARM_FORCE_SERVICE_UPDATE=1`) porque a tag `:latest` não muda o spec da stack.
 - Apps com `pull-only` (`evolutionapi`, `n8n`) apenas fazem `docker compose pull` + `stack deploy` (imagem pública, sem build).
-- `hedgedoc`, `netdata`, `opensearch`, `uptime-kuma` **não têm** `ci/apps/<slug>.sh` — deploy manual via `docker stack deploy` (ver README de cada pasta quando existir).
+- `netdata`, `opensearch`, `uptime-kuma` **não têm** `ci/apps/<slug>.sh` — deploy manual via `docker stack deploy` (ver README de cada pasta quando existir).
 
 ### 10.2 Métodos de deploy
 
-- **Build local + Swarm:** `./ci/deploy-app.sh <slug>` — clona/atualiza o monorepo, faz `docker compose build`, renderiza `docker-stack.yml` e faz `docker stack deploy`. Exemplos: `alura`, `chat-one`, `financeiro-borcath`, `nox-cms`, `nox-schduler`, `vulcano`, `webraster`.
+- **Build local + Swarm:** `./ci/deploy-app.sh <slug>` — clona/atualiza o monorepo, faz `docker compose build`, renderiza `docker-stack.yml` e faz `docker stack deploy`. Exemplos: `alura`, `build-runner`, `chat-one`, `eywa`, `financeiro-apolar`, `financeiro-borcath`, `minha-rotina`, `monensure`, `nox-cms`, `nox-schduler`, `vulcano`, `webraster`.
 - **Pull-only:** `./ci/deploy-app.sh <slug>` com `APP_COMPOSE_PULL_ONLY=1`. Exemplos: `evolutionapi`, `n8n`.
 - **Manual:** `docker stack deploy` direto (sem `ci/apps/<slug>.sh`). Exemplos: `hedgedoc`, `netdata`, `opensearch`, `uptime-kuma`.
 
@@ -275,11 +291,13 @@ Ao retomar qualquer uma destas apps, validar DNS, `.env` e rede `infra_shared` c
 
 ### 10.4 Nova aplicação (template)
 
+Checklist passo a passo (agentes): **[docs/guia-agentes.md](guia-agentes.md) §3**. Resumo:
+
 1. `cp -r stacks/apps/_template stacks/apps/<slug>`
 2. Substituir `myservice` pelo slug; ajustar imagem, portas e labels Traefik (`<slug>.${DOMAIN}`).
 3. DNS para o hostname.
 4. Se precisar de MySQL/Redis: rede **`infra_shared`**, `DB_HOST=mysql`, `REDIS_HOST=redis`, prefixos Redis por app.
-5. Deploy automatizado: ficheiro `ci/apps/<slug>.sh` (ver secção 13); se for manual, documentar no README da pasta.
+5. Deploy automatizado: ficheiro `ci/apps/<slug>.sh` (ver secção 13); Jenkins/webhook se aplicável (regra `novos-projetos-ci-jenkins.mdc`).
 
 ---
 

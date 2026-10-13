@@ -4,7 +4,11 @@ Repositório de infraestrutura: Traefik (TLS e roteamento), MySQL e Redis partil
 
 ## Documentação
 
-**[docs/arquitetura.md](docs/arquitetura.md)** — documento único: arquitetura, decisões, ordem de arranque na VPS, Traefik, shared, apps (incl. eMatricula), Jenkins, webhooks, deploy, versionamento e diagnóstico.
+| Documento | Conteúdo |
+|-----------|----------|
+| **[docs/guia-agentes.md](docs/guia-agentes.md)** | Entrada para agentes (IA): SSH produção, inventário atual, novo projeto, segredos |
+| **[docs/arquitetura.md](docs/arquitetura.md)** | Arquitetura completa, Traefik, shared, apps, Jenkins, deploy e diagnóstico |
+| **[AGENTS.md](AGENTS.md)** | Regras globais do repositório (uptime, validação, Git) |
 
 ## Mapa do repositório
 

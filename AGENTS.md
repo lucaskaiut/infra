@@ -2,6 +2,13 @@
 
 This repository is for infrastructure work. Apply these instructions by default when working here.
 
+## Documentação operacional (ler primeiro)
+
+- **[docs/guia-agentes.md](docs/guia-agentes.md)** — produção na VPS (`ssh contabo`, `~/infra`), inventário Swarm, checklist para nova app, política de segredos (português).
+- **[docs/arquitetura.md](docs/arquitetura.md)** — detalhe técnico (Traefik, Jenkins, `deploy-app.sh`, diagnóstico).
+
+Respostas ao utilizador neste repo: **português**, salvo pedido em contrário.
+
 ## Scope
 
 - Focus on infrastructure only: Docker Compose, proxy, TLS, packaging images, example environment variables, and deployment documentation.
