@@ -16,6 +16,7 @@ services:
       - shared_data
     volumes:
       - webraster_storage:/var/www/html/storage/app/public
+      - webraster_private:/var/www/html/storage/app/private
     stop_grace_period: 45s
     healthcheck:
       test: ["CMD-SHELL", "wget -qO- http://127.0.0.1/up || exit 1"]
@@ -47,6 +48,8 @@ services:
         condition: service_healthy
     networks:
       - shared_data
+    volumes:
+      - webraster_private:/var/www/html/storage/app/private
 
   scheduler:
     image: local/webraster-api:latest
@@ -61,6 +64,8 @@ services:
         condition: service_healthy
     networks:
       - shared_data
+    volumes:
+      - webraster_private:/var/www/html/storage/app/private
 
 networks:
   edge:
@@ -72,3 +77,4 @@ networks:
 
 volumes:
   webraster_storage:
+  webraster_private:

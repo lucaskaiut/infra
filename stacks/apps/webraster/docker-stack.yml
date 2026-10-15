@@ -10,6 +10,7 @@ services:
       - shared_data
     volumes:
       - webraster_storage:/var/www/html/storage/app/public
+      - webraster_private:/var/www/html/storage/app/private
     stop_grace_period: 45s
     healthcheck:
       test: ["CMD-SHELL", "wget -qO- http://127.0.0.1/up || exit 1"]
@@ -47,6 +48,8 @@ services:
       CONTAINER_ROLE: worker
     networks:
       - shared_data
+    volumes:
+      - webraster_private:/var/www/html/storage/app/private
     deploy:
       mode: replicated
       replicas: 1
@@ -65,6 +68,8 @@ services:
       CONTAINER_ROLE: scheduler
     networks:
       - shared_data
+    volumes:
+      - webraster_private:/var/www/html/storage/app/private
     deploy:
       mode: replicated
       replicas: 1
@@ -85,3 +90,4 @@ networks:
 
 volumes:
   webraster_storage:
+  webraster_private:
