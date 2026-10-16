@@ -52,7 +52,7 @@ services:
       - webraster_private:/var/www/html/storage/app/private
     deploy:
       mode: replicated
-      replicas: 1
+      replicas: 4
       restart_policy:
         condition: any
         delay: 10s

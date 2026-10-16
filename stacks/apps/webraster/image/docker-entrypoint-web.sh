@@ -27,7 +27,16 @@ if [ "$role" = "worker" ]; then
     i=$((i + 1))
     sleep 2
   done
-  exec su-exec www-data php artisan queue:work --sleep=3 --tries=3 --max-time=3600
+  tracking_queue="${TRACCAR_QUEUE:-tracking}"
+  chat_queue="${CHAT_QUEUE:-chat}"
+  sync_queue="${TRACCAR_SYNC_QUEUE:-sync}"
+  queue_list="${tracking_queue},${chat_queue},broadcasts,default,${sync_queue}"
+  exec su-exec www-data php artisan queue:work \
+    --queue="${queue_list}" \
+    --sleep=1 \
+    --tries=3 \
+    --timeout=900 \
+    --max-time=3600
 fi
 
 if [ "$role" = "scheduler" ]; then
