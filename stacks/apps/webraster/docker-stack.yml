@@ -31,7 +31,7 @@ services:
         delay: 5s
       labels:
         - traefik.enable=true
-        - "traefik.http.routers.webraster-api.rule=Host(`webraster-api.${DOMAIN:?defina DOMAIN no .env da stack}`)"
+        - "traefik.http.routers.webraster-api.rule=Host(`webraster-api.${DOMAIN:?defina DOMAIN no .env da stack}`) || Host(`webraster-api.nuvemax.srv.br`)"
         - traefik.http.routers.webraster-api.entrypoints=websecure
         - traefik.http.routers.webraster-api.tls=true
         - traefik.http.routers.webraster-api.tls.certresolver=letsencrypt
