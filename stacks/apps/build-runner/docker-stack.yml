@@ -47,6 +47,8 @@ services:
       CONTAINER_ROLE: scheduler
     networks:
       - shared_data
+    volumes:
+      - build_runner_storage:/var/www/html/storage
     deploy:
       mode: replicated
       replicas: 1

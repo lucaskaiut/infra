@@ -47,6 +47,8 @@ services:
         condition: service_healthy
     networks:
       - shared_data
+    volumes:
+      - build_runner_storage:/var/www/html/storage
 
 networks:
   edge:
