@@ -18,6 +18,14 @@ Publica apenas a pasta `api` do monorepo
 - DNS `A` para `monensure-api.noxtecnologias.com.br` → IP da VPS.
 - Base de dados `monensure` + usuário com privilégios no MySQL compartilhado.
 
+## OAuth (MCP)
+
+O servidor MCP financeiro (`/api/mcp/financial`) aceita OAuth 2.1 via
+Laravel Passport para conectores remotos (claude.ai web/mobile/desktop).
+As chaves ficam em `PASSPORT_PRIVATE_KEY` / `PASSPORT_PUBLIC_KEY` no `.env`
+da stack (ver `.env.example`) — precisam ser idênticas nas réplicas, por isso
+não são geradas no container. Trocar as chaves invalida todos os tokens OAuth.
+
 ## Deploy
 
 ```bash
