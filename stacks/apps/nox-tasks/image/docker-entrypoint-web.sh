@@ -19,7 +19,8 @@ wait_for_table() {
           getenv('DB_USERNAME'),
           getenv('DB_PASSWORD')
         );
-        \$pdo->query('select 1 from \`' . getenv('WAIT_TABLE') . '\` limit 1');
+        \$t = getenv('WAIT_TABLE');
+        \$pdo->query(\$t ? 'select 1 from \`' . \$t . '\` limit 1' : 'select 1');
         exit(0);
       } catch (Throwable \$e) {
         exit(1);
@@ -34,7 +35,7 @@ wait_for_table() {
   return 1
 }
 
-export WAIT_TABLE="migrations"
+export WAIT_TABLE=""
 
 if [ "$role" = "worker" ]; then
   export WAIT_TABLE="jobs"
@@ -48,12 +49,13 @@ if [ "$role" = "scheduler" ]; then
   exec su-exec www-data sh -c 'while true; do php artisan schedule:run --verbose --no-interaction; sleep 60; done'
 fi
 
-wait_for_table "migrations"
+# Web: aguarda apenas a conexão (banco novo ainda não tem tabelas).
+wait_for_table ""
 
 echo "Running migrations (com lock para múltiplas réplicas)..."
 # As réplicas sobem em paralelo (start-first); o flock no volume compartilhado
 # serializa as migrations e evita "table already exists" no primeiro deploy.
-flock -w 180 /var/www/html/storage/app/public/.migrate.lock \
+flock /var/www/html/storage/app/public/.migrate.lock \
   php artisan migrate --force \
   || echo "WARNING: migrations failed — container will start with current schema" >&2
 
