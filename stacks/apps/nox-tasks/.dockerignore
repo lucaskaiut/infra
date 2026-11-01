@@ -1,0 +1,15 @@
+.env
+nox-tasks/.git
+nox-tasks/.github
+nox-tasks/.opencode
+nox-tasks/web
+nox-tasks/docker
+nox-tasks/docs
+nox-tasks/api/.env
+nox-tasks/api/.env.docker
+nox-tasks/api/vendor
+nox-tasks/api/node_modules
+nox-tasks/api/storage/logs
+nox-tasks/api/storage/app
+nox-tasks/api/database/database.sqlite
+nox-tasks/api/.phpunit.result.cache

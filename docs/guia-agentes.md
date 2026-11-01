@@ -66,6 +66,7 @@ curl -sS -o /dev/null -w '%{http_code}\n' --max-time 15 https://jenkins.lucaskai
 | `infra-app-monensure` | `monensure-api.noxtecnologias.com.br` | `./ci/deploy-app.sh monensure` |
 | `infra-app-n8n` | `n8n.lucaskaiut.com.br` | `./ci/deploy-app.sh n8n` |
 | `infra-app-nox-cms` | `cms-api.noxtecnologias.com.br` | `./ci/deploy-app.sh nox-cms` |
+| `infra-app-nox-tasks` | `tasks-api.noxtecnologias.com.br` | `./ci/deploy-app.sh nox-tasks` |
 | `infra-app-nox-schduler` | `api.noxagenda.com.br` | `./ci/deploy-app.sh nox-schduler` |
 | `infra-app-traccar` | `dispositivos.nuvemax.srv.br`, `traccar.noxtecnologias.com.br` | `./ci/deploy-app.sh traccar` (pode existir só na VPS até versionar no Git) |
 | `infra-app-vulcano` | `sistema-api.dborcath.com.br` | `./ci/deploy-app.sh vulcano` |

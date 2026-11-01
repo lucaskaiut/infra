@@ -74,3 +74,8 @@ stacks/apps/build-runner/android-build-runner/
 stacks/jenkins/keys-build-runner/id_ed25519
 stacks/jenkins/keys-build-runner/webhook-token.txt
 stacks/jenkins/keys-build-runner/cred-build-runner.groovy
+
+# nox-tasks
+stacks/apps/nox-tasks/.env
+stacks/apps/nox-tasks/nox-tasks/
+stacks/jenkins/keys-nox-tasks/

@@ -400,6 +400,7 @@ Jobs presentes no Jenkins de produção (16):
 | **deploy-monensure-webhook** | Webhook push em `main` no repo **monensure** → `./ci/deploy-app.sh monensure` |
 | **deploy-horus-webhook** | Webhook push em `main` no repo **horus** (alterações em `api/`) → `./ci/deploy-app.sh horus` |
 | **deploy-nox-cms-webhook** | Webhook push em `main` no repo **nox-cms** → `./ci/deploy-app.sh nox-cms` |
+| **deploy-nox-tasks-webhook** | Webhook push em `main` no repo **nox-tasks** (alterações em `api/`) → `./ci/deploy-app.sh nox-tasks` |
 | **deploy-nox-schduler-webhook** | Webhook push no repo **nox-schduler** → `./ci/deploy-app.sh nox-schduler` |
 | **deploy-plutao-webhook** | Webhook push em `main` no repo **plutao** → `./ci/deploy-app.sh plutao` |
 | **deploy-tasksautomation-webhook** | Webhook no repo **tasksautomation** → `./ci/deploy-app.sh tasksautomation` |

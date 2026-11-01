@@ -1,0 +1,29 @@
+# Usado pelo ci/deploy-app.sh apenas para o build da imagem (produção corre em Swarm via docker-stack.yml).
+name: infra-app-nox-tasks
+
+services:
+  app:
+    image: local/nox-tasks-api:latest
+    build:
+      context: .
+      dockerfile: image/Dockerfile
+    env_file:
+      - .env
+    environment:
+      CONTAINER_ROLE: web
+    networks:
+      - edge
+      - shared_data
+    volumes:
+      - nox_tasks_storage:/var/www/html/storage/app
+
+networks:
+  edge:
+    external: true
+    name: infra_edge
+  shared_data:
+    external: true
+    name: infra_shared
+
+volumes:
+  nox_tasks_storage:
