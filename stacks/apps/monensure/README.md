@@ -41,5 +41,6 @@ e deploy via Swarm na stack `infra-app-monensure`.
 |---------|--------|
 | `app`   | Nginx + PHP-FPM (API, TLS no Traefik), 2 réplicas, rolling `start-first` |
 | `worker`| Fila (`queue:work` com driver database) |
+| `scheduler` | Agendador (`schedule:run` a cada minuto): pagamentos agendados, reconciliação, cobranças |
 
 MySQL fica em `stacks/shared/`, não aqui.
