@@ -11,6 +11,8 @@ services:
     networks:
       - edge
       - shared_data
+    volumes:
+      - eywa_storage:/var/www/html/storage/app/public
     stop_grace_period: 45s
     healthcheck:
       test: ["CMD-SHELL", "wget -qO- http://127.0.0.1/up || exit 1"]
@@ -51,6 +53,8 @@ services:
       REVERB_SCHEME: http
     networks:
       - shared_data
+    volumes:
+      - eywa_storage:/var/www/html/storage/app/public
     deploy:
       mode: replicated
       replicas: 1
@@ -72,6 +76,8 @@ services:
       REVERB_SCHEME: http
     networks:
       - shared_data
+    volumes:
+      - eywa_storage:/var/www/html/storage/app/public
     deploy:
       mode: replicated
       replicas: 1
@@ -118,6 +124,11 @@ services:
         - traefik.http.routers.eywa-reverb.tls=true
         - traefik.http.routers.eywa-reverb.tls.certresolver=letsencrypt
         - traefik.http.services.eywa-reverb.loadbalancer.server.port=8080
+
+volumes:
+  # Uploads do disco "public" (avatares, comprovantes, imagens): compartilhado
+  # entre as réplicas e preservado entre deploys.
+  eywa_storage:
 
 networks:
   edge:
