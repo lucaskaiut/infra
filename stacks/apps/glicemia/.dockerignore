@@ -1,0 +1,15 @@
+.env
+glicemia/.git
+glicemia/.github
+glicemia/.opencode
+glicemia/web
+glicemia/reader
+glicemia/docker
+glicemia/api/.env
+glicemia/api/.env.docker
+glicemia/api/vendor
+glicemia/api/node_modules
+glicemia/api/storage/logs
+glicemia/api/storage/app
+glicemia/api/database/database.sqlite
+glicemia/api/.phpunit.result.cache

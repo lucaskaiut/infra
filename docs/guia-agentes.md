@@ -61,6 +61,7 @@ curl -sS -o /dev/null -w '%{http_code}\n' --max-time 15 https://jenkins.lucaskai
 | `infra-app-eywa` | `eywa-api.noxtecnologias.com.br` (+ `/app` Reverb) | `./ci/deploy-app.sh eywa` |
 | `infra-app-financeiro-apolar` | `financeiro-apolar-api.noxtecnologias.com.br` | `./ci/deploy-app.sh financeiro-apolar` |
 | `infra-app-financeiro-borcath` | `financeiro-api.dborcath.com.br` | `./ci/deploy-app.sh financeiro-borcath` |
+| `infra-app-glicemia` | `glicosimetro-api.noxtecnologias.com.br` | `./ci/deploy-app.sh glicemia` |
 | `infra-app-hedgedoc` | `docs.lucaskaiut.com.br` | manual (`docker stack deploy`; ver README da stack) |
 | `infra-app-minha-rotina` | `minharotina-api.noxtecnologias.com.br` | `./ci/deploy-app.sh minha-rotina` |
 | `infra-app-monensure` | `monensure-api.noxtecnologias.com.br` | `./ci/deploy-app.sh monensure` |

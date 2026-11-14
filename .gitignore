@@ -79,3 +79,8 @@ stacks/jenkins/keys-build-runner/cred-build-runner.groovy
 stacks/apps/nox-tasks/.env
 stacks/apps/nox-tasks/nox-tasks/
 stacks/jenkins/keys-nox-tasks/
+
+# glicemia
+stacks/apps/glicemia/.env
+stacks/apps/glicemia/glicemia/
+stacks/jenkins/keys-glicemia/
