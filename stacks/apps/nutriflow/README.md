@@ -19,6 +19,10 @@ cd ~/infra
 ./ci/deploy-app.sh nutriflow
 ```
 
+Automático: job Jenkins `deploy-nutriflow-webhook` (push em `main` do repo `lucaskaiut/nutriflow` com mudanças em `api/`;
+build manual faz deploy sempre). Credencial do webhook: `nutriflow-webhook-token` (Secret text; valor só na VPS em
+`stacks/jenkins/keys-nutriflow/webhook-token.txt`, fora do Git).
+
 ## Banco (uma vez)
 
 ```sql
