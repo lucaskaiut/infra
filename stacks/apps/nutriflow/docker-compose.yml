@@ -1,0 +1,27 @@
+# Usado pelo ci/deploy-app.sh apenas para o build da imagem (produção corre em Swarm via docker-stack.yml).
+name: infra-app-nutriflow
+
+services:
+  app:
+    image: local/nutriflow-api:latest
+    build:
+      context: .
+      dockerfile: image/Dockerfile
+    env_file:
+      - .env
+    networks:
+      - edge
+      - shared_data
+    volumes:
+      - nutriflow_storage:/var/www/html/storage/app
+
+networks:
+  edge:
+    external: true
+    name: infra_edge
+  shared_data:
+    external: true
+    name: infra_shared
+
+volumes:
+  nutriflow_storage:

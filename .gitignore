@@ -84,3 +84,8 @@ stacks/jenkins/keys-nox-tasks/
 stacks/apps/glicemia/.env
 stacks/apps/glicemia/glicemia/
 stacks/jenkins/keys-glicemia/
+
+# nutriflow
+stacks/apps/nutriflow/.env
+stacks/apps/nutriflow/nutriflow/
+stacks/jenkins/keys-nutriflow/

@@ -66,6 +66,7 @@ curl -sS -o /dev/null -w '%{http_code}\n' --max-time 15 https://jenkins.lucaskai
 | `infra-app-minha-rotina` | `minharotina-api.noxtecnologias.com.br` | `./ci/deploy-app.sh minha-rotina` |
 | `infra-app-monensure` | `monensure-api.noxtecnologias.com.br` | `./ci/deploy-app.sh monensure` |
 | `infra-app-n8n` | `n8n.lucaskaiut.com.br` | `./ci/deploy-app.sh n8n` |
+| `infra-app-nutriflow` | `nutriflow-api.noxtecnologias.com.br` | `./ci/deploy-app.sh nutriflow` |
 | `infra-app-nox-cms` | `cms-api.noxtecnologias.com.br` | `./ci/deploy-app.sh nox-cms` |
 | `infra-app-nox-tasks` | `tasks-api.noxtecnologias.com.br` | `./ci/deploy-app.sh nox-tasks` |
 | `infra-app-nox-schduler` | `api.noxagenda.com.br` | `./ci/deploy-app.sh nox-schduler` |

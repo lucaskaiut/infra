@@ -1,0 +1,16 @@
+.env
+nutriflow/.git
+nutriflow/.github
+nutriflow/.opencode
+nutriflow/mobile
+nutriflow/prototype
+nutriflow/docker
+nutriflow/docs
+nutriflow/api/.env
+nutriflow/api/.env.docker
+nutriflow/api/vendor
+nutriflow/api/node_modules
+nutriflow/api/storage/logs
+nutriflow/api/storage/app
+nutriflow/api/database/database.sqlite
+nutriflow/api/.phpunit.result.cache

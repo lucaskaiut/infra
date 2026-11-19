@@ -1,0 +1,56 @@
+services:
+  app:
+    image: local/nutriflow-api:latest
+    env_file:
+      - .env
+    networks:
+      - edge
+      - shared_data
+    volumes:
+      # fotos de receitas (disco privado) e lock das migrations
+      - nutriflow_storage:/var/www/html/storage/app
+    stop_grace_period: 30s
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1/up || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 120s
+    deploy:
+      mode: replicated
+      replicas: 1
+      update_config:
+        order: start-first
+        parallelism: 1
+        delay: 15s
+        failure_action: rollback
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+      resources:
+        limits:
+          memory: 512M
+      placement:
+        constraints:
+          - node.role == manager
+      labels:
+        - traefik.enable=true
+        - "traefik.http.routers.nutriflow-api.rule=Host(`nutriflow-api.${DOMAIN:?defina DOMAIN no .env da stack}`)"
+        - traefik.http.routers.nutriflow-api.entrypoints=websecure
+        - traefik.http.routers.nutriflow-api.tls=true
+        - traefik.http.routers.nutriflow-api.tls.certresolver=letsencrypt
+        - traefik.http.services.nutriflow-api.loadbalancer.server.port=80
+        - traefik.http.services.nutriflow-api.loadbalancer.healthcheck.path=/up
+        - traefik.http.services.nutriflow-api.loadbalancer.healthcheck.interval=5s
+        - traefik.http.services.nutriflow-api.loadbalancer.healthcheck.timeout=4s
+
+networks:
+  edge:
+    external: true
+    name: infra_edge
+  shared_data:
+    external: true
+    name: infra_shared
+
+volumes:
+  nutriflow_storage:
